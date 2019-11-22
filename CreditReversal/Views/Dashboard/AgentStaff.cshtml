@@ -1,0 +1,527 @@
+﻿
+@{
+    ViewBag.Title = "AgentStaff";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+<style>
+    #placeholder {
+        width: 550px;
+        height: 300px;
+        text-align: center;
+    }
+
+    #bar {
+        width: 550px;
+        height: 300px;
+        text-align: center;
+    }
+
+    .pagination > li > a, .pagination > li > span {
+        position: unset;
+    }
+
+    .loader1 {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 100px;
+        height: 100px;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
+    }
+
+    .loader1 {
+        position: absolute;
+        top: 10%;
+        left: 50%;
+        margin: -50px 0px 0px -50px;
+        z-index: 1000;
+    }
+
+    @@-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    span1 {
+        font: bold;
+        color: red;
+        animation: blink 1s linear infinite;
+    }
+
+    @@keyframes blink {
+        0% {
+            opacity: 0;
+        }
+
+        50% {
+            opacity: .9;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+</style>
+<div class="loader1"> </div>
+<div id="overlay"></div>
+<title>Staff Dashboard</title>
+<h3>Staff Dashboard</h3>
+<div class="row">
+
+    <div class="col-lg-6">
+
+        <div class="portlet portlet-boxed">
+            <div class="portlet-header">
+                <h4 class="portlet-title">
+                    <u>New Clients</u>
+                </h4>
+                <span class="pull-right" style="padding-right:15px;">
+                    <a href="/Client/CreateClient?from=db" class="btn btn-secondary">Add NewClient</a>
+                </span>
+            </div> <!-- /.portlet-header -->
+            <div class="portlet-body">
+                <div class="table-responsive" style="min-height:350px;">
+                    <table class="table table-bordered" id="tblnewClient">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>DOB</th>
+                                <th>Signed Up Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.Clients.Count > 0)
+                            {
+                                int i = 0;
+
+                                foreach (var item in ViewBag.Clients)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="/Client/CreateClient?ClientId=@item.ClientId&Mode=Edit&from=sdb">@item.Name</a>
+                                        </td>
+                                        <td>@item.DOB.ToString("MM/dd/yyyy")</td>
+                                        <td>@item.SignedUpDate.ToString("MM/dd/yyyy")</td>
+                                        <td>
+
+                                            @if (ViewBag.staffId == item.AgentStaffId)
+                                            {
+                                                <input type="hidden" id="clientid_@i" value="@item.ClientId" />
+                                                if (item.IdentityStatus)
+                                                {
+                                                    @*<button id="btn_@i" name="buttonpull" class="btn btn-secondary btn-xs PullCreditItems">Credit Pull</button>*@
+                                                    @*<a href="/Client/CreditPull?clientId=@item.ClientId&Mode=Edit&from=db" class="btn btn-secondary btn-xs">Credit Pull</a>*@
+                                                    <a onclick="pullcreditFirstTime(@item.ClientId);" class="btn btn-secondary btn-xs">Credit Pull</a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="/Client/CreateClient?ClientId=@item.ClientId&Mode=Edit&from=db" class="btn btn-secondary btn-xs">Complete Setup</a>
+                                                }
+                                                <a class="btn btn-danger btn-xs" onclick="btnDelete('@item.ClientId')">
+                                                    <span class="glyphicon glyphicon-remove" aria-hidden="true" title="Delete"></span>
+                                                </a>
+
+                                            }
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center">No records found</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="portlet portlet-boxed">
+            <div class="portlet-header">
+                <h4 class="portlet-title">
+                    <u>Active Clients</u>
+                </h4>
+            </div> <!-- /.portlet-header -->
+            <div class="portlet-body">
+                <div class="table-responsive" style="min-height:350px;">
+                    <table class="table table-bordered" id="tblactiveClient">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                @*<th>DOB</th>*@
+                                <th>Current Status</th>
+                                <th>Next Action</th>
+                                <th>Due Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @if (ViewBag.ActiveClients.Count > 0)
+                            {
+                                int i = 0;
+                                foreach (var item in ViewBag.ActiveClients)
+                                {
+                                    <tr>
+                                        <td width="10%"><a href="/Client/CreateClient?ClientId=@item.ClientId&Mode=Edit&from=db">@item.Name</a></td>
+                                        @*<td>@item.DOB.ToString("MM/dd/yyyy")</td>*@
+                                        <td width="15%">@item.CurrentStatus</td>
+                                        <td width="15%">@item.NextAction</td>
+
+                                        <td class="blink">
+                                            @{
+                                                DateTime date = DateTime.Now;
+                                                string st = date.ToString("MM/dd/yyyy");
+                                            }
+                                            @if (item.DueDate != null)
+                                            {
+                                                int value = DateTime.Compare(date, item.DueDate);
+
+                                                if (value < 0)
+                                                {
+                                                    @item.DueDate.ToString("MM/dd/yyyy")
+                                                }
+                                                else
+                                                {
+                                                    <span1> @item.DueDate.ToString("MM/dd/yyyy") </span1>
+
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            <input type="hidden" id="client_@i" value="@item.ClientId" />
+                                            @*<button id="btn_@i" name="Viewcreditpull" class="btn btn-secondary btn-xs Viewcreditpull">Credit Pull</button>*@
+                                            @*<a href="/Client/CreditPull?clientId=@item.ClientId&Mode=Edit&from=db" class="btn btn-secondary btn-xs">Credit Pull</a>*@
+                                            <div style="height:25px">
+                                                <a onclick="pullcredit(@item.ClientId);" class="btn btn-secondary btn-xs" title="View Credit Pull">View Credit Pull</a>
+                                                </div>
+                                            <div>
+                                                <a href="/Agent/Challenges?ClientId=@item.ClientId" class="btn btn-secondary btn-xs" title="View Challenges">View Challenges</a>
+                                            </div>
+                                                
+                                        </td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center">No records found</td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="portlet portlet-boxed">
+            <div class="portlet-header">
+                <h4 class="portlet-title">
+                    <u>Active Clients by Status</u>
+                </h4>
+            </div> <!-- /.portlet-header -->
+            <div class="portlet-body">
+                <div id="vertical-chart" class="chart-holder"></div>
+            </div> <!-- /.portlet-body -->
+        </div> <!-- /.portlet -->
+    </div> <!-- /.col -->
+
+</div>
+<script>
+    function pullcredit(id) {
+        try {
+            $(".loader1").show();
+            $("#overlay").show();
+            location.href = "/Client/CreditPull?clientId=" + id + "&Mode=Edit&from=db";
+        } catch (e) {
+            $(".loader1").hide();
+            $("#overlay").hide();
+        }
+    }
+    function pullcreditFirstTime(id) {
+        try {
+            $(".loader1").show();
+            $("#overlay").show();
+            location.href = "/Client/CreditPullFirstTime?clientId=" + id + "&Mode=Edit&from=db";
+        } catch (e) {
+            $(".loader1").hide();
+            $("#overlay").hide();
+        }
+    }
+    $(document).ready(function () {
+         $(".loader1").hide();
+        $("#overlay").hide();
+		var newclients = @Html.Raw(Json.Encode(ViewBag.Clients.Count));
+		var activeclients = @Html.Raw(Json.Encode(ViewBag.ActiveClients.Count));
+
+		if (newclients > 0) {
+			$('#tblnewClient').DataTable({
+				"pagingType": "simple",
+				"lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+			});
+		}
+		if (activeclients > 0) {
+			$('#tblactiveClient').DataTable({
+				"pagingType": "simple",
+				"lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+			});
+		}
+
+         $(function () {
+
+		   var currentTime = new Date()
+		   var year = currentTime.getFullYear();
+             var d1 = [], d2 = [], d3 = [], data, chartOptions;
+		   var round1 = @Html.Raw(Json.Encode(ViewBag.ActiveRoundOne));
+		var round2 = @Html.Raw(Json.Encode(ViewBag.ActiveRoundTwo));
+		var round3 = @Html.Raw(Json.Encode(ViewBag.ActiveRoundThree));
+		   console.log(round1);
+		   console.log(round2);
+		   console.log(round3);
+		var round1len = round1.length;
+		var round2len = round2.length;
+		var round3len = round3.length;
+		//FOR ROUND-1
+
+		   for (var i = 1; i < round1len; i++) {
+			   var arr = [new Date(year, round1[i].Month, 1), round1[i].clients];
+			   d1.push(arr);
+		   }
+
+		   //FOR ROUND-2
+		   for (var i = 1; i < round2len; i++) {
+			   var arr = [new Date(year, round2[i].Month, 1), round2[i].clients];
+			   d2.push(arr);
+		   }
+
+		   //FOR ROUND-3
+		   for (var i = 1; i < round3len; i++) {
+			   var arr = [new Date(year, round3[i].Month, 1), round3[i].clients];
+			   d3.push(arr);
+		   }
+		   console.log(d1);
+		   console.log(d2);
+		   console.log(d3);
+		data = [{
+			label: 'First Round',
+			data: d1,
+			bars: {
+				order: 0
+			}
+		}, {
+			label: 'Second Round',
+			data: d2,
+			bars: {
+				order: 1
+			}
+		}, {
+			label: 'Third Round',
+			data: d3,
+			bars: {
+				order: 2
+			}
+		}];
+
+		chartOptions = {
+			xaxis: {
+				min: (new Date(year,01, 01)).getTime(),
+				max: (new Date(year, 12, 31)).getTime(),
+				mode: "time",
+				tickSize: [1, "month"],
+				monthNames: ["","Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+				tickLength: 0
+			},
+
+			grid: {
+				hoverable: true,
+				clickable: false,
+				borderWidth: 0
+			},
+
+			bars: {
+				show: true,
+                barWidth: 12 * 24 * 60 * 60 *  300,
+				fill: true,
+				lineWidth: 1,
+				lineWidth: 0,
+				fillColor: { colors: [{ opacity: 1 }, { opacity: 1 }] }
+			},
+
+			tooltip: true,
+			tooltipOpts: {
+				content: '%s: %y'
+			},
+			colors: mvpready_core.layoutColors
+		}
+		var holder = $('#vertical-chart');
+
+		if (holder.length) {
+			$.plot(holder, data, chartOptions);
+		}
+
+        });
+        //////////////////////////////////////////
+
+	});
+
+
+	$(".PullCreditItems,.Creditpull").on("click", function () {
+
+		debugger;
+		var Id = 0;
+		var name = this.name;
+
+		if (name == "buttonpull") {
+			var btnid = this.id;
+			var i = btnid.split('_').pop();
+			var clientId = "clientid_" + i;
+			var val = document.getElementById(clientId).value;
+			Id = val;
+		} else if (name == "creditpull") {
+			var btnid = this.id;
+			var i = btnid.split('_').pop();
+			var clientId = "client_" + i;
+			var val = document.getElementById(clientId).value;
+			Id = val;
+		}
+		var values = new Array();
+		values.push({
+			'MerchantName': "BANK OF USA",
+			'AccountId': "656458-XXXXX",
+			'OpenDate': "06/1988",
+			'CurrentBalance': "$20,000",
+			'HighestBalance': "$30,000",
+			'Status': "Pays as Agreed",
+		});
+		$.ajax({
+			method: "POST",
+			url: "/Client/CheckIdentityIQInfo",
+			data: { clientId: Id },
+			dataType: "json",
+			success: function (data) {
+
+				if (data == true) {
+
+					$.ajax({
+						method: "POST",
+						url: "/Client/AddCreditReport",
+						dataType: "json",
+						data: { credit: values, clientId: Id },
+						success: function (data) {
+							debugger;
+							var ReportId = data;
+							if (ReportId == "report") {
+								Swal.fire({
+									title: "Warning!",
+									text: "Records already pulled!",
+									type: 'warning',
+
+								}).then(function () {
+								})
+							}
+							else {
+
+								window.location.href = "/Client/CreditItems?ClientId=" + Id + "&from=db";
+							}
+
+						}
+					});
+				}
+
+
+				else {
+
+					Swal.fire({
+						title: "Warning!",
+						text: "Identity IQ Information not available.",
+						type: 'warning',
+
+					}).then(function () {
+
+					})
+				}
+			}
+		});
+
+	});
+
+
+
+	$(".Viewcreditpull").on("click", function () {
+
+		debugger;
+		var Id = 0;
+		var name = this.name;
+
+		if (name == "buttonpull") {
+			var btnid = this.id;
+			var i = btnid.split('_').pop();
+			var clientId = "clientid_" + i;
+			var val = document.getElementById(clientId).value;
+			Id = val;
+		} else if (name == "Viewcreditpull") {
+			var btnid = this.id;
+			var i = btnid.split('_').pop();
+			var clientId = "client_" + i;
+			var val = document.getElementById(clientId).value;
+			Id = val;
+		}
+		window.location.href = "/Client/CreditItems?ClientId=" + Id + "&from=db";
+
+	});
+	function btnDelete(ClientId) {
+		debugger;
+		Swal.fire({
+			title: 'Are you sure?',
+			text: "You want delete this client !",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then(function (isConfirm) {
+			if (isConfirm.value == true) {
+				var serviceURL = '/Dashboard/DeleteClient';
+				$.ajax({
+					type: "POST",
+					url: serviceURL,
+					data: { 'ClientId': ClientId },
+					cache: false,
+					dataType: "json",
+				});
+				window.location = "/dashboard/agentstaff";
+			}
+
+		})
+
+	}
+</script>
+

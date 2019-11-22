@@ -1,0 +1,233 @@
+﻿
+@{
+    ViewBag.Title = "Challenged Items";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+
+<div class="page-header">
+    <div style="padding-bottom:10px;">
+        <ol class="breadcrumb pull-right">
+            <li class="breadcrumb-item"><a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+            <li class="breadcrumb-item active">Challenged Items </li>
+        </ol>
+    </div>
+</div>
+<link href="~/Content/css/loader.css" rel="stylesheet" />
+<div class="portlet portlet-boxed">
+    <div class="portlet-header">
+        <h4 class="portlet-title">
+            <u>Challenged Items</u>
+        </h4>
+
+    </div> <!-- /.portlet-header -->
+    <div class="portlet-body">
+        <div class="row" style="padding-bottom:2px;padding-top:15px;">
+            <h5>Account History</h5>
+        </div>
+        <div class="row" style="padding-bottom:12px;">
+
+            <div class="table-responsive">
+                <table id="tblClientChallenges" class="table table-bordered">
+                    <thead>
+                        <tr class="trTable">
+                            <th style="cursor: pointer;">
+                                Agent
+                            </th>
+                            <th style="cursor: pointer;">
+                                Agency Name
+                            </th>
+                            <th style="cursor: pointer;">
+                                Challenge Date
+                            </th>
+                            <th style="cursor: pointer;">
+                                Merchant Name
+                            </th>
+                            <th style="cursor: pointer;">
+                                Account Number
+                            </th>
+                            <th style="cursor: pointer;">
+                                Open Date
+                            </th>
+                            <th style="cursor: pointer;">
+                                Current Balance
+                            </th>
+                            <th style="cursor: pointer;">
+                                Highest Balance
+                            </th>
+                            @*<th style="cursor: pointer;">
+                                Challenge Text
+                            </th>*@
+                            <th style="cursor: pointer;">
+                                Status
+                            </th>
+                            @*<th>
+                                Actions
+                            </th>*@
+                            @*<th style="max-width:100px;"> Actions</th>*@
+                        </tr>
+                    </thead>
+                    @if (ViewBag.CreditReportItems != null && ViewBag.CreditReportItems.Count > 0)
+                    {
+                        <tbody>
+                            @foreach (var item in ViewBag.CreditReportItems)
+                            {
+                                <tr class="trBody">
+                                    <td>
+                                        <span>@item.Agent</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.Agency</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.ChallengeCreatedDate</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.MerchantName</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.AccountId</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.OpenDate</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.CurrentBalance</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.HighestBalance</span>
+                                    </td>
+                                    @*<td>
+                                        <span>@item.Challenge</span>
+                                    </td>*@
+
+                                    <td>
+                                        <span>@item.Status</span>
+                                    </td>
+                                    @{
+                                        string path = "/Documents/Challenge/Challenge-" + @ViewBag.name + "-" + @item.CredRepItemsId + ".pdf";
+                                    }
+                                    @*<td> <a target="_blank" class="btn btn-secondary" href="@path"> View </a></td>*@
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                </table>
+            </div>
+
+
+        </div>
+
+        <div class="row" style="padding-bottom:2px;padding-top:15px;">
+            <h5>Inquiries</h5>
+        </div>
+        <div class="row" style="padding-bottom:12px;">
+
+            <div class="table-responsive">
+                <table id="tblClientInq" class="table table-bordered">
+                    <thead>
+                        <tr class="trTable">
+                            <th style="cursor: pointer;">
+                                Creditor Name
+                            </th>
+                            <th style="cursor: pointer;">
+                                Type of Business
+                            </th>
+                            <th style="cursor: pointer;">
+                                Date of inquiry
+                            </th>
+                            <th style="cursor: pointer;">
+                                Agency
+                            </th>
+                            @*<th style="cursor: pointer;">
+                                ChallengeText
+                            </th>*@
+                           
+                        </tr>
+                    </thead>
+                    @if (ViewBag.CreditReportInquiresItems != null && ViewBag.CreditReportInquiresItems.Count > 0)
+                    {
+                        <tbody>
+                            @foreach (var item in ViewBag.CreditReportInquiresItems)
+                            {
+                                <tr class="trBody">
+                                    <td>
+                                        <span>@item.CreditorName</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.TypeofBusiness</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.Dateofinquiry</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.CreditBureau</span>
+                                    </td>
+                                    @*<td>
+                                        <span>@item.ChallengeText</span>
+                                    </td>*@
+                                   
+                                    @*@{
+                                        string path = "/Documents/Challenge/Challenge-" + @ViewBag.name + "-" + @item.CredRepItemsId + ".pdf";
+                                    }*@
+                                    @*<td> <a target="_blank" class="btn btn-secondary" href="@path"> View </a></td>*@
+                                </tr>
+                            }
+                        </tbody>
+                    }
+                </table>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+
+    $(document).ready(function () {
+        try {
+            $('#tblClientChallenges').DataTable({
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+            });
+
+            $('#tblClientInq').DataTable({
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+            });
+        }
+        catch (e) { }
+
+    });
+    function btnDelete(AgentBillingId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want delete this Billing Type !",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(function (isConfirm) {
+            if (isConfirm.value == true) {
+
+                var serviceURL = '/Agent/DeleteAgentBilling';
+                $.ajax({
+                    type: "POST",
+                    url: serviceURL,
+                    data: { 'AgentBillingId': AgentBillingId },
+                    cache: false,
+                    dataType: "json",
+                });
+
+
+                window.location = "/Agent/BillingList";
+            }
+
+        })
+
+    }
+</script>
+
+

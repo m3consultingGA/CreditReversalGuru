@@ -1,0 +1,1518 @@
+﻿
+@{
+    /**/
+
+    ViewBag.Title = "Credit Items";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+    string from = null, role = null;
+    if (Request["from"] != null)
+    {
+        from = "db";
+    }
+    if (Session["UserRole"] != null)
+    {
+        role = Session["UserRole"].ToString();
+    }
+}
+<style>
+
+    .input-group .form-control {
+        position: unset;
+    }
+
+    .tdClass {
+        font-weight: 600;
+    }
+
+    .loader1 {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 100px;
+        height: 100px;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
+    }
+
+    .loader1 {
+        position: absolute;
+        top: 1%;
+        left: 50%;
+        margin: -50px 0px 0px -50px;
+        z-index: 50;
+    }
+
+    @@-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+<title>Credit Items</title>
+@if (ViewBag.CreditRepItemId != null)
+{
+    <input type="hidden" id="hdnCreditRepItemId" value="@ViewBag.CreditRepItemId" />
+}
+<div class="page-header">
+    <h3 class="page-title">Credit Items</h3>
+    <div style="padding-bottom:10px;">
+        <ol class="breadcrumb pull-right">
+            <li class="breadcrumb-item">
+                <a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a>
+            </li>
+            @*@if (from == null)
+                {
+                    <li class="breadcrumb-item">
+                        <a href="/Client/Index"><i class="fa fa-user"></i>&nbsp;Manage Clients</a>
+                    </li>
+                }*@
+            <li class="breadcrumb-item active">Credit Items </li>
+        </ol>
+    </div>
+</div>
+<div class="loader1"> </div>
+<div id="overlay"></div>
+
+<div class="col-md-12">
+    <div class="row">
+        <div class="portlet portlet-boxed">
+            <div class="portlet-header">
+                <h4 class="portlet-title">
+                    <u>Credit Items</u>
+                </h4>
+
+            </div> <!-- /.portlet-header -->
+            <div class="portlet-body">
+                <div class="row" style="padding-bottom:12px;padding-top:5px;">
+                    @if (ViewBag.AgentName != null)
+                    {
+
+                        if (role.ToUpper() != "CLIENT")
+                        {
+                            <div class="col-md-3">
+                                <label>Client:</label> @ViewBag.Cname
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-3">
+                                <label>Agent:</label> @ViewBag.AgentName
+                            </div>
+                        }
+
+                        <div class="col-md-3">
+                            <label>Pull Credit Date:</label> @ViewBag.DateReportPulls
+                        </div>
+                        <div class="col-md-3">
+                            <label>Round:</label> @ViewBag.Round
+                        </div>
+
+                        <input type="hidden" id="hdnRound" value="@ViewBag.Round" />
+                    }
+
+                </div>
+
+
+                <div class="row" style="padding-bottom:12px;">
+                    <span class="pull-left"><h5>Account History</h5></span>
+                    @if (role.ToUpper() != "CLIENT")
+                    {
+                        <span class="pull-right">
+                            <button class="btn btn-secondary" id="RefreshCreditPull">Refresh Credit Pull</button>
+                            <button class="btn btn-secondary" id="AddChallenge">Create Challenge</button>
+                        </span>
+                    }
+                </div>
+
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th width="20%"></th>
+                                    <th width="23%" style="text-align:center;background-color:#DAB96A;color:#fff;">TransUnion</th>
+                                    <th width="23%" style="text-align:center;background-color:#98BDC5;color:#fff;">Experian</th>
+                                    <th width="23%" style="text-align:center;background-color:#CBD06C;color:#fff;">Equifax</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.challenges != null)
+                                {
+                                    var i = 0;
+                                    var j = 0;
+                                    //string StatusEQUIFAX = "";
+                                    //string StatusEXPERIAN = "";
+                                    //string StatusTRANSUNION = "";
+
+                                    foreach (var item in ViewBag.challenges)
+                                    {
+
+                                        //if (i == 7)
+                                        //{
+
+                                        //    StatusEQUIFAX = item.EQUIFAX;
+                                        //    StatusEXPERIAN = item.EXPERIAN;
+                                        //    StatusTRANSUNION = item.TRANSUNION;
+                                        //}
+                                        <tr>
+
+                                            @if (role.ToUpper() != "CLIENT" && item.Heading != "CreditreportId")
+                                            {
+                                                //displaying all headings except creditreportid for agent
+                                                <td class="tdClass">@item.Heading</td>
+                                            }
+                                            else
+                                            {
+                                                //displaying all headings except Challenge and creditreportid for client
+                                                if (item.Heading != "Challenge" && item.Heading != "CreditreportId")
+                                                {
+                                                    <td class="tdClass">@item.Heading</td>
+                                                }
+
+                                            }
+
+                                            @if (i == 3 || i == 4 || i == 5)
+                                            {
+                                                //High Credit and Balance and monthly payment right alignment
+                                                <td align="right">@item.TRANSUNION</td>
+                                                <td align="right">@item.EXPERIAN</td>
+                                                <td align="right">@item.EQUIFAX</td>
+                                            }
+                                            else if (i == 0)
+                                            {
+
+                                                //bank name bold color
+                                                <td style="font-weight:600">@item.TRANSUNION</td>
+                                                <td style="font-weight:600">@item.EXPERIAN</td>
+                                                <td style="font-weight:600">@item.EQUIFAX</td>
+                                            }
+                                            else
+                                            {
+
+                                                if (i == 8)
+                                                {
+                                                    if (role.ToUpper() != "CLIENT")
+                                                    {
+
+                                                        //transunion challenge text dropdown
+                                                        if (item.TRANSUNION == "" || item.TRANSUNION == "-")
+                                                        {
+                                                            <td></td>
+                                                        }
+                                                        else if (item.TRANSUNION == "" || item.TRANSUNION == "0")
+                                                        {
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkTRANS_@j">
+                                                                    </span>
+                                                                    <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="TRANSChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                    <datalist id="challenges" class="dropdown">
+                                                                        @if (ViewBag.challengeMasters.Count > 0)
+                                                                        {
+                                                                            foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                            {
+                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                            }
+                                                                        }
+                                                                    </datalist>
+                                                                </div>
+
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkTRANS_@j" checked disabled>
+                                                                    </span>
+                                                                    <input type="text" list="challenges" class="form-control challengestext" value="@item.TRANSUNION" placeholder="Select challenge" id="TRANSChallenge_@j" name="TRChallenge" style="width:200px" disabled />
+                                                                    <datalist id="challenges" class="dropdown">
+                                                                        @if (ViewBag.challengeMasters.Count > 0)
+                                                                        {
+                                                                            foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                            {
+                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                            }
+                                                                        }
+                                                                    </datalist>
+                                                                </div>
+                                                            </td>
+                                                        }
+
+
+                                                        //EXPERIAN challenge text dropdown
+                                                        if (item.EXPERIAN == "" || item.EXPERIAN == "-")
+                                                        {
+                                                            <td></td>
+                                                        }
+                                                        else if (item.EXPERIAN == "" || item.EXPERIAN == "0")
+                                                        {
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkEXPE_@j">
+                                                                    </span>
+                                                                    <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="EXPEChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                    <datalist id="challenges" class="dropdown">
+                                                                        @if (ViewBag.challengeMasters.Count > 0)
+                                                                        {
+                                                                            foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                            {
+                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                            }
+                                                                        }
+                                                                    </datalist>
+                                                                </div>
+
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkEXPE_@j" checked disabled>
+                                                                    </span>
+                                                                    <input type="text" list="challenges" class="form-control challengestext" value="@item.EXPERIAN" placeholder="Select challenge" id="EXPEChallenge_@j" name="TRChallenge" style="width:200px" disabled />
+                                                                    <datalist id="challenges" class="dropdown">
+                                                                        @if (ViewBag.challengeMasters.Count > 0)
+                                                                        {
+                                                                            foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                            {
+                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                            }
+                                                                        }
+                                                                    </datalist>
+                                                                </div>
+                                                            </td>
+                                                        }
+
+                                                        //EQUIFAX challenge text dropdown
+                                                        if (item.EQUIFAX == "" || item.EQUIFAX == "-")
+                                                        {
+                                                            <td></td>
+                                                        }
+                                                        else if (item.EQUIFAX == "" || item.EQUIFAX == "0")
+                                                        {
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkEQUI_@j">
+                                                                    </span>
+                                                                    <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="EQUIChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                    <datalist id="challenges" class="dropdown">
+                                                                        @if (ViewBag.challengeMasters.Count > 0)
+                                                                        {
+                                                                            foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                            {
+                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                            }
+                                                                        }
+                                                                    </datalist>
+                                                                </div>
+
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkEQUI_@j" checked disabled>
+                                                                    </span>
+                                                                    <input type="text" list="challenges" class="form-control challengestext" value="@item.EQUIFAX" placeholder="Select challenge" id="EQUIChallenge_@j" name="TRChallenge" style="width:200px" ; disabled />
+                                                                    <datalist id="challenges" class="dropdown">
+                                                                        @if (ViewBag.challengeMasters.Count > 0)
+                                                                        {
+                                                                            foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                            {
+                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                            }
+                                                                        }
+                                                                    </datalist>
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    if (item.Heading != "CreditreportId")
+                                                    {
+
+                                                        string[] str = null;
+
+                                                        string negativeitemTU = "0";
+                                                        string negativeitemEX = "0";
+                                                        string negativeitemEQ = "0";
+
+                                                        string statusTU = item.TRANSUNION;
+                                                        string statusEX = item.EXPERIAN;
+                                                        string statusEQ = item.EQUIFAX;
+                                                        if (i == 7)
+                                                        {
+
+                                                            if (item.TRANSUNION != "-")
+                                                            {
+
+                                                                str = item.TRANSUNION.Split('~');
+                                                                string late = string.Empty;
+                                                                late = string.IsNullOrEmpty(str[2]) ? "" : " ( " + str[2] + " ) ";
+                                                                statusTU = str[0] + late;
+                                                                negativeitemTU = str[1];
+                                                            }
+
+                                                            if (item.EXPERIAN != "-")
+                                                            {
+                                                                str = item.EXPERIAN.Split('~');
+                                                                string late = string.Empty;
+                                                                late = string.IsNullOrEmpty(str[2]) ? "" : " ( " + str[2] + " ) ";
+                                                                statusEX = str[0] + late;
+                                                                negativeitemEX = str[1];
+                                                            }
+
+                                                            if (item.EQUIFAX != "-")
+                                                            {
+                                                                str = item.EQUIFAX.Split('~');
+                                                                string late = string.Empty;
+                                                                late = string.IsNullOrEmpty(str[2]) ? "" : " ( " + str[2] + " ) ";
+                                                                statusEQ = str[0] + late;
+                                                                negativeitemEQ = str[1];
+                                                            }
+
+                                                        }
+
+
+
+
+                                                        //showing Late 30 Days challenge text in red background
+                                                        if (negativeitemTU != "0" && i == 7)
+                                                        {
+                                                            <td style="background-color:red;color:white">@statusTU</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>@statusTU</td>
+                                                        }
+                                                        if (negativeitemEX != "0" && i == 7)
+                                                        {
+                                                            <td style="background-color:red;color:white">@statusEX</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>@statusEX</td>
+                                                        }
+                                                        if (negativeitemEQ != "0" && i == 7)
+                                                        {
+                                                            <td style="background-color:red;color:white">@statusEQ</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>@statusEQ</td>
+                                                        }
+
+                                                    }
+
+
+                                                }
+
+
+                                            }
+                                        </tr>
+
+                                        i++;
+                                        j++;
+                                        if (i == 10)
+                                        {
+                                            <lable id="hdnEXPECreditRepItemId_@j" hidden>@item.EXPERIAN</lable>
+                                            <lable id="hdnEQUICreditRepItemId_@j" hidden>@item.EQUIFAX</lable>
+                                            <lable id="hdnTRANSCreditRepItemId_@j" hidden>@item.TRANSUNION</lable>
+                                        }
+                                        if (i == 10)
+                                        {
+                                            <tr>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td> </td>
+                                            </tr>
+                                            i = 0;
+                                        }
+
+                                    }
+
+
+
+                                }
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
+
+                @*anothertablae*@
+                <div class="row" style="padding-bottom:12px;">
+
+                    <span class="pull-left"><h5>Inquiries</h5></span>
+                    @if (role.ToUpper() != "CLIENT")
+                    {
+                        <span class="pull-right">
+                            <button class="btn btn-secondary" id="AddInquiriesChallenge">Create Challenge</button>
+                        </span>
+                    }
+
+                </div>
+
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th width="20%"></th>
+
+                                    <th width="23%" style="text-align:center;background-color:#DAB96A;color:#fff;">TransUnion</th>
+                                    <th width="23%" style="text-align:center;background-color:#98BDC5;color:#fff;">Experian</th>
+                                    <th width="23%" style="text-align:center;background-color:#CBD06C;color:#fff;">Equifax</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.Inquires != null)
+                                {
+                                    var i = 0;
+                                    var j = 0;
+
+
+                                    foreach (var item in ViewBag.Inquires)
+                                    {
+
+
+                                <tr>
+
+                                    @if (role.ToUpper() != "CLIENT" && item.Heading != "CreditInqId")
+                                    {
+                                        //displaying all headings except creditreportid for agent
+                                        <td class="tdClass">@item.Heading</td>
+                                    }
+                                    else
+                                    {
+                                        //displaying all headings except Challenge and creditreportid for client
+                                        if (item.Heading != "Challenge" && item.Heading != "CreditInqId")
+                                        {
+                                            <td class="tdClass">@item.Heading</td>
+                                        }
+
+                                    }
+
+
+                                    @if (i == 0)
+                                    {
+
+                                        //bank name bold color
+                                        <td style="font-weight:600">@item.TRANSUNION</td>
+                                        <td style="font-weight:600">@item.EXPERIAN</td>
+                                        <td style="font-weight:600">@item.EQUIFAX</td>
+                                    }
+                                    else
+                                    {
+
+                                        if (i == 3)
+                                        {
+                                            if (role.ToUpper() != "CLIENT")
+                                            {
+                                                //if (role.ToUpper() == "AGENTADMIN")
+                                                //{
+
+                                                //transunion challenge text dropdown
+
+                                                if (item.TRANSUNION == "" || item.TRANSUNION == "-")
+                                                {
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j">
+                                                            </span>
+                                                            <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="TRANSInquiriesChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                            <datalist id="challenges" class="dropdown">
+                                                                @if (ViewBag.challengeMasters.Count > 0)
+                                                                {
+                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                    {
+                                                                        <option value="@challengeitem.ChallengeText" />
+                                                                    }
+                                                                }
+                                                            </datalist>
+                                                        </div>
+
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" checked disabled>
+                                                            </span>
+                                                            <input type="text" list="challenges" class="form-control challengestext" value="@item.TRANSUNION" placeholder="Select challenge" id="TRANSInquiriesChallenge_@j" name="TRChallenge" style="width:200px" disabled />
+                                                            @if (item.TRANSUNION != "")
+                                                            {
+                                                                <lable id="hdnTRANSUNIONchallgtxt" hidden>@item.TRANSUNION</lable>
+                                                            }
+                                                            <datalist id="challenges" class="dropdown">
+                                                                @if (ViewBag.challengeMasters.Count > 0)
+                                                                {
+                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                    {
+                                                                        <option value="@challengeitem.ChallengeText" />
+                                                                    }
+                                                                }
+                                                            </datalist>
+                                                        </div>
+                                                    </td>
+                                                }
+
+
+                                                //EXPERIAN challenge text dropdown
+
+                                                if (item.EXPERIAN == "" || item.EXPERIAN == "-")
+                                                {
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j">
+                                                            </span>
+                                                            <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="EXPEInquiriesChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                            <datalist id="challenges" class="dropdown">
+                                                                @if (ViewBag.challengeMasters.Count > 0)
+                                                                {
+                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                    {
+                                                                        <option value="@challengeitem.ChallengeText" />
+                                                                    }
+                                                                }
+                                                            </datalist>
+                                                        </div>
+
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" checked disabled>
+                                                            </span>
+                                                            <input type="text" list="challenges" class="form-control challengestext" value="@item.EXPERIAN" placeholder="Select challenge" id="EXPEInquiriesChallenge_@j" name="TRChallenge" style="width:200px" disabled />
+                                                            @if (item.EXPERIAN != "")
+                                                            {
+                                                                <lable id="hdnEXPERIANchallgtxt" hidden>@item.EXPERIAN</lable>
+                                                            }
+
+                                                            <datalist id="challenges" class="dropdown">
+                                                                @if (ViewBag.challengeMasters.Count > 0)
+                                                                {
+                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                    {
+                                                                        <option value="@challengeitem.ChallengeText" />
+                                                                    }
+                                                                }
+                                                            </datalist>
+                                                        </div>
+                                                    </td>
+                                                }
+
+                                                //EQUIFAX challenge text dropdown
+
+                                                if (item.EQUIFAX == "" || item.EQUIFAX == "-")
+                                                {
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j">
+                                                            </span>
+                                                            <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="EQUIInquiriesChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                            <datalist id="challenges" class="dropdown">
+                                                                @if (ViewBag.challengeMasters.Count > 0)
+                                                                {
+                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                    {
+                                                                        <option value="@challengeitem.ChallengeText" />
+                                                                    }
+                                                                }
+                                                            </datalist>
+                                                        </div>
+
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">
+                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" checked disabled>
+                                                            </span>
+                                                            <input type="text" list="challenges" class="form-control challengestext" value="@item.EQUIFAX" placeholder="Select challenge" id="EQUIInquiriesChallenge_@j" name="TRChallenge" style="width:200px" disabled />
+                                                            @if (item.EQUIFAX != "")
+                                                            {
+                                                                <lable id="hdnEQUIFAXchallgtxt" hidden>@item.EQUIFAX</lable>
+                                                            }
+
+                                                            <datalist id="challenges" class="dropdown">
+                                                                @if (ViewBag.challengeMasters.Count > 0)
+                                                                {
+                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                    {
+                                                                        <option value="@challengeitem.ChallengeText" />
+                                                                    }
+                                                                }
+                                                            </datalist>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            if (item.Heading != "CreditInqId")
+                                            {
+                                                <td>@item.TRANSUNION</td>
+                                                <td>@item.EXPERIAN</td>
+                                                <td>@item.EQUIFAX</td>
+
+                                            }
+
+
+                                        }
+
+
+                                    }
+                                </tr>
+
+                                        i++;
+                                        j++;
+                                        if (i == 5)
+                                        {
+                                            <lable id="hdnEXPECreditInqId_@j" hidden>@item.EXPERIAN</lable>
+                                            <lable id="hdnEQUICreditInqId_@j" hidden>@item.EQUIFAX</lable>
+                                            <lable id="hdnTRANSCreditInqId_@j" hidden>@item.TRANSUNION</lable>
+                                        }
+                                        if (i == 5)
+                                        {
+                                            <tr>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td> </td>
+                                            </tr>
+                                            i = 0;
+                                        }
+
+                                    }
+
+
+
+                                }
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+                @*nsdfl*@
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $(".loader1").hide();
+        $("#overlay").hide();
+        var Status = '@ViewBag.Status';
+        var Round = '@ViewBag.Round';
+        if (Round == 'Third Round') {
+            if (Status=='true') {
+                $("#RefreshCreditPull").attr("disabled", true);
+                $("#AddChallenge").attr("disabled", true);
+            }
+        }
+    });
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+    };
+
+    var Id = getUrlParameter('ClientId');
+    var from = getUrlParameter('from');
+	var role = @Html.Raw(Json.Encode(ViewBag.Role))
+
+
+    //Creating Account History Challenges
+    $("#AddChallenge").click(function () {
+            //debugger;
+            var items=@Html.Raw(Json.Encode(ViewBag.challenges));
+            var i = 0;
+
+            var AllAgenciesvalues = new Array();
+
+            for (var i = 0; i < items.length; i++) {
+
+                    var EQUIChallenge = $("#EQUIChallenge_" + i).val();
+                    var EXPEChallenge = $("#EXPEChallenge_" + i).val();
+                    var TRANSChallenge = $("#TRANSChallenge_" + i).val();
+
+                var k = i + 2;
+                var hdnEQUICreditRepItemId = $("#hdnEQUICreditRepItemId_" + k).text();
+                var hdnEXPECreditRepItemId = $("#hdnEXPECreditRepItemId_" + k).text();
+                var hdnTRANSCreditRepItemId = $("#hdnTRANSCreditRepItemId_" + k).text();
+
+
+
+
+                //if ($("#chkEQUI_" + i).prop("checked") == true ) {
+                //    if (EQUIChallenge == "") {
+                //        Swal.fire("Warning!", "Please select challenge !", 'warning');
+                //        $("#EQUIChallenge_" + i).focus();
+                //        return false;
+                //    }
+                //}
+                //else if ($("#chkEQUI_" + i).prop("checked") == false) {
+
+                //    Swal.fire("Warning!", "Please select challenge !", 'warning');
+                //    $("#EQUIChallenge_" + i).focus();
+                //    return false;
+
+                //}
+
+                //if ($("#chkEXPE_" + i).prop("checked") == true) {
+
+                //    if (EXPEChallenge == "") {
+                //        Swal.fire("Warning!", "Please select challenge !", 'warning');
+                //        $("#EXPEChallenge_" + i).focus();
+                //        return false;
+                //    }
+                //}
+                //else if ($("#chkEXPE_" + i).prop("checked") == false) {
+                //    Swal.fire("Warning!", "Please check challenge !", 'warning');
+                //    return false;
+                //}
+
+                //if ($("#chkTRANS_" + i).prop("checked") == true) {
+
+                //    if (TRANSChallenge == "") {
+                //        Swal.fire("Warning!", "Please select challenge !", 'warning');
+                //        $("#TRANSChallenge_" + i).focus();
+                //        return false;
+                //    }
+                //}
+                //else if ($("#chkTRANS_" + i).prop("checked") == false) {
+                //    Swal.fire("Warning!", "Please check challenge !", 'warning');
+                //    $("#TRANSChallenge_" + i).focus();
+                //    return false;
+                //}
+
+                var isCheckboxdisabled = $('#chkEQUI_' + i).is(':disabled');
+                if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditRepItemId != "" && isCheckboxdisabled == false) {
+                    debugger
+                    
+                    if ($("#chkEQUI_" + i).prop("checked") == true) {
+                        AllAgenciesvalues.push({
+                            'Challenge': EQUIChallenge,
+                            'CredRepItemsId': hdnEQUICreditRepItemId,
+                        });
+                    } else {
+                        Swal.fire("Warning!", "Please check challenge !", 'warning');
+                        return false;
+                    }
+                }
+
+                 var isCheckboxdisabled = $('#chkEXPE_' + i).is(':disabled');
+                if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditRepItemId != "" && isCheckboxdisabled == false) {
+                    //debugger;
+                    
+                    if ($("#chkEXPE_" + i).prop("checked") == true) {
+
+                        AllAgenciesvalues.push({
+                            'Challenge': EXPEChallenge,
+                            'CredRepItemsId': hdnEXPECreditRepItemId,
+                        });
+                    } else {
+                        Swal.fire("Warning!", "Please check challenge !", 'warning');
+                        return false;
+                    }
+                }
+
+                var isCheckboxdisabled = $('#chkTRANS_' + i).is(':disabled');
+                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditRepItemId != ""  && isCheckboxdisabled == false) {
+                    
+                    if ($("#chkTRANS_" + i).prop("checked") == true) {
+                        AllAgenciesvalues.push({
+                            'Challenge': TRANSChallenge,
+                            'CredRepItemsId': hdnTRANSCreditRepItemId,
+                        });
+                    } else {
+                        Swal.fire("Warning!", "Please check challenge !", 'warning');
+                        return false;
+                    }
+                }
+
+            }
+
+
+            if (AllAgenciesvalues.length == 0)
+            {
+                Swal.fire("Warning!", "Please select challenge !", 'warning');
+                return false;
+            }
+
+
+
+            var values = new Array();
+            var ClientId = getUrlParameter('ClientId');
+
+            var res = 0;
+            values.push(@Html.Raw(Json.Encode(ViewBag.AgentName)));
+            values.push(@Html.Raw(Json.Encode(ViewBag.Cname)));
+            values.push(@Html.Raw(Json.Encode(ViewBag.DateReportPulls)));
+            values.push(@Html.Raw(Json.Encode(ViewBag.Round)));
+
+        $(".loader1").show();
+        $("#overlay").show();
+            //debugger;
+        $.ajax({
+            method: "POST",
+            url: "/Client/ClientChallengeform",
+            dataType: "json",
+            data: { credit: AllAgenciesvalues, Id: ClientId, values: values },
+            success: function (data) {
+                //debugger;
+                if (data == true) {
+                    $(".loader1").hide();
+                    $("#overlay").hide();
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Challenge created successfully.!",
+                        type: 'success',
+                    }).then(function () {
+                        if (from == "db")
+                        {
+                            if (role == "agentadmin")
+                            {
+								window.location.href = "/dashboard/agent";
+                            }
+                            else if (role == "agentstaff") {
+								window.location.href = "/dashboard/staff";
+							}
+                        }
+                        else
+                        {
+                           window.location.href = "/Client/CreditItems?ClientId=" + Id;
+
+                        }
+                    })
+                }
+                else {
+
+                    $(".loader1").hide();
+                    $("#overlay").hide();
+                    location.reload();
+
+                }
+            }
+        });
+
+
+
+
+    });
+
+
+    //Creating Inquiries Challenges
+    $("#AddInquiriesChallenge").click(function () {
+            //debugger;
+            var items=@Html.Raw(Json.Encode(ViewBag.Inquires));
+            var i = 0;
+
+            var AllAgenciesvalues = new Array();
+
+            for (var i = 0; i < items.length; i++) {
+
+                //Reading  Inquiries challenge text from Inquiries table 
+                    var EQUIChallenge = $("#EQUIInquiriesChallenge_" + i).val();
+                    var EXPEChallenge = $("#EXPEInquiriesChallenge_" + i).val();
+                    var TRANSChallenge = $("#TRANSInquiriesChallenge_" + i).val();
+
+                //Reading  CreditInqId from  Inquiries table 
+                var k = i + 2;
+                var hdnEQUICreditInqId = $("#hdnEQUICreditInqId_" + k).text();
+                var hdnEXPECreditInqId = $("#hdnEXPECreditInqId_" + k).text();
+                var hdnTRANSCreditInqId = $("#hdnTRANSCreditInqId_" + k).text();
+
+
+                var isCheckboxdisabled = $('#chkInquiriesEQUI_' + i).is(':disabled');
+                if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditInqId != "" && isCheckboxdisabled == false) {
+                    
+                    if ($("#chkInquiriesEQUI_" + i).prop("checked") == true) {
+                        AllAgenciesvalues.push({
+                            'ChallengeText': EQUIChallenge,
+                            'CreditInqId': hdnEQUICreditInqId,
+                        });
+                    } else {
+                        Swal.fire("Warning!", "Please check challenge !", 'warning');
+                        return false;
+                    }
+                }
+                 var isCheckboxdisabled = $('#chkInquiriesEXPE_' + i).is(':disabled');
+                if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditInqId != "" && isCheckboxdisabled == false) {
+                    //debugger;
+                   
+                    if ($("#chkInquiriesEXPE_" + i).prop("checked") == true) {
+
+                        AllAgenciesvalues.push({
+                            'ChallengeText': EXPEChallenge,
+                            'CreditInqId': hdnEXPECreditInqId,
+                        });
+                    } else {
+                        Swal.fire("Warning!", "Please check challenge !", 'warning');
+                        return false;
+                    }
+                }
+                var isCheckboxdisabled = $('#chkInquiriesTRANS_' + i).is(':disabled');
+                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditInqId != "" && isCheckboxdisabled == false) {
+                    
+                    if ($("#chkInquiriesTRANS_" + i).prop("checked") == true) {
+                        AllAgenciesvalues.push({
+                            'ChallengeText': TRANSChallenge,
+                            'CreditInqId': hdnTRANSCreditInqId,
+                        });
+                    } else {
+                        Swal.fire("Warning!", "Please check challenge !", 'warning');
+                        return false;
+                    }
+                }
+
+            }
+
+
+            if (AllAgenciesvalues.length == 0)
+            {
+                Swal.fire("Warning!", "Please select challenge !", 'warning');
+                return false;
+            }
+
+
+
+            var values = new Array();
+
+            var Id = getUrlParameter('ClientId');
+           
+            values.push(@Html.Raw(Json.Encode(ViewBag.AgentName)));
+            values.push(@Html.Raw(Json.Encode(ViewBag.Cname)));
+            values.push(@Html.Raw(Json.Encode(ViewBag.DateReportPulls)));
+            values.push(@Html.Raw(Json.Encode(ViewBag.Round)));
+
+        $(".loader1").show();
+        $("#overlay").show();
+            //debugger;
+        $.ajax({
+            method: "POST",
+            url: "/Client/ClientChallengeInquiresform",
+            dataType: "json",
+            data: { credit: AllAgenciesvalues, Id: Id, values: values },
+            success: function (data) {
+                //debugger;
+                if (data == true) {
+                    $(".loader1").hide();
+                    $("#overlay").hide();
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Challenge created successfully.!",
+                        type: 'success',
+                    }).then(function () {
+                        if (from == "db")
+                        {
+                            if (role == "agentadmin")
+                            {
+								window.location.href = "/dashboard/agent";
+                            }
+                            else if (role == "agentstaff") {
+								window.location.href = "/dashboard/staff";
+							}
+                        }
+                        else
+                        {
+                           window.location.href = "/Client/CreditItems?ClientId=" + Id;
+
+                        }
+                    })
+                }
+                else {
+                    $(".loader1").hide();
+                    $("#overlay").hide();
+                    location.reload();
+                }
+            }
+        });
+
+
+    });
+
+    function refreshcreditpull() {
+         $(".loader1").show();
+                    $("#overlay").show();
+
+                    $.ajax({
+                        method: "POST",
+                        url: "/Client/CheckIdentityIQInfo",
+                        data: { clientId: Id },
+                        dataType: "json",
+                        success: function (data) {
+                            //debugger;
+                            if (data == true) {
+                                $.ajax({
+                                    method: "POST",
+                                    url: "/Client/AddCreditReport?mode=reset&round=" + $("#hdnRound").val(),
+                                    dataType: "json",
+                                    data: { clientId: Id },
+                                    success: function (data) {
+                                        if (data == 0) {
+                                            $(".loader1").hide();
+                                            $("#overlay").hide();
+                                            Swal.fire("Warning!", "Invalid Identity IQ details!", 'warning');
+                                            return false;
+                                        }
+                                        //debugger;
+                                        $(".loader1").hide();
+                                        $("#overlay").hide();
+                                        Swal.fire({
+                                            title: "Success!",
+                                            text: "Credit pull refreshed successfully.",
+                                            type: 'success',
+
+                                        }).then(function () {
+                                            window.location.href = "/Client/CreditItems?ClientId=" + Id + "&from=db";
+                                        })
+
+                                    }
+                                });
+                            }
+                            else {
+                                Swal.fire({
+                                    title: "Warning!",
+                                    text: "Identity IQ Information not available.",
+                                    type: 'warning',
+
+                                }).then(function () {
+
+                                })
+                            }
+                        }
+                    });
+    }
+
+    $("#RefreshCreditPull").click(function () {
+        debugger;
+        
+        //inquiries start
+        var items=@Html.Raw(Json.Encode(ViewBag.Inquires));
+            var i = 0;
+            var AllAgenciesInquiresvalues = new Array();
+            for (var i = 0; i < items.length; i++) {
+
+                //Reading  Inquiries challenge text from Inquiries table 
+                    var EQUIChallenge = $("#EQUIInquiriesChallenge_" + i).val();
+                    var EXPEChallenge = $("#EXPEInquiriesChallenge_" + i).val();
+                    var TRANSChallenge = $("#TRANSInquiriesChallenge_" + i).val();
+
+                //Reading  CreditInqId from  Inquiries table 
+                var k = i + 2;
+                var hdnEQUICreditInqId = $("#hdnEQUICreditInqId_" + k).text();
+                var hdnEXPECreditInqId = $("#hdnEXPECreditInqId_" + k).text();
+                var hdnTRANSCreditInqId = $("#hdnTRANSCreditInqId_" + k).text();
+
+
+                var isCheckboxdisabled = $('#chkInquiriesEQUI_' + i).is(':disabled');
+                if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditInqId != "" && isCheckboxdisabled == true) {
+                    
+                    if ($("#chkInquiriesEQUI_" + i).prop("checked") == true) {
+                        AllAgenciesInquiresvalues.push({
+                            'ChallengeText': EQUIChallenge,
+                            'CreditInqId': hdnEQUICreditInqId,
+                        });
+                    }
+                }
+                 var isCheckboxdisabled = $('#chkInquiriesEXPE_' + i).is(':disabled');
+                if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditInqId != "" && isCheckboxdisabled == true) {
+                    //debugger;
+                   
+                    if ($("#chkInquiriesEXPE_" + i).prop("checked") == true) {
+
+                        AllAgenciesInquiresvalues.push({
+                            'ChallengeText': EXPEChallenge,
+                            'CreditInqId': hdnEXPECreditInqId,
+                        });
+                    } 
+                }
+                var isCheckboxdisabled = $('#chkInquiriesTRANS_' + i).is(':disabled');
+                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditInqId != "" && isCheckboxdisabled == true) {
+                    
+                    if ($("#chkInquiriesTRANS_" + i).prop("checked") == true) {
+                        AllAgenciesInquiresvalues.push({
+                            'ChallengeText': TRANSChallenge,
+                            'CreditInqId': hdnTRANSCreditInqId,
+                        });
+                    }
+                    
+                }
+
+            }      
+        
+        //inquies end
+
+
+        //account historychallenge start
+        var items=@Html.Raw(Json.Encode(ViewBag.challenges));
+            var i = 0;
+            var AllAgenciesvalues = new Array();
+            for (var i = 0; i < items.length; i++) {
+
+                    var EQUIChallenge = $("#EQUIChallenge_" + i).val();
+                    var EXPEChallenge = $("#EXPEChallenge_" + i).val();
+                    var TRANSChallenge = $("#TRANSChallenge_" + i).val();
+
+                var k = i + 2;
+                var hdnEQUICreditRepItemId = $("#hdnEQUICreditRepItemId_" + k).text();
+                var hdnEXPECreditRepItemId = $("#hdnEXPECreditRepItemId_" + k).text();
+                var hdnTRANSCreditRepItemId = $("#hdnTRANSCreditRepItemId_" + k).text();
+
+
+
+
+                
+
+                var isCheckboxdisabled = $('#chkEQUI_' + i).is(':disabled');
+                if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditRepItemId != "" && isCheckboxdisabled == true) {
+                    debugger
+                    
+                    if ($("#chkEQUI_" + i).prop("checked") == true) {
+                        AllAgenciesvalues.push({
+                            'Challenge': EQUIChallenge,
+                            'CredRepItemsId': hdnEQUICreditRepItemId,
+                        });
+                    } else {
+                        Swal.fire("Warning!", "Please check challenge !", 'warning');
+                        return false;
+                    }
+                }
+
+                 var isCheckboxdisabled = $('#chkEXPE_' + i).is(':disabled');
+                if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditRepItemId != "" && isCheckboxdisabled == true) {
+                    //debugger;
+                    
+                    if ($("#chkEXPE_" + i).prop("checked") == true) {
+
+                        AllAgenciesvalues.push({
+                            'Challenge': EXPEChallenge,
+                            'CredRepItemsId': hdnEXPECreditRepItemId,
+                        });
+                    } else {
+                        Swal.fire("Warning!", "Please check challenge !", 'warning');
+                        return false;
+                    }
+                }
+
+                var isCheckboxdisabled = $('#chkTRANS_' + i).is(':disabled');
+                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditRepItemId != "" && isCheckboxdisabled == true) {
+                    
+                    if ($("#chkTRANS_" + i).prop("checked") == true) {
+                        AllAgenciesvalues.push({
+                            'Challenge': TRANSChallenge,
+                            'CredRepItemsId': hdnTRANSCreditRepItemId,
+                        });
+                    } else {
+                        Swal.fire("Warning!", "Please check challenge !", 'warning');
+                        return false;
+                    }
+                }
+
+            }
+        //account historychallenge end
+
+
+        if (AllAgenciesvalues.length > 0 || AllAgenciesInquiresvalues.length > 0) {
+            debugger
+          
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Challenges already created. Do you want to refresh!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Continue it!'
+            }).then((result) => {
+                if (result.value) {
+                    //debugger;
+                    refreshcreditpull();
+                    //
+                }
+            })
+        } else {
+             refreshcreditpull();
+            
+        }
+        
+
+
+       
+
+       
+
+
+
+    });
+    //$("#AddChallenge").click(function () {
+
+    //    ////debugger;
+    //    var values = new Array();
+    //    var cha = new Array();
+    //    var status = true;
+    //    var Id = getUrlParameter('ClientId');
+    //    var countchecked = $("table input[type=checkbox]:checked").length;
+
+    //    if (countchecked == 0) {
+    //        Swal.fire("Warning", "please select at least one checkbox", "warning");
+    //        return false;
+    //    }
+
+
+    //    //if (cha == 0) {
+    //    //    Swal.fire("!Warning", "please check at least one checkbox", "warning");
+    //    //    return false;
+    //    //}
+    //    $(":input[name='case[]']:checked").each(function (i) {
+
+    //        ////debugger;
+    //        var data = $(this).parents('tr:eq(0)');
+    //        var td = $(data).find('td:eq(8)').find('input').val();
+
+    //        if (td == "" || td == undefined) {
+    //            Swal.fire("Warning", "Please select challenge", "warning");
+    //            $(data).find('td:eq(8)').find('input').focus();
+    //            return false;
+    //        }
+    //        ////debugger;
+    //        values.push({
+    //            'MerchantName': $(data).find('td:eq(3)').text(),
+    //            'AccountId': $(data).find('td:eq(4)').text(),
+    //            'OpenDate': $(data).find('td:eq(5)').text(),
+    //            'CurrentBalance': $(data).find('td:eq(6)').text(),
+    //            'HighestBalance': $(data).find('td:eq(7)').text(),
+    //            'Challenge': $(data).find('td:eq(8)').find('input').val(),
+    //            'CredRepItemsId': $(data).find('td:eq(9)').text(),
+    //        });
+
+    //    });
+
+
+    //    ////debugger;
+    //    console.log(values);
+
+    //    for (var i = 0; i < values.length; i++) {
+    //        cha[i] = values[i].Challenge;
+    //    }
+
+    //    ////debugger;
+    //    var res = 0;
+    //    if (countchecked == cha.length) {
+    //        $(".loader1").show();
+    //        $("#overlay").show();
+    //            $.ajax({
+    //                method: "POST",
+    //                url: "/Client/ClientChallengeform",
+    //                dataType: "json",
+    //                data: { credit: values, Id: Id },
+    //                success: function (data) {
+    //                    if (data == true) {
+    //                        Swal.fire({
+    //                            title: "Success!",
+    //                            text: "Challenge created successfully.!",
+    //                            type: 'success',
+
+
+    //                        }).then(function () {
+    //                            if (from == "db") {
+    //                                window.location.href = "/dashboard/agent";
+    //                            } else {
+    //                                window.location.href = "/Client/CreditItems?ClientId=" + Id;
+    //                            }
+    //                        })
+    //                    }
+    //                    else {
+    //                        $(".loader1").hide();
+    //                        $("#overlay").hide();
+    //                    }
+    //                }
+    //            });
+
+    //        //i = 0;
+
+    //    }
+
+
+    //});
+
+    $("#PullCreditItems").on("click", function () {
+
+        ////debugger;
+        var values = new Array();
+        values.push({
+            'MerchantName': "BANK OF USA",
+            'AccountId': "656458-XXXXX",
+            'OpenDate': "06/1988",
+            'CurrentBalance': "$20,000",
+            'HighestBalance': "$30,000",
+            'Status': "30-daysleft",
+        });
+        //values.push({
+        //    'MerchantName': "AXIS",
+        //    'AccountId': "546321789",
+        //    'OpenDate': "02-03-2000",
+        //    'CurrentBalance': "600",
+        //    'HighestBalance': "800",
+        //    'Status': "30-daysleft",
+        //});
+        //values.push({
+        //    'MerchantName': "Merchant3",
+        //    'AccountId': "456",
+        //    'OpenDate': "2019-09-10",
+        //    'CurrentBalance': "700",
+        //    'HighestBalance': "900",
+        //    'Status': "30-daysleft",
+        //});
+        //values.push({
+        //    'MerchantName': "Merchant4",
+        //    'AccountId': "675",
+        //    'OpenDate': "2019-09-10",
+        //    'CurrentBalance': "800",
+        //    'HighestBalance': "850",
+        //    'Status': "30-daysleft",
+        //});
+        console.log(values);
+
+        $.ajax({
+            method: "POST",
+            url: "/Client/CheckIdentityIQInfo",
+            data: { clientId: Id },
+            dataType: "json",
+            success: function (data) {
+
+                if (data == true) {
+
+                    $.ajax({
+                        method: "POST",
+                        url: "/Client/AddCreditReport",
+                        dataType: "json",
+                        data: { credit: values, clientId: Id },
+                        success: function (data) {
+                            ////debugger;
+                            var ReportId = data;
+                            if (ReportId == "report") {
+                                Swal.fire({
+                                    title: "Warning!",
+                                    text: "Records already pulled!",
+                                    type: 'warning',
+
+                                }).then(function () {
+                                    window.location.href = "/Client/CreditItems?ClientId=" + Id;
+                                })
+                            }
+                            else {
+
+                                window.location.href = "/Client/CreditItems?ClientId=" + Id;
+                            }
+
+
+                            //if (ReportId != null && ReportId != "") {
+
+                            //    $.ajax({
+                            //        method: "POST",
+                            //        url: "/Client/AddCreditReportItems",
+                            //        dataType: "json",
+                            //        data: { credit: values, Id: ReportId },
+                            //        success: function (data) {
+                            //            ////debugger;
+                            //            if (data == true) {
+
+                            //                window.location.href = "/Client/CreditItems?ClientId=" + Id;
+
+                            //            }
+
+                            //        }
+                            //    });
+
+                            //} else {
+
+                            //    Swal.fire({
+                            //        title: "Warning!",
+                            //        text: "Records already pulled!",
+                            //        type: 'warning',
+
+                            //    }).then(function () {
+                            //        window.location.href = "/Client/CreditItems?ClientId=" + Id;
+                            //    })
+                            //}
+
+                        }
+                    });
+                }
+
+
+                else {
+
+                    Swal.fire({
+                        title: "Warning!",
+                        text: "Identity IQ Information not available.",
+                        type: 'warning',
+
+                    }).then(function () {
+                        window.location.href = "/Client/CreditItems?ClientId=" + Id;
+                    })
+                }
+            }
+        });
+
+    });
+</script>

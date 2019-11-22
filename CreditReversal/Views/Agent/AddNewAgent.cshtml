@@ -1,0 +1,2213 @@
+﻿@model CreditReversal.Models.Agent
+@{
+    if (Session["UserRole"] != null && Session["UserName"] != null)
+    {
+        if (Request.QueryString["Mode"] == "Edit")
+        {
+            ViewBag.Title = "Edit Agent";
+        }
+        else
+        {
+            ViewBag.Title = "Create Agent";
+        }
+
+    }
+    else
+    {
+        ViewBag.Title = "Agent Registration";
+    }
+    if (Session["UserRole"] != null && Session["UserName"] != null)
+    {
+        Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_publicLayoutPage.cshtml";
+    }
+
+}
+<br />
+<link href="~/Content/css/jquery.steps.css" rel="stylesheet" type="text/css" />
+<div class="page-header" style="padding-bottom:20px;">
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/Agent/Index"><i class="fa fa-user"></i>&nbsp;Manage Agents</a></li>
+        @{
+            if (Request != null)
+            {
+                if (Request.QueryString["Mode"] == "Edit")
+                {
+                    <li class="breadcrumb-item active">Edit Agent </li>
+                }
+                else
+                {
+                    <li class="breadcrumb-item active">Create Agent </li>
+                }
+            }
+        }
+
+    </ol>
+</div>
+
+<div class="portlet portlet-boxed">
+    <div class="portlet-header">
+
+        @if (Session["UserRole"] != null && Session["UserName"] != null)
+        {
+            if (Request.QueryString["Mode"] == "Edit")
+            {
+                <h4 class="portlet-title">Edit Agent</h4>
+            }
+            else
+            {
+                <h4 class="portlet-title">Create Agent</h4>
+            }
+
+        }
+
+
+    </div> <!-- /.portlet-header -->
+    <div class="portlet-body" style="padding-top:10px;">
+
+        <ul class="nav nav-tabs" id="guide-tabs">
+            <li class="Business active"><a data-toggle="tab" href="#home" id="navBusiness"><h6>Business Information</h6></a></li>
+            <li class="Address"><a data-toggle="tab" href="#Address" id="navAddress"><h6>Address</h6></a></li>
+            <li class="Billing"><a data-toggle="tab" href="#Billing" id="navBilling"><h6>Billing Information</h6></a></li>
+            <li class="User"><a data-toggle="tab" href="#User" id="navUser"><h6>Primary User</h6></a></li>
+
+        </ul>
+        <div class="loader"> </div>
+        <div id="overlay"></div>
+        <form method="post" action="/Agent/AddNewAgent" id="example-advanced-form"  enctype="multipart/form-data" class="wizard-enhanced wizard-horizontal parsley-form">
+            <div class="tab-content">
+                <div id="home" class="tab-pane fade in active">
+                    <div class="container">
+                        <div class="col-lg-12">
+                            <div class="form-group" id="divBusinessName">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>Business Name <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" name="BusinessName" id="BusinessName" placeholder="Business Name" onchange="RemoveValidation(this);" class="form-control" required />
+                                        @if (Request != null)
+                                        {
+                                            if (Request.QueryString["Id"] != null)
+                                            {
+
+                                                <input type="hidden" name="AgentId" id="AgentId" value="@Request.QueryString["Id"]" />
+                                            }
+
+                                        }
+
+                                        <div id="Msg_BusinessName" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>Type Of Company<span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <select class="form-control" id="TypeOfComp" name="TypeOfComp" onchange="RemoveValidation(this);" required>
+                                            <option value="0">Select Company Type</option>
+                                            @if (ViewBag.companytypes != null)
+                                            {
+                                                foreach (var item in ViewBag.companytypes)
+                                                {
+                                                    <option value="@item.CompanyTypeId">@item.CompanyType</option>
+                                                }
+                                            }
+                                        </select>
+                                        <div id="Msg_TypeOfComp" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group" id="divDBA">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="DBA">DBA </label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" id="DBA" name="DBA" placeholder="DBA">
+                                        <div id="Msg_DBA" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="divtxtSSN">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>Social Security Number <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" id="SocialSecCardNo" name="SocialSecCardNo" class="form-control" maxlength="50" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_SocialSecCardNo" class="text-danger">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <div class="form-group" id="divFileSocialSecCard">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>Social Security Card <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="file" id="SocialSecCard" name="SocialSecCard" class="form-control" accept=".pdf,.jpeg,.png,.jpg" onchange="RemoveValidation(this);" required />
+                                        <label id="lblSocialSecCard"></label>
+                                        <div id="Msg_SocialSecCard" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group" id="divDriversLicenseNumber">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>Drivers License Number <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" id="DriversLicenseNumber" name="DriversLicenseNumber" class="form-control" maxlength="50" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_DriversLicenseNumber" class="text-danger">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="divDriversLicenseState">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>Drivers License State<span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <select class="form-control" id="DriversLicenseState" name="DriversLicenseState" onchange="RemoveValidation(this);" required>
+                                            <option value="0">Select Drivers License State</option>
+                                            @if (ViewBag.States != null)
+                                            {
+                                                foreach (var item in ViewBag.States)
+                                                {
+                                                    <option value="@item.StateCode">@item.StateName</option>
+                                                }
+                                            }
+                                        </select>
+                                        <div id="Msg_DriversLicenseState" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="divDriversLicenseCopy">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>Drivers License Copy <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="file" id="DriversLicenseCopy" name="DriversLicenseCopy" class="form-control" accept=".pdf,.jpeg,.png,.jpg" onchange="RemoveValidation(this);" required />
+                                        <label id="lblDriversLicenseCopy"></label>
+                                        <div id="Msg_DriversLicenseCopy" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="divStateOfEncorp">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>State Of Incorporation <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" id="StateOfEncorp" name="StateOfEncorp" placeholder="State Of Incorporation" class="form-control" onchange="RemoveValidation(this);" required />
+                                        <div id="Msg_StateOfEncorp" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="divStateOfIncorporationProof">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>State Of Incorporation Proof <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="file" id="StateOfIncorporationProof" name="StateOfIncorporationProof" class="form-control" placeholder="State Of Incorporation Proof" accept=".pdf,.jpeg,.png,.jpg" onchange="RemoveValidation(this);" required>
+                                        <label id="lblStateOfIncorporationProof"></label>
+                                        <div id="Msg_StateOfIncorporationProof" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="divDateOfEncorp">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label>Date Of Incorporation <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" id="DateOfEncorp" name="DateOfEncorp" class="form-control" placeholder="Date Of Incorporation" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_DateOfEncorp" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="divFedTaxIdentityNo">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="FedTaxIdentityNo">Fed Tax Identity No <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" id="FedTaxIdentityNo" name="FedTaxIdentityNo" class="form-control" placeholder="Fed Tax Identity No" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_FedTaxIdentityNo" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="divFedTaxIdentityProof">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="FedTaxIdentityNo">Fed Tax Identity Proof <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="file" id="FedTaxIdentityProof" name="FedTaxIdentityProof" class="form-control" accept=".pdf,.jpeg,.png,.jpg" placeholder="Fed Tax Identity Proof" onchange="RemoveValidation(this);" required />
+                                        <label id="lblFedTaxIdentityProof"></label>
+                                        <div id="Msg_FedTaxIdentityProof" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <a class="btn btn-secondary pull-right" id="btnnext_1">Next</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Tab 2(Address Tab)-->
+                <div id="Address" class="tab-pane fade">
+
+                    <div class="container" style="border:1px solid #f8f5f5;width:auto;">
+
+                        <div class="panel-heading">
+                            <h6>Primary Business Address</h6>
+                            <hr />
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="PrimaryBusinessAdd1">Line1 <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="PrimaryBusinessAdd1" placeholder="Line1" id="PrimaryBusinessAdd1" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_PrimaryBusinessAdd1" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="PrimaryBusinessAdd1">Line2</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="PrimaryBusinessAdd2" placeholder="Line2" id="PrimaryBusinessAdd2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="PrimaryBusinessCity">City <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="PrimaryBusinessCity" placeholder="City" id="PrimaryBusinessCity" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_PrimaryBusinessCity" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="PrimaryBusinessCity">State <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="PrimaryBusinessState" placeholder="State" id="PrimaryBusinessState" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_PrimaryBusinessState" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="PrimaryBusinessCity">ZipCode <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="PrimaryBusinessZip" placeholder="ZipCode" id="PrimaryBusinessZip" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_PrimaryBusinessZip" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="PrimaryBusinessPhone">Phone <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="PrimaryBusinessPhone" placeholder="Phone" id="PrimaryBusinessPhone" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_PrimaryBusinessPhone" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="PrimaryBusinessPhone">Email <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="email" class="form-control" name="PrimaryBusinessEmail" placeholder="Email" id="PrimaryBusinessEmail" required>
+                                        <div id="Msg_PrimaryBusinessEmail" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <br />
+                    <div class="container" style="border:1px solid #f8f5f5;width:auto;">
+                        <div class="panel-heading">
+                            <h6>Billing Address</h6>
+                            <hr />
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <div class="checkbox">
+                                    <label><input type="checkbox" id="chk_primary" onchange="check()" />Same as Primary Business Address</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="PrimaryBusinessAdd1">Line1 <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="BillingAdd1" placeholder="Line1" id="BillingAdd1" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_BillingAdd1" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="PrimaryBusinessAdd1">Line2</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="BillingAdd2" placeholder="Line3" id="BillingAdd2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="BillingCity">City <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="BillingCity" placeholder="City" id="BillingCity" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_BillingCity" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="BillingState">State <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="BillingState" placeholder="State" id="BillingState" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_BillingState" class="text-danger">
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="BillingZip">ZipCode <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="BillingZip" placeholder="ZipCode" id="BillingZip" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_BillingZip" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="BillingPhone">Phone <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" name="BillingPhone" placeholder="Phone" id="BillingPhone" onchange="RemoveValidation(this);" required>
+                                        <div id="BillingPhone" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="BillingEmail">Email <span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <input type="email" class="form-control" name="BillingEmail" placeholder="Email" id="BillingEmail" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_BillingEmail" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pull-right" style="padding:20px;">
+                        <a id="btnnext_2" class="btn btn-secondary">Next</a>
+                    </div>
+                   
+                </div>
+                <div id="Billing" class="tab-pane fade">
+                    <div class="panel-heading">
+                        <h6>Billing Information</h6>
+                        <hr />
+                    </div>
+                   
+                    <div class="container">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <label>Pricing Plan <span style="color:red">*</span></label>
+                                            </div>
+
+                                            <div class="col-sm-7">
+                                                <select id="PricingPlan" name="PricingPlan" class="form-control" onchange="RemoveValidation(this);" required>
+                                                    <option value="0"> Select Option</option>
+                                                    @if (ViewBag.pricing != null)
+                                                    {
+                                                        foreach (var item in ViewBag.pricing)
+                                                        {
+                                                            <option value="@item.PricingId">@item.PricingType</option>
+                                                        }
+                                                    }
+                                                </select>
+                                                <div id="Msg_PricingPlan" class="text-danger">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <label>Billing Type <span style="color:red">*</span></label>
+                                            </div>
+                                            <div class="col-sm-7">
+                                                <input type="text" class="form-control" name="BillingType" placeholder="Billing Type" maxlength="50" id="txtBillingType" onchange="RemoveValidation(this);" required>
+                                                <div id="Msg_txtBillingType" class="text-danger">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <label>Card Type <span style="color:red">*</span></label>
+                                            </div>
+                                            @{
+                                                List<string> cardTypes = new List<string>();
+                                                cardTypes.Add("VISA");
+                                                cardTypes.Add("Capital One");
+                                                cardTypes.Add("Mastercard");
+                                            }
+                                            <div class="col-sm-7">
+                                                <select id="CardType" name="CardType" class="form-control" onchange="RemoveValidation(this);" required>
+                                                    <option value="0"> Select Option</option>
+                                                    @foreach (var item in cardTypes)
+                                                    {
+                                                        <option value="@item">@item</option>
+                                                    }
+                                                </select>
+                                                <div id="Msg_CardType" class="text-danger">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <label>
+                                                    Card Number
+                                                    <span style="color:red">*</span>
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-7">
+                                                <input type="text" class="form-control" maxlength="20" name="CardNumber" placeholder="CardNumber" id="txtCardNumber" onchange="RemoveValidation(this);" required>
+                                                <div id="Msg_txtCardNumber" class="text-danger">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <label>Expiry <span style="color:red">*</span></label>
+                                            </div>
+                                            @{
+                                                string[] Months = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
+                                                string[] Year = { "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029" };
+                                            }
+                                            <div class="col-sm-3">
+                                                <select class="form-control" name="Month" id="txtExpiryMonth" onchange="RemoveValidation(this);" required>
+                                                    <option value="0">Month</option>
+                                                    @foreach (var item in Months)
+                                                    {
+                                                        <option value="@item">@item</option>
+                                                    }
+                                                </select>
+                                                <div id="Msg_txtExpiryMonth" class="text-danger">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <select class="form-control" name="ExpiryDate" id="txtExpiryYear" onchange="RemoveValidation(this);" required>
+                                                    <option value="0">Year</option>
+                                                    @if (ViewBag.years != null)
+                                                    {
+
+                                                        foreach (var item in ViewBag.years)
+                                                        {
+                                                            <option value="@item">@item</option>
+                                                        }
+                                                    }
+                                                </select>
+                                                <div id="Msg_txtExpiryYear" class="text-danger">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <label>CVV <span style="color:red">*</span></label>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <input type="password" class="form-control" onkeypress="return isNumber(event);" maxlength="4" placeholder="CVV" name="CVV" id="txtCVV" onchange="RemoveValidation(this);" required />
+                                                <div id="Msg_txtCVV" class="text-danger">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <label>Billing Zip Code <span style="color:red">*</span></label>
+                                            </div>
+                                            <div class="col-sm-7">
+                                                <input type="text" class="form-control" onkeypress="return isNumber(event);" maxlength="10" placeholder="Billing Zip Code" name="BillingZipCode" id="BillingZipCode" onchange="RemoveValidation(this);" required />
+                                                <div id="Msg_BillingZipCode" class="text-danger">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label><span style="color:red">Note: We will save this information for recurring billing.</span></label>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-10" style="padding:20px;">
+                                            <a class="btn btn-secondary AddBilling pull-right" id="btnnext_3">Next</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="User" class="tab-pane fade">
+                    <div class="panel-heading">
+                        <h6>Primary User Details</h6>
+                        <hr />
+                    </div>
+                   
+                    <div class="container">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="FirstName">First Name<span class="errmsg" style="color:red">*</span> </label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" name="FirstName" placeholder="FirstName" id="FirstName" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_FirstName" class="text-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="LastName">Last Name<span class="errmsg" style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" name="LastName" placeholder="LastName" id="LastName" onchange="RemoveValidation(this);" required>
+                                        <div id="Msg_LastName" class="text-danger">
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="MiddleName">Middle Name</label>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" class="form-control" name="MiddleName" placeholder="Middle Name" id="MiddleName">
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                    </div>
+                                    <div class="col-md-4" style="padding:20px;">
+                                        <button type="submit" id="submit" class="btn btn-secondary pull-right">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+
+
+
+<script src="~/Content/js/jquery.steps.js"></script>
+<script src="~/Content/js/parsley.js"></script>
+@*<script src="~/Content/js/wizard.js"></script>*@
+<script>
+
+    $(document).ready(function () {
+        $(".loader").hide();
+        $("#overlay").hide();
+
+        $("#divDBA").hide();
+        $("#divStateOfEncorp").hide();
+        $("#divStateOfIncorporationProof").hide();
+        $("#divDateOfEncorp").hide();
+        $("#divFedTaxIdentityNo").hide();
+        $("#divFedTaxIdentityProof").hide();
+        $("#divtxtSSN").hide();
+        $("#divFileSocialSecCard").hide();
+        $("#divDriversLicenseNumber").hide();
+        $("#divDriversLicenseState").hide();
+        $("#divDriversLicenseCopy").hide();
+
+        
+        var Id = getUrlParameter('Id');
+        if (Id != undefined) {
+            $.ajax({
+                method: "POST",
+                url: "/Agent/AgentById",
+                dataType: "json",
+                data: { AgentId: Id },
+                success: function (agentB) {
+
+                    var d = new Date();
+                    var currentyear = d.getFullYear().toString();
+                    var yearsub = currentyear.substring(0, 2);
+                    var year = yearsub + agentB.ExpiryDate
+
+
+                    $("#TypeOfComp").prop("disabled", true);
+
+                    $("#BusinessName").val(agentB.BusinessName);
+                    $("#TypeOfComp").val(agentB.TypeOfComp);
+                    $("#DBA").val(agentB.DBA);
+                    $("#SocialSecCardNo").val(agentB.FedTaxIdentityNo);
+                    $("#lblSocialSecCard").text(agentB.FedTaxIdentitytext);
+                    $("#StateOfEncorp").val(agentB.StateOfEncorp);
+                    $("#lblStateOfIncorporationProof").text(agentB.StateOfIncorporationtext);
+                    $("#DateOfEncorp").val(agentB.DateOfEncorp);
+                    $("#FedTaxIdentityNo").val(agentB.FedTaxIdentityNo);
+                    $("#lblFedTaxIdentityProof").text(agentB.FedTaxIdentitytext);
+
+                    $("#lblDriversLicenseCopy").text(agentB.DriversLicenseCopytext);
+                    $("#DriversLicenseState").val(agentB.DriversLicenseState);
+                    $("#DriversLicenseNumber").val(agentB.DriversLicenseNumber);
+
+                    $("#PrimaryBusinessAdd1").val(agentB.PrimaryBusinessAdd1);
+                    $("#PrimaryBusinessAdd2").val(agentB.PrimaryBusinessAdd2);
+                    $("#PrimaryBusinessCity").val(agentB.PrimaryBusinessCity);
+                    $("#PrimaryBusinessState").val(agentB.PrimaryBusinessState);
+                    $("#PrimaryBusinessZip").val(agentB.PrimaryBusinessZip);
+                    $("#PrimaryBusinessPhone").val(agentB.PrimaryBusinessPhone);
+                    $("#PrimaryBusinessEmail").val(agentB.PrimaryBusinessEmail);
+                    $("#PrimaryBusinessEmail").attr("disabled", "disabled");
+
+                    $("#BillingAdd1").val(agentB.BillingAdd1);
+                    $("#BillingAdd2").val(agentB.BillingAdd2);
+                    $("#BillingCity").val(agentB.BillingCity);
+                    $("#BillingState").val(agentB.BillingState);
+                    $("#BillingZip").val(agentB.BillingZip);
+                    $("#BillingPhone").val(agentB.BillingPhone);
+                    $("#BillingEmail").val(agentB.BillingEmail);
+                    $("#PricingPlan").val(agentB.PricingPlan);
+                    $("#txtBillingType").val(agentB.BillingType);
+                    $("#CardType").val(agentB.CardType);
+                    $("#txtCardNumber").val(agentB.CardNumber);
+                    $("#txtExpiryMonth").val(agentB.Month);
+                    $("#txtExpiryYear").val(year);
+                    $("#txtCVV").val(agentB.CVV);
+                    $("#BillingZipCode").val(agentB.BillingZipCode);
+                    $("#FirstName").val(agentB.FirstName);
+                    $("#LastName").val(agentB.LastName);
+                    $("#MiddleName").val(agentB.MiddleName);
+
+                    if (agentB.TypeOfComp == 1) {
+                        $("#divDBA").show();
+                        $("#divtxtSSN").show();
+                        $("#divFileSocialSecCard").show();
+                        $("#divDriversLicenseNumber").show();
+                        $("#divDriversLicenseState").show();
+                        $("#divDriversLicenseCopy").show();
+
+                        $("#divStateOfEncorp").hide();
+                        $("#divStateOfIncorporationProof").hide();
+                        $("#divDateOfEncorp").hide();
+                        $("#divFedTaxIdentityNo").hide();
+                        $("#divFedTaxIdentityProof").hide();
+                        $("#divBusinessName").hide();
+
+                    }
+                    else {
+                        $("#divDBA").show();
+                        $("#divStateOfEncorp").show();
+                        $("#divStateOfIncorporationProof").show();
+                        $("#divDateOfEncorp").show();
+                        $("#divFedTaxIdentityNo").show();
+                        $("#divFedTaxIdentityProof").show();
+
+                        $("#divtxtSSN").hide();
+                        $("#divFileSocialSecCard").hide();
+                        $("#divDriversLicenseNumber").hide();
+                        $("#divDriversLicenseState").hide();
+                        $("#divDriversLicenseCopy").hide();
+                    }
+
+                }
+
+            });
+        }
+
+
+    });
+
+
+    $('#ReEnterPassword').on('click', function () {
+        $(this).attr('type', 'password');
+    });
+    $('#Password').on('click', function () {
+        $(this).attr('type', 'password');
+    });
+    $('#CurrentPassword').on('click', function () {
+        $(this).attr('type', 'password');
+    });
+
+
+    $('#DateOfEncorp').datepicker({
+        format: 'mm/dd/yyyy',
+        autoclose: true
+    }).datepicker("setDate", new Date());
+
+    $("#btnnext_1").click(function () {
+
+
+        var DBA = document.getElementById("DBA");
+        var businessname = document.getElementById("BusinessName");
+        var companytype = document.getElementById("TypeOfComp");
+        if ($("#BusinessName").val() == "") {
+            $("#BusinessName").focus();
+            document.getElementById("Msg_BusinessName").innerHTML = businessname.validationMessage;
+        }
+        if (companytype.value == '1') {
+
+
+            var SocialSecCardNo = document.getElementById("SocialSecCardNo");
+            var SocialSecCard = document.getElementById("SocialSecCard");
+            var DriversLicenseCopy = document.getElementById("DriversLicenseCopy");
+            var DriversLicenseState = document.getElementById("DriversLicenseState");
+            var DriversLicenseNumber = document.getElementById("DriversLicenseNumber");
+
+
+            if (!SocialSecCardNo.checkValidity()) {
+
+                document.getElementById("Msg_SocialSecCardNo").innerHTML = SocialSecCardNo.validationMessage;
+            }
+            else if (!SocialSecCard.checkValidity() && $('#lblSocialSecCard').text() == "") {
+
+                document.getElementById("Msg_SocialSecCard").innerHTML = "Please select file.";
+            }
+            else if (!DriversLicenseNumber.checkValidity()) {
+
+                document.getElementById("Msg_DriversLicenseNumber").innerHTML = DriversLicenseNumber.validationMessage;
+            }
+            else if (DriversLicenseState.value == '0') {
+
+                document.getElementById("Msg_DriversLicenseState").innerHTML = "Please select";
+                $("#Msg_DriversLicenseState").show();
+            }
+            else if (!DriversLicenseCopy.checkValidity() && $('#lblDriversLicenseCopy').text() == "") {
+
+                document.getElementById("Msg_DriversLicenseCopy").innerHTML = "Please select file.";
+            }
+            else {
+                $('#guide-tabs li:eq(1) a').tab('show');
+            }
+        }
+        else if (companytype.value == '0') {
+            document.getElementById("Msg_TypeOfComp").innerHTML = "Please select";
+        }
+        else {
+            var FedTaxIdentityNo = document.getElementById("FedTaxIdentityNo");
+            var StateOfEncorp = document.getElementById("StateOfEncorp");
+            var DateOfEncorp = document.getElementById("DateOfEncorp");
+            var StateOfIncorporationProof = document.getElementById("StateOfIncorporationProof");
+            var FedTaxIdentityProof = document.getElementById("FedTaxIdentityProof");
+
+            if (!businessname.checkValidity()) {
+                $("#BusinessName").focus();
+                document.getElementById("Msg_BusinessName").innerHTML = businessname.validationMessage;
+            }
+
+            else if (!StateOfEncorp.checkValidity()) {
+
+                document.getElementById("Msg_StateOfEncorp").innerHTML = StateOfEncorp.validationMessage;
+            }
+            else if (!StateOfIncorporationProof.checkValidity() && $('#lblStateOfIncorporationProof').text() == "") {
+
+                document.getElementById("Msg_StateOfIncorporationProof").innerHTML = "Please select file.";
+            }
+            else if (!DateOfEncorp.checkValidity()) {
+
+                document.getElementById("Msg_DateOfEncorp").innerHTML = DateOfEncorp.validationMessage;
+            }
+            else if (!FedTaxIdentityNo.checkValidity()) {
+
+                document.getElementById("Msg_FedTaxIdentityNo").innerHTML = FedTaxIdentityNo.validationMessage;;
+            }
+            else if (!FedTaxIdentityProof.checkValidity() && $('#lblFedTaxIdentityProof').text() == "") {
+
+                document.getElementById("Msg_FedTaxIdentityProof").innerHTML = "Please select file.";
+            }
+            else {
+                $('#guide-tabs li:eq(1) a').tab('show');
+            }
+        }
+
+
+
+    })
+
+    $("#btnnext_2").click(function () {
+
+        var businessadd1 = document.getElementById("PrimaryBusinessAdd1");
+        var primarycity = document.getElementById("PrimaryBusinessCity");
+        var primarystate = document.getElementById("PrimaryBusinessState");
+        var primaryzip = document.getElementById("PrimaryBusinessZip");
+        var primaryphone = document.getElementById("PrimaryBusinessPhone");
+        var primaryemail = document.getElementById("PrimaryBusinessEmail");
+
+
+        var billingadd1 = document.getElementById("BillingAdd1");
+        var billingcity = document.getElementById("BillingCity");
+        var billingstate = document.getElementById("BillingState");
+        var billingzip = document.getElementById("BillingZip");
+        var billingphone = document.getElementById("BillingPhone");
+        var billingemail = document.getElementById("BillingEmail");
+
+
+
+        if (!businessadd1.checkValidity()) {
+            $("#PrimaryBusinessAdd1").focus();
+            document.getElementById("Msg_PrimaryBusinessAdd1").innerHTML = businessadd1.validationMessage;
+        }
+        else if (!primarycity.checkValidity()) {
+            $("#PrimaryBusinessCity").focus();
+            document.getElementById("Msg_PrimaryBusinessCity").innerHTML = primarycity.validationMessage;
+        }
+        else if (!primarystate.checkValidity()) {
+            $("#PrimaryBusinessState").focus();
+            document.getElementById("Msg_PrimaryBusinessState").innerHTML = primarystate.validationMessage;
+        }
+        else if (!primaryzip.checkValidity()) {
+            $("#PrimaryBusinessZip").focus();
+            document.getElementById("Msg_PrimaryBusinessZip").innerHTML = primaryzip.validationMessage;
+        }
+        else if (!primaryphone.checkValidity()) {
+            $("#PrimaryBusinessPhone").focus();
+            document.getElementById("Msg_PrimaryBusinessPhone").innerHTML = primaryphone.validationMessage;
+        }
+        else if (!primaryemail.checkValidity()) {
+            $("#PrimaryBusinessEmail").focus();
+            document.getElementById("Msg_PrimaryBusinessEmail").innerHTML = primaryemail.validationMessage;
+        }
+        else if (!billingadd1.checkValidity()) {
+            $("#BillingAdd1").focus();
+            document.getElementById("Msg_BillingAdd1").innerHTML = billingadd1.validationMessage;
+        }
+        else if (!billingcity.checkValidity()) {
+            $("#BillingCity").focus();
+            document.getElementById("Msg_BillingCity").innerHTML = billingcity.validationMessage;
+        }
+        else if (!billingstate.checkValidity()) {
+            $("#BillingState").focus();
+            document.getElementById("Msg_BillingState").innerHTML = billingstate.validationMessage;
+        }
+        else if (!billingzip.checkValidity()) {
+            $("#BillingZip").focus();
+            document.getElementById("Msg_BillingZip").innerHTML = billingzip.validationMessage;
+        }
+        else if (!billingphone.checkValidity()) {
+            $("#BillingPhone").focus();
+            document.getElementById("Msg_BillingPhone").innerHTML = billingphone.validationMessage;
+        }
+        else if (!billingemail.checkValidity()) {
+            $("#BillingEmail").focus();
+            document.getElementById("Msg_BillingEmail").innerHTML = billingemail.validationMessage;
+        }
+        else {
+            $("#Msg_BillingAdd1").hide();
+            $("#Msg_BillingCity").hide();
+            $("#Msg_BillingState").hide();
+            $("#Msg_BillingZip").hide();
+            $("#Msg_BillingPhone").hide();
+            $("#Msg_BillingEmail").hide();
+            $('#guide-tabs li:eq(2) a').tab('show');
+        }
+
+    })
+
+    $("#btnnext_3").click(function () {
+
+
+        var pricingplan = document.getElementById("PricingPlan");
+        var billingtype = document.getElementById("txtBillingType");
+        var cardtype = document.getElementById("CardType");
+        var cardnumber = document.getElementById("txtCardNumber");
+        var month = document.getElementById("txtExpiryMonth");
+        var year = document.getElementById("txtExpiryYear");
+        var cvv = document.getElementById("txtCVV");
+        var zipcode = document.getElementById("BillingZipCode");
+
+        if (pricingplan.value == '0') {
+            $("#PricingPlan").focus();
+            document.getElementById("Msg_PricingPlan").innerHTML = "Please select";
+            $("#Msg_PricingPlan").show();
+        }
+        else if (!billingtype.checkValidity()) {
+            $("#txtBillingType").focus();
+            document.getElementById("Msg_txtBillingType").innerHTML = billingtype.validationMessage;
+        }
+        else if (cardtype.value == '0') {
+            $("#CardType").focus();
+            document.getElementById("Msg_CardType").innerHTML = "Please select";
+            $("#Msg_CardType").show();
+        }
+        else if (!cardnumber.checkValidity()) {
+            $("#txtCardNumber").focus();
+            document.getElementById("Msg_txtCardNumber").innerHTML = cardnumber.validationMessage;
+        }
+        else if (month.value == '0') {
+            $("#txtExpiryMonth").focus();
+            document.getElementById("Msg_txtExpiryMonth").innerHTML = "Please select Month.";
+        }
+        else if (year.value == '0') {
+            $("#txtExpiryYear").focus();
+            document.getElementById("Msg_txtExpiryYear").innerHTML = "Please select Year.";
+        }
+        else if (!cvv.checkValidity()) {
+            $("#txtCVV").focus();
+            document.getElementById("Msg_txtCVV").innerHTML = cvv.validationMessage;
+        }
+        else if (!zipcode.checkValidity()) {
+            $("#BillingZipCode").focus();
+            document.getElementById("Msg_BillingZipCode").innerHTML = zipcode.validationMessage;
+        }
+        else {
+            $('#guide-tabs li:eq(3) a').tab('show');
+        }
+
+    })
+
+    function check() {
+        if ($("#chk_primary").prop('checked') == true) {
+            $("#BillingAdd1").val($("#PrimaryBusinessAdd1").val());
+            $("#BillingAdd2").val($("#PrimaryBusinessAdd2").val());
+            $("#BillingEmail").val($("#PrimaryBusinessEmail").val());
+            $("#BillingCity").val($("#PrimaryBusinessCity").val());
+            $("#BillingState").val($("#PrimaryBusinessState").val());
+            $("#BillingZip").val($("#PrimaryBusinessZip").val());
+            $("#BillingPhone").val($("#PrimaryBusinessPhone").val());
+        }
+        else {
+            $("#BillingAdd1").val("");
+            $("#BillingAdd2").val("");
+            $("#BillingEmail").val("");
+            $("#BillingCity").val("");
+            $("#BillingState").val("");
+            $("#BillingZip").val("");
+            $("#BillingPhone").val("");
+        }
+    }
+
+    $("#submit").click(function () {
+
+
+        document.querySelector('#StateOfEncorp').required = false;
+        document.querySelector('#StateOfIncorporationProof').required = false;
+        document.querySelector('#FedTaxIdentityNo').required = false;
+        document.querySelector('#FedTaxIdentityProof').required = false;
+
+        document.querySelector('#SocialSecCardNo').required = false;
+        document.querySelector('#SocialSecCard').required = false;
+        document.querySelector('#DriversLicenseNumber').required = false;
+        document.querySelector('#DriversLicenseCopy').required = false;
+        document.querySelector('#DriversLicenseState').required = false;
+        document.querySelector('#DateOfEncorp').required = false;
+
+
+
+
+        var fname = document.getElementById("FirstName");
+        var lname = document.getElementById("LastName");
+        if (!fname.checkValidity()) {
+            $("#FirstName").focus();
+            document.getElementById("Msg_FirstName").innerHTML = fname.validationMessage;
+            return false;
+        } else if (!lname.checkValidity()) {
+
+            $("#LastName").focus();
+            document.getElementById("Msg_LastName").innerHTML = lname.validationMessage;
+            return false;
+        }
+        $(".loader").show();
+        $("#overlay").show();
+
+    });
+
+    //change type of company
+    $("#TypeOfComp").change(function () {
+
+        if (this.value == "1") {
+            $("#divBusinessName").hide();
+            $("#BusinessName").val('');
+            document.querySelector('#BusinessName').required = false;
+            $("#divDBA").show();
+            $("#divtxtSSN").show();
+            $("#divFileSocialSecCard").show();
+            $("#divDriversLicenseNumber").show();
+            $("#divDriversLicenseState").show();
+            $("#divDriversLicenseCopy").show();
+
+            $("#divStateOfEncorp").hide();
+            $("#divStateOfIncorporationProof").hide();
+            $("#divDateOfEncorp").hide();
+            $("#divFedTaxIdentityNo").hide();
+            $("#divFedTaxIdentityProof").hide();
+
+        }
+        else if (this.value == "0") {
+            $("#divDBA").hide();
+            $("#divStateOfEncorp").hide();
+            $("#divStateOfIncorporationProof").hide();
+            $("#divDateOfEncorp").hide();
+            $("#divFedTaxIdentityNo").hide();
+            $("#divFedTaxIdentityProof").hide();
+
+            $("#divtxtSSN").hide();
+            $("#divFileSocialSecCard").hide();
+            $("#divDriversLicenseNumber").hide();
+            $("#divDriversLicenseState").hide();
+            $("#divDriversLicenseCopy").hide();
+            $("#divBusinessName").show();
+        }
+        else {
+            $("#divBusinessName").show();
+            $("#divDBA").show();
+            $("#divStateOfEncorp").show();
+            $("#divStateOfIncorporationProof").show();
+            $("#divDateOfEncorp").show();
+            $("#divFedTaxIdentityNo").show();
+            $("#divFedTaxIdentityProof").show();
+
+            $("#divtxtSSN").hide();
+            $("#divFileSocialSecCard").hide();
+            $("#divDriversLicenseNumber").hide();
+            $("#divDriversLicenseState").hide();
+            $("#divDriversLicenseCopy").hide();
+        }
+
+
+    });
+
+
+
+
+    //check email valid or not
+    $("#PrimaryBusinessEmail").on('change', function () {
+
+        var primaryemail = document.getElementById("PrimaryBusinessEmail");
+        var PrimaryBusinessEmail = $("#PrimaryBusinessEmail").val();
+        if (PrimaryBusinessEmail !== "") {
+            var reg = /^([A-Za-z0-9_\-\.])+\@@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+            if (reg.test(PrimaryBusinessEmail) === false) {
+                document.getElementById("Msg_PrimaryBusinessEmail").innerHTML = "Invalid Email Address";
+                $("#PrimaryBusinessEmail").val('');
+                return false;
+            }
+        }
+
+        if ($("#PrimaryBusinessEmail").val() != "") {
+            $.ajax({
+                url: '/Agent/CheckUsernameexistorNot',
+                type: 'POST',
+                data: { CurrentEmail: PrimaryBusinessEmail, ClientId: 0 },
+                //cache: false,
+                dataType: "json",
+                success: function (res) {
+
+                    if (res == true) {
+
+
+                        document.getElementById("Msg_PrimaryBusinessEmail").innerHTML = "Email Address already exists";
+                        $("#PrimaryBusinessEmail").val('');
+
+                    } else {
+                        document.getElementById("Msg_PrimaryBusinessEmail").innerHTML = "";
+                    }
+
+                }
+            });
+
+
+        }
+
+
+    });
+
+
+
+    $("#navAddress").click(function () {
+        var text = $(this).text()
+        //tab1
+        var businessname = document.getElementById("BusinessName");
+        var companytype = document.getElementById("TypeOfComp");
+        if ($("#BusinessName").val() == "" && companytype.value != '1') {
+            $("#BusinessName").focus();
+            document.getElementById("Msg_BusinessName").innerHTML = businessname.validationMessage;
+            $('#guide-tabs li:eq(0) a').tab('show');
+            return false;
+        }
+
+
+        if (companytype.value == '1') {
+
+            var SocialSecCardNo = document.getElementById("SocialSecCardNo");
+            var SocialSecCard = document.getElementById("SocialSecCard");
+            var DriversLicenseCopy = document.getElementById("DriversLicenseCopy");
+            var DriversLicenseState = document.getElementById("DriversLicenseState");
+            var DriversLicenseNumber = document.getElementById("DriversLicenseNumber");
+
+
+            if (!SocialSecCardNo.checkValidity()) {
+
+                document.getElementById("Msg_SocialSecCardNo").innerHTML = SocialSecCardNo.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!SocialSecCard.checkValidity() && $('#lblSocialSecCard').text() == "") {
+
+                document.getElementById("Msg_SocialSecCard").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!DriversLicenseNumber.checkValidity()) {
+
+                document.getElementById("Msg_DriversLicenseNumber").innerHTML = DriversLicenseNumber.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (DriversLicenseState.value == '0') {
+
+                document.getElementById("Msg_DriversLicenseState").innerHTML = "Please select";
+                $("#Msg_DriversLicenseState").show();
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!DriversLicenseCopy.checkValidity() && $('#lblDriversLicenseCopy').text() == "") {
+
+                document.getElementById("Msg_DriversLicenseCopy").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else {
+
+                if (text == "Address") {
+                    $('#guide-tabs li:eq(1) a').tab('show');
+                }
+
+            }
+
+        }
+        else if (companytype.value == '0') {
+            document.getElementById("Msg_TypeOfComp").innerHTML = "Please select";
+            $('#guide-tabs li:eq(0) a').tab('show');
+            return false;
+        }
+        else {
+            var FedTaxIdentityNo = document.getElementById("FedTaxIdentityNo");
+            var StateOfEncorp = document.getElementById("StateOfEncorp");
+            var DateOfEncorp = document.getElementById("DateOfEncorp");
+            var StateOfIncorporationProof = document.getElementById("StateOfIncorporationProof");
+            var FedTaxIdentityProof = document.getElementById("FedTaxIdentityProof");
+
+            if (!businessname.checkValidity()) {
+                $("#BusinessName").focus();
+                document.getElementById("Msg_BusinessName").innerHTML = businessname.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+
+            else if (!StateOfEncorp.checkValidity()) {
+
+                document.getElementById("Msg_StateOfEncorp").innerHTML = StateOfEncorp.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!StateOfIncorporationProof.checkValidity() && $('#lblStateOfIncorporationProof').text() == "") {
+
+                document.getElementById("Msg_StateOfIncorporationProof").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!DateOfEncorp.checkValidity()) {
+
+                document.getElementById("Msg_DateOfEncorp").innerHTML = DateOfEncorp.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!FedTaxIdentityNo.checkValidity()) {
+
+                document.getElementById("Msg_FedTaxIdentityNo").innerHTML = FedTaxIdentityNo.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!FedTaxIdentityProof.checkValidity() && $('#lblFedTaxIdentityProof').text() == "") {
+
+                document.getElementById("Msg_FedTaxIdentityProof").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else {
+                if (text == "Address") {
+                    $('#guide-tabs li:eq(1) a').tab('show');
+                }
+
+            }
+        }
+    })
+
+    $("#navBilling").click(function () {
+
+        var text = $(this).text()
+        //tab1
+        var businessname = document.getElementById("BusinessName");
+        var companytype = document.getElementById("TypeOfComp");
+        if ($("#BusinessName").val() == "" && companytype.value != '1') {
+            $("#BusinessName").focus();
+            document.getElementById("Msg_BusinessName").innerHTML = businessname.validationMessage;
+            $('#guide-tabs li:eq(0) a').tab('show');
+            return false;
+        }
+
+
+        if (companytype.value == '1') {
+
+            var SocialSecCardNo = document.getElementById("SocialSecCardNo");
+            var SocialSecCard = document.getElementById("SocialSecCard");
+            var DriversLicenseCopy = document.getElementById("DriversLicenseCopy");
+            var DriversLicenseState = document.getElementById("DriversLicenseState");
+            var DriversLicenseNumber = document.getElementById("DriversLicenseNumber");
+
+
+            if (!SocialSecCardNo.checkValidity()) {
+
+                document.getElementById("Msg_SocialSecCardNo").innerHTML = SocialSecCardNo.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!SocialSecCard.checkValidity() && $('#lblSocialSecCard').text() == "") {
+
+                document.getElementById("Msg_SocialSecCard").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!DriversLicenseNumber.checkValidity()) {
+
+                document.getElementById("Msg_DriversLicenseNumber").innerHTML = DriversLicenseNumber.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (DriversLicenseState.value == '0') {
+
+                document.getElementById("Msg_DriversLicenseState").innerHTML = "Please select";
+                $("#Msg_DriversLicenseState").show();
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!DriversLicenseCopy.checkValidity() && $('#lblDriversLicenseCopy').text() == "") {
+
+                document.getElementById("Msg_DriversLicenseCopy").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else {
+                if (text == "Address") {
+                    $('#guide-tabs li:eq(1) a').tab('show');
+                }
+
+
+            }
+
+        }
+        else if (companytype.value == '0') {
+            document.getElementById("Msg_TypeOfComp").innerHTML = "Please select";
+            $('#guide-tabs li:eq(0) a').tab('show');
+            return false;
+        }
+        else {
+            var FedTaxIdentityNo = document.getElementById("FedTaxIdentityNo");
+            var StateOfEncorp = document.getElementById("StateOfEncorp");
+            var DateOfEncorp = document.getElementById("DateOfEncorp");
+            var StateOfIncorporationProof = document.getElementById("StateOfIncorporationProof");
+            var FedTaxIdentityProof = document.getElementById("FedTaxIdentityProof");
+
+            if (!businessname.checkValidity()) {
+                $("#BusinessName").focus();
+                document.getElementById("Msg_BusinessName").innerHTML = businessname.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+
+            else if (!StateOfEncorp.checkValidity()) {
+
+                document.getElementById("Msg_StateOfEncorp").innerHTML = StateOfEncorp.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!StateOfIncorporationProof.checkValidity() && $('#lblStateOfIncorporationProof').text() == "") {
+
+                document.getElementById("Msg_StateOfIncorporationProof").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!DateOfEncorp.checkValidity()) {
+
+                document.getElementById("Msg_DateOfEncorp").innerHTML = DateOfEncorp.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!FedTaxIdentityNo.checkValidity()) {
+
+                document.getElementById("Msg_FedTaxIdentityNo").innerHTML = FedTaxIdentityNo.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!FedTaxIdentityProof.checkValidity() && $('#lblFedTaxIdentityProof').text() == "") {
+
+                document.getElementById("Msg_FedTaxIdentityProof").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else {
+                if (text == "Address") {
+                    $('#guide-tabs li:eq(1) a').tab('show');
+                }
+            }
+        }
+
+        //tab2
+        var businessadd1 = document.getElementById("PrimaryBusinessAdd1");
+        var primarycity = document.getElementById("PrimaryBusinessCity");
+        var primarystate = document.getElementById("PrimaryBusinessState");
+        var primaryzip = document.getElementById("PrimaryBusinessZip");
+        var primaryphone = document.getElementById("PrimaryBusinessPhone");
+        var primaryemail = document.getElementById("PrimaryBusinessEmail");
+
+
+        var billingadd1 = document.getElementById("BillingAdd1");
+        var billingcity = document.getElementById("BillingCity");
+        var billingstate = document.getElementById("BillingState");
+        var billingzip = document.getElementById("BillingZip");
+        var billingphone = document.getElementById("BillingPhone");
+        var billingemail = document.getElementById("BillingEmail");
+
+
+
+        if (!businessadd1.checkValidity()) {
+            $("#PrimaryBusinessAdd1").focus();
+            document.getElementById("Msg_PrimaryBusinessAdd1").innerHTML = businessadd1.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!primarycity.checkValidity()) {
+            $("#PrimaryBusinessCity").focus();
+            document.getElementById("Msg_PrimaryBusinessCity").innerHTML = primarycity.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!primarystate.checkValidity()) {
+            $("#PrimaryBusinessState").focus();
+            document.getElementById("Msg_PrimaryBusinessState").innerHTML = primarystate.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!primaryzip.checkValidity()) {
+            $("#PrimaryBusinessZip").focus();
+            document.getElementById("Msg_PrimaryBusinessZip").innerHTML = primaryzip.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!primaryphone.checkValidity()) {
+            $("#PrimaryBusinessPhone").focus();
+            document.getElementById("Msg_PrimaryBusinessPhone").innerHTML = primaryphone.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!primaryemail.checkValidity()) {
+            $("#PrimaryBusinessEmail").focus();
+            document.getElementById("Msg_PrimaryBusinessEmail").innerHTML = primaryemail.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingadd1.checkValidity()) {
+            $("#BillingAdd1").focus();
+            document.getElementById("Msg_BillingAdd1").innerHTML = billingadd1.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingcity.checkValidity()) {
+            $("#BillingCity").focus();
+            document.getElementById("Msg_BillingCity").innerHTML = billingcity.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingstate.checkValidity()) {
+            $("#BillingState").focus();
+            document.getElementById("Msg_BillingState").innerHTML = billingstate.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingzip.checkValidity()) {
+            $("#BillingZip").focus();
+            document.getElementById("Msg_BillingZip").innerHTML = billingzip.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingphone.checkValidity()) {
+            $("#BillingPhone").focus();
+            document.getElementById("Msg_BillingPhone").innerHTML = billingphone.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingemail.checkValidity()) {
+            $("#BillingEmail").focus();
+            document.getElementById("Msg_BillingEmail").innerHTML = billingemail.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else {
+            if (text == "Billing Information") {
+                $('#guide-tabs li:eq(2) a').tab('show');
+            }
+
+        }
+        //
+    })
+
+    $("#navUser").click(function () {
+
+        var text = $(this).text()
+        //tab1
+        var businessname = document.getElementById("BusinessName");
+        var companytype = document.getElementById("TypeOfComp");
+        if ($("#BusinessName").val() == "" && companytype.value != '1') {
+            $("#BusinessName").focus();
+            document.getElementById("Msg_BusinessName").innerHTML = businessname.validationMessage;
+            $('#guide-tabs li:eq(0) a').tab('show');
+            return false;
+        }
+
+
+        if (companytype.value == '1') {
+
+            var SocialSecCardNo = document.getElementById("SocialSecCardNo");
+            var SocialSecCard = document.getElementById("SocialSecCard");
+            var DriversLicenseCopy = document.getElementById("DriversLicenseCopy");
+            var DriversLicenseState = document.getElementById("DriversLicenseState");
+            var DriversLicenseNumber = document.getElementById("DriversLicenseNumber");
+
+
+            if (!SocialSecCardNo.checkValidity()) {
+
+                document.getElementById("Msg_SocialSecCardNo").innerHTML = SocialSecCardNo.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!SocialSecCard.checkValidity() && $('#lblSocialSecCard').text() == "") {
+
+                document.getElementById("Msg_SocialSecCard").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!DriversLicenseNumber.checkValidity()) {
+
+                document.getElementById("Msg_DriversLicenseNumber").innerHTML = DriversLicenseNumber.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (DriversLicenseState.value == '0') {
+
+                document.getElementById("Msg_DriversLicenseState").innerHTML = "Please select";
+                $("#Msg_DriversLicenseState").show();
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!DriversLicenseCopy.checkValidity() && $('#lblDriversLicenseCopy').text() == "") {
+
+                document.getElementById("Msg_DriversLicenseCopy").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else {
+                if (text == "Address") {
+                    $('#guide-tabs li:eq(1) a').tab('show');
+                }
+
+
+            }
+
+        }
+        else if (companytype.value == '0') {
+            document.getElementById("Msg_TypeOfComp").innerHTML = "Please select";
+            $('#guide-tabs li:eq(0) a').tab('show');
+            return false;
+        }
+        else {
+            var FedTaxIdentityNo = document.getElementById("FedTaxIdentityNo");
+            var StateOfEncorp = document.getElementById("StateOfEncorp");
+            var DateOfEncorp = document.getElementById("DateOfEncorp");
+            var StateOfIncorporationProof = document.getElementById("StateOfIncorporationProof");
+            var FedTaxIdentityProof = document.getElementById("FedTaxIdentityProof");
+
+            if (!businessname.checkValidity()) {
+                $("#BusinessName").focus();
+                document.getElementById("Msg_BusinessName").innerHTML = businessname.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+
+            else if (!StateOfEncorp.checkValidity()) {
+
+                document.getElementById("Msg_StateOfEncorp").innerHTML = StateOfEncorp.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!StateOfIncorporationProof.checkValidity() && $('#lblStateOfIncorporationProof').text() == "") {
+
+                document.getElementById("Msg_StateOfIncorporationProof").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!DateOfEncorp.checkValidity()) {
+
+                document.getElementById("Msg_DateOfEncorp").innerHTML = DateOfEncorp.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!FedTaxIdentityNo.checkValidity()) {
+
+                document.getElementById("Msg_FedTaxIdentityNo").innerHTML = FedTaxIdentityNo.validationMessage;
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else if (!FedTaxIdentityProof.checkValidity() && $('#lblFedTaxIdentityProof').text() == "") {
+
+                document.getElementById("Msg_FedTaxIdentityProof").innerHTML = "Please select file.";
+                $('#guide-tabs li:eq(0) a').tab('show');
+                return false;
+            }
+            else {
+                if (text == "Address") {
+                    $('#guide-tabs li:eq(1) a').tab('show');
+                }
+
+            }
+        }
+
+        //tab2
+        var businessadd1 = document.getElementById("PrimaryBusinessAdd1");
+        var primarycity = document.getElementById("PrimaryBusinessCity");
+        var primarystate = document.getElementById("PrimaryBusinessState");
+        var primaryzip = document.getElementById("PrimaryBusinessZip");
+        var primaryphone = document.getElementById("PrimaryBusinessPhone");
+        var primaryemail = document.getElementById("PrimaryBusinessEmail");
+
+
+        var billingadd1 = document.getElementById("BillingAdd1");
+        var billingcity = document.getElementById("BillingCity");
+        var billingstate = document.getElementById("BillingState");
+        var billingzip = document.getElementById("BillingZip");
+        var billingphone = document.getElementById("BillingPhone");
+        var billingemail = document.getElementById("BillingEmail");
+
+
+
+        if (!businessadd1.checkValidity()) {
+            $("#PrimaryBusinessAdd1").focus();
+            document.getElementById("Msg_PrimaryBusinessAdd1").innerHTML = businessadd1.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!primarycity.checkValidity()) {
+            $("#PrimaryBusinessCity").focus();
+            document.getElementById("Msg_PrimaryBusinessCity").innerHTML = primarycity.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!primarystate.checkValidity()) {
+            $("#PrimaryBusinessState").focus();
+            document.getElementById("Msg_PrimaryBusinessState").innerHTML = primarystate.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!primaryzip.checkValidity()) {
+            $("#PrimaryBusinessZip").focus();
+            document.getElementById("Msg_PrimaryBusinessZip").innerHTML = primaryzip.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!primaryphone.checkValidity()) {
+            $("#PrimaryBusinessPhone").focus();
+            document.getElementById("Msg_PrimaryBusinessPhone").innerHTML = primaryphone.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!primaryemail.checkValidity()) {
+            $("#PrimaryBusinessEmail").focus();
+            document.getElementById("Msg_PrimaryBusinessEmail").innerHTML = primaryemail.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingadd1.checkValidity()) {
+            $("#BillingAdd1").focus();
+            document.getElementById("Msg_BillingAdd1").innerHTML = billingadd1.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingcity.checkValidity()) {
+            $("#BillingCity").focus();
+            document.getElementById("Msg_BillingCity").innerHTML = billingcity.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingstate.checkValidity()) {
+            $("#BillingState").focus();
+            document.getElementById("Msg_BillingState").innerHTML = billingstate.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingzip.checkValidity()) {
+            $("#BillingZip").focus();
+            document.getElementById("Msg_BillingZip").innerHTML = billingzip.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingphone.checkValidity()) {
+            $("#BillingPhone").focus();
+            document.getElementById("Msg_BillingPhone").innerHTML = billingphone.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else if (!billingemail.checkValidity()) {
+            $("#BillingEmail").focus();
+            document.getElementById("Msg_BillingEmail").innerHTML = billingemail.validationMessage;
+            $('#guide-tabs li:eq(1) a').tab('show');
+            return false;
+        }
+        else {
+            if (text == "Billing Information") {
+                $('#guide-tabs li:eq(2) a').tab('show');
+            }
+
+        }
+        //
+        //tab3
+        var pricingplan = document.getElementById("PricingPlan");
+        var billingtype = document.getElementById("txtBillingType");
+        var cardtype = document.getElementById("CardType");
+        var cardnumber = document.getElementById("txtCardNumber");
+        var month = document.getElementById("txtExpiryMonth");
+        var year = document.getElementById("txtExpiryYear");
+        var cvv = document.getElementById("txtCVV");
+        var zipcode = document.getElementById("BillingZipCode");
+
+        if (pricingplan.value == '0') {
+            $("#PricingPlan").focus();
+            document.getElementById("Msg_PricingPlan").innerHTML = "Please select";
+            $("#Msg_PricingPlan").show();
+            $('#guide-tabs li:eq(2) a').tab('show');
+            return false;
+        }
+        else if (!billingtype.checkValidity()) {
+            $("#txtBillingType").focus();
+            document.getElementById("Msg_txtBillingType").innerHTML = billingtype.validationMessage;
+            $('#guide-tabs li:eq(2) a').tab('show');
+            return false;
+        }
+        else if (cardtype.value == '0') {
+            $("#CardType").focus();
+            document.getElementById("Msg_CardType").innerHTML = "Please select";
+            $("#Msg_CardType").show();
+            $('#guide-tabs li:eq(2) a').tab('show');
+            return false;
+        }
+        else if (!cardnumber.checkValidity()) {
+            $("#txtCardNumber").focus();
+            document.getElementById("Msg_txtCardNumber").innerHTML = cardnumber.validationMessage;
+            $('#guide-tabs li:eq(2) a').tab('show');
+            return false;
+        }
+        else if (month.value == '0') {
+            $("#txtExpiryMonth").focus();
+            document.getElementById("Msg_txtExpiryMonth").innerHTML = "Please select Month.";
+            $("#Msg_txtExpiryMonth").show();
+            $('#guide-tabs li:eq(2) a').tab('show');
+            return false;
+        }
+        else if (year.value == '0') {
+            $("#txtExpiryYear").focus();
+            document.getElementById("Msg_txtExpiryYear").innerHTML = "Please select Year.";
+            $("#Msg_txtExpiryYear").show();
+            $('#guide-tabs li:eq(2) a').tab('show');
+            return false;
+        }
+        else if (!cvv.checkValidity()) {
+            $("#txtCVV").focus();
+            document.getElementById("Msg_txtCVV").innerHTML = cvv.validationMessage;
+            $('#guide-tabs li:eq(2) a').tab('show');
+            return false;
+        }
+        else if (!zipcode.checkValidity()) {
+            $("#BillingZipCode").focus();
+            document.getElementById("Msg_BillingZipCode").innerHTML = zipcode.validationMessage;
+            $('#guide-tabs li:eq(2) a').tab('show');
+            return false;
+        }
+        else {
+            if (text == "Primary User") {
+                $('#guide-tabs li:eq(3) a').tab('show');
+            }
+
+        }
+
+
+    })
+
+    function isNumber(sText, decimals, negatives) {
+        var isNumber = true;
+        var numDecimals = 0;
+        var validChars = "0123456789";
+        if (decimals) validChars += ".";
+        if (negatives) validChars += "-";
+        var thisChar;
+        for (i = 0; i < sText.length && isNumber == true; i++) {
+            thisChar = sText.charAt(i);
+            if (negatives && thisChar == "-" && i > 0) isNumber = false;
+            if (decimals && thisChar == ".") {
+                numDecimals = numDecimals + 1;
+                if (i == 0 || i == sText.length - 1) isNumber = false;
+                if (numDecimals > 1) isNumber = false;
+            }
+            if (validChars.indexOf(thisChar) == -1) isNumber = false;
+        }
+        return isNumber;
+    }
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+    };
+    function RemoveValidation(inputid) {
+        var input = inputid.id;
+        var ID = document.getElementById(inputid.id);
+        var msgID = "Msg_" + input;
+        if (!ID.checkValidity()) {
+            $("#" + msgID).show();
+
+        } else {
+            $("#" + msgID).hide();
+        }
+    }
+
+                    //
+                    //$("#navBusiness,#navAddress,#navBilling,#navUser").click(function () {
+                    //
+                    //    var text = $(this).text()
+                    //    //tab1
+                    //    var businessname = document.getElementById("BusinessName");
+                    //    var companytype = document.getElementById("TypeOfComp");
+                    //    if ($("#BusinessName").val() == "" && companytype.value != '1') {
+                    //        $("#BusinessName").focus();
+                    //        document.getElementById("Msg_BusinessName").innerHTML = businessname.validationMessage;
+                    //        $('#guide-tabs li:eq(0) a').tab('show');
+                    //        return false;
+                    //    }
+
+
+                    //    if (companytype.value == '1') {
+                    //
+                    //        var SocialSecCardNo = document.getElementById("SocialSecCardNo");
+                    //        var SocialSecCard = document.getElementById("SocialSecCard");
+                    //        var DriversLicenseCopy = document.getElementById("DriversLicenseCopy");
+                    //        var DriversLicenseState = document.getElementById("DriversLicenseState");
+                    //        var DriversLicenseNumber = document.getElementById("DriversLicenseNumber");
+
+
+                    //        if (!SocialSecCardNo.checkValidity()) {
+
+                    //            document.getElementById("Msg_SocialSecCardNo").innerHTML = SocialSecCardNo.validationMessage;
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+                    //        else if (!SocialSecCard.checkValidity() && $('#lblSocialSecCard').text() == "") {
+
+                    //            document.getElementById("Msg_SocialSecCard").innerHTML = "Please select file.";
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+                    //        else if (!DriversLicenseNumber.checkValidity()) {
+
+                    //            document.getElementById("Msg_DriversLicenseNumber").innerHTML = DriversLicenseNumber.validationMessage;
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+                    //        else if (DriversLicenseState.value == '0') {
+
+                    //            document.getElementById("Msg_DriversLicenseState").innerHTML = "Please select";
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+                    //        else if (!DriversLicenseCopy.checkValidity() && $('#lblDriversLicenseCopy').text() == "") {
+
+                    //            document.getElementById("Msg_DriversLicenseCopy").innerHTML = "Please select file.";
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+
+                    //    }
+                    //    else if (companytype.value == '0') {
+                    //        document.getElementById("Msg_TypeOfComp").innerHTML = "Please select";
+                    //        $('#guide-tabs li:eq(0) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else {
+                    //        var FedTaxIdentityNo = document.getElementById("FedTaxIdentityNo");
+                    //        var StateOfEncorp = document.getElementById("StateOfEncorp");
+                    //        var DateOfEncorp = document.getElementById("DateOfEncorp");
+                    //        var StateOfIncorporationProof = document.getElementById("StateOfIncorporationProof");
+                    //        var FedTaxIdentityProof = document.getElementById("FedTaxIdentityProof");
+
+                    //        if (!businessname.checkValidity()) {
+                    //            $("#BusinessName").focus();
+                    //            document.getElementById("Msg_BusinessName").innerHTML = businessname.validationMessage;
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+
+                    //        else if (!StateOfEncorp.checkValidity()) {
+
+                    //            document.getElementById("Msg_StateOfEncorp").innerHTML = StateOfEncorp.validationMessage;
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+                    //        else if (!StateOfIncorporationProof.checkValidity() && $('#lblStateOfIncorporationProof').text() == "") {
+
+                    //            document.getElementById("Msg_StateOfIncorporationProof").innerHTML = "Please select file.";
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+                    //        else if (!DateOfEncorp.checkValidity()) {
+
+                    //            document.getElementById("Msg_DateOfEncorp").innerHTML = DateOfEncorp.validationMessage;
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+                    //        else if (!FedTaxIdentityNo.checkValidity()) {
+
+                    //            document.getElementById("Msg_FedTaxIdentityNo").innerHTML = FedTaxIdentityNo.validationMessage;
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+                    //        else if (!FedTaxIdentityProof.checkValidity() && $('#lblFedTaxIdentityProof').text() == "") {
+
+                    //            document.getElementById("Msg_FedTaxIdentityProof").innerHTML = "Please select file.";
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //            return false;
+                    //        }
+
+                    //    }
+
+                    //    //
+
+
+
+                    //    //tab2
+                    //    var businessadd1 = document.getElementById("PrimaryBusinessAdd1");
+                    //    var primarycity = document.getElementById("PrimaryBusinessCity");
+                    //    var primarystate = document.getElementById("PrimaryBusinessState");
+                    //    var primaryzip = document.getElementById("PrimaryBusinessZip");
+                    //    var primaryphone = document.getElementById("PrimaryBusinessPhone");
+                    //    var primaryemail = document.getElementById("PrimaryBusinessEmail");
+
+
+                    //    var billingadd1 = document.getElementById("BillingAdd1");
+                    //    var billingcity = document.getElementById("BillingCity");
+                    //    var billingstate = document.getElementById("BillingState");
+                    //    var billingzip = document.getElementById("BillingZip");
+                    //    var billingphone = document.getElementById("BillingPhone");
+                    //    var billingemail = document.getElementById("BillingEmail");
+
+
+
+                    //    if (!businessadd1.checkValidity()) {
+                    //        $("#PrimaryBusinessAdd1").focus();
+                    //        document.getElementById("Msg_PrimaryBusinessAdd1").innerHTML = businessadd1.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!primarycity.checkValidity()) {
+                    //        $("#PrimaryBusinessCity").focus();
+                    //        document.getElementById("Msg_PrimaryBusinessCity").innerHTML = primarycity.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!primarystate.checkValidity()) {
+                    //        $("#PrimaryBusinessState").focus();
+                    //        document.getElementById("Msg_PrimaryBusinessState").innerHTML = primarystate.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!primaryzip.checkValidity()) {
+                    //        $("#PrimaryBusinessZip").focus();
+                    //        document.getElementById("Msg_PrimaryBusinessZip").innerHTML = primaryzip.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!primaryphone.checkValidity()) {
+                    //        $("#PrimaryBusinessPhone").focus();
+                    //        document.getElementById("Msg_PrimaryBusinessPhone").innerHTML = primaryphone.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!primaryemail.checkValidity()) {
+                    //        $("#PrimaryBusinessEmail").focus();
+                    //        document.getElementById("Msg_PrimaryBusinessEmail").innerHTML = primaryemail.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!billingadd1.checkValidity()) {
+                    //        $("#BillingAdd1").focus();
+                    //        document.getElementById("Msg_BillingAdd1").innerHTML = billingadd1.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!billingcity.checkValidity()) {
+                    //        $("#BillingCity").focus();
+                    //        document.getElementById("Msg_BillingCity").innerHTML = billingcity.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!billingstate.checkValidity()) {
+                    //        $("#BillingState").focus();
+                    //        document.getElementById("Msg_BillingState").innerHTML = billingstate.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!billingzip.checkValidity()) {
+                    //        $("#BillingZip").focus();
+                    //        document.getElementById("Msg_BillingZip").innerHTML = billingzip.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!billingphone.checkValidity()) {
+                    //        $("#BillingPhone").focus();
+                    //        document.getElementById("Msg_BillingPhone").innerHTML = billingphone.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!billingemail.checkValidity()) {
+                    //        $("#BillingEmail").focus();
+                    //        document.getElementById("Msg_BillingEmail").innerHTML = billingemail.validationMessage;
+                    //        $('#guide-tabs li:eq(1) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    //
+                    //    //tab3
+                    //    var pricingplan = document.getElementById("PricingPlan");
+                    //    var billingtype = document.getElementById("txtBillingType");
+                    //    var cardtype = document.getElementById("CardType");
+                    //    var cardnumber = document.getElementById("txtCardNumber");
+                    //    var month = document.getElementById("txtExpiryMonth");
+                    //    var year = document.getElementById("txtExpiryYear");
+                    //    var cvv = document.getElementById("txtCVV");
+                    //    var zipcode = document.getElementById("BillingZipCode");
+
+                    //    if (pricingplan.value == '0') {
+                    //        $("#PricingPlan").focus();
+                    //        document.getElementById("Msg_PricingPlan").innerHTML = "Please select";
+                    //        $('#guide-tabs li:eq(2) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!billingtype.checkValidity()) {
+                    //        $("#txtBillingType").focus();
+                    //        document.getElementById("Msg_txtBillingType").innerHTML = billingtype.validationMessage;
+                    //        $('#guide-tabs li:eq(2) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!cardtype.checkValidity()) {
+                    //        $("#CardType").focus();
+                    //        document.getElementById("Msg_CardType").innerHTML = cardtype.validationMessage;
+                    //        $('#guide-tabs li:eq(2) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!cardnumber.checkValidity()) {
+                    //        $("#txtCardNumber").focus();
+                    //        document.getElementById("Msg_txtCardNumber").innerHTML = cardnumber.validationMessage;
+                    //        $('#guide-tabs li:eq(2) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (month.value == '0') {
+                    //        $("#txtExpiryMonth").focus();
+                    //        document.getElementById("Msg_txtExpiryMonth").innerHTML = "Please select Month.";
+                    //        $('#guide-tabs li:eq(2) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (year.value == '0') {
+                    //        $("#txtExpiryYear").focus();
+                    //        document.getElementById("Msg_txtExpiryYear").innerHTML = "Please select Year.";
+                    //        $('#guide-tabs li:eq(2) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!cvv.checkValidity()) {
+                    //        $("#txtCVV").focus();
+                    //        document.getElementById("Msg_txtCVV").innerHTML = cvv.validationMessage;
+                    //        $('#guide-tabs li:eq(2) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else if (!zipcode.checkValidity()) {
+                    //        $("#BillingZipCode").focus();
+                    //        document.getElementById("Msg_BillingZipCode").innerHTML = zipcode.validationMessage;
+                    //        $('#guide-tabs li:eq(2) a').tab('show');
+                    //        return false;
+                    //    }
+                    //    else {
+                    //        if (text == "Address") {
+                    //            $('#guide-tabs li:eq(1) a').tab('show');
+                    //        }
+                    //        else if (text == "Business Information") {
+                    //            $('#guide-tabs li:eq(0) a').tab('show');
+                    //        }
+                    //        else if (text == "Billing Information") {
+                    //            $('#guide-tabs li:eq(2) a').tab('show');
+                    //        }
+                    //        else if (text == "Primary User") {
+                    //            $('#guide-tabs li:eq(3) a').tab('show');
+                    //        }
+                    //    }
+                    //})
+                    //
+</script>
+
+
+
+
+
+
+
+
+
