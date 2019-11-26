@@ -13,5 +13,6 @@ namespace CreditReversal.Models
         public string CreateDate { get; set; }
         public string CreditRepFileId { get; set; }
         public string ClientName { get; set; }
+        public string CAgency { get; set; }
     }
 }

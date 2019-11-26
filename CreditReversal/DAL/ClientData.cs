@@ -607,21 +607,26 @@ namespace CreditReversal.DAL
             {}
             return sno;
         }
-        public int getsnofromitems(string id)
+        public int getsnofromitems(string id,string round)
         {
             int sno = 0;
             try
             {
 
-                sql = "Select max(sno) from CreditReport where AgencyName='EQUIFAX' and ClientId=" + id;
+                sql = "Select max(sno) from CreditReportItemChallenges where ClientId =" + id + " and RoundType = '" + round + "' ";
                 try
                 {
                     sno = utils.ExecuteScalar(sql, true).ConvertObjectToIntIfNotNull();
                 }
                 catch (Exception ex)
                 {
-                   
+                    sno = 1;   
                 }
+                if(sno == 0)
+                {
+                    sno = 1;
+                }
+
             }
             catch (Exception)
             { }
@@ -653,8 +658,38 @@ namespace CreditReversal.DAL
                    + " values(@ClientId,GETDATE(),@AgencyName,@RoundType,@CreatedBy,getdate(),"+ sno +");SELECT CAST(scope_identity() AS int)";                    SqlCommand cmd = new SqlCommand();                    cmd.CommandText = sql;                    cmd.Parameters.AddWithValue("@ClientId", clientId);                    cmd.Parameters.AddWithValue("@AgencyName", agencyname[i]);                    cmd.Parameters.AddWithValue("@RoundType", roundtype);                    cmd.Parameters.AddWithValue("@CreatedBy", AgentId);                    cmd.CommandText = sql;                    res = Convert.ToInt64(utils.ExecuteScalarCommand(cmd, true));                    int id = (int)res;                    if (id != 0)                    {                        AccountHistory = credit.Where(x => x.Agency.ToUpper() == agencyname[i]).ToList();                        AddCreditReportItems(AccountHistory, id, agencyname[i], roundtype,sno);                        Inquires = inquires.Where(x => x.CreditBureau.ToUpper() == agencyname[i]).ToList();                        AddCreditInquiries(Inquires, id, AgentId, roundtype,sno);                    }                }
                 ReportId = res.ToString();                long result=  InsertPaymentHistory(roundtype, clientId.StringToLong(0), monthlyPayStatusHistoryDetails,sno);            }            catch (Exception ex) {                 ex.insertTrace("");             }            return ReportId;        }
 
+        public string RefreshCreditReport(List<AccountHistory> credit, List<Inquires> inquires, List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string round = "")        {            string ReportId = ""; string sql = string.Empty; string roundtype = string.Empty;            List<AccountHistory> AccountHistory = new List<AccountHistory>();            string AgentId = HttpContext.Current.Session["UserId"].ToString();            string[] agencyname = { "EQUIFAX", "EXPERIAN", "TRANSUNION" };            int i = 0;            long res = 0;
+            List<Inquires> Inquires = new List<Inquires>();
 
-        public string RefreshCreditReport(List<AccountHistory> credit, List<Inquires> inquires , List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails,string clientId, string mode = "", string round = "")        {            string ReportId = ""; string sql = string.Empty; string roundtype = string.Empty;            List<AccountHistory> AccountHistory = new List<AccountHistory>();            string AgentId = HttpContext.Current.Session["UserId"].ToString();            string[] agencyname = { "EQUIFAX", "EXPERIAN", "TRANSUNION" };            int i = 0;            long res = 0;
+            int sno = getsno(clientId);            try            {                if (mode == "reset")                {                    //sql = "delete from CreditReportItemChallenges Where CredRepItemsId in "                    //  + " (select CredRepItemsId from CreditReportItems where CredReportId in "                    // + " (Select CreditReportId from CreditReport where ClientId =" + clientId + " and RoundType = '" + round + "')) ";                    //utils.ExecuteString(sql, true);
+                    //sql = "delete from CreditReportItemChallenges Where CreditInqId in "
+                    // + " (select CreditInqId from CreditInquiries where CredReportId in "
+                    //+ " (Select CreditReportId from CreditReport where ClientId =" + clientId + " and RoundType = '" + round + "')) ";                    //utils.ExecuteString(sql, true);                    sql = "delete from CreditReportItems Where CredReportId in "                     + " (Select CreditReportId from CreditReport where  ClientId =" + clientId + " and RoundType = '" + round + "') ";                    utils.ExecuteString(sql, true);
+
+                    sql = "delete from CreditInquiries Where CreditReportId in "
+                    //+ "  (select CredRepItemsId from CreditReportItems where CredReportId in "
+                    + " (Select CreditReportId from CreditReport where  ClientId =" + clientId + " and RoundType = '" + round + "') ";                    utils.ExecuteString(sql, true);
+                    sql = "delete from PaymentHistory Where   ClientId =" + clientId + " and RoundType = '" + round + "' ";                    utils.ExecuteString(sql, true);
+                    //sql = "delete from CreditReportFiles Where   ClientId =" + clientId + " and RoundType = '" + round + "' ";                    //utils.ExecuteString(sql, true);
+                }
+
+                for (i = 0; i < 3; i++)
+                {
+                    sql = "select CreditReportId from  CreditReport where ClientId=@ClientId and RoundType=@RoundType and AgencyName=@AgencyName";
+
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.CommandText = sql;
+                    cmd.Parameters.AddWithValue("@ClientId", clientId);
+                    cmd.Parameters.AddWithValue("@AgencyName", agencyname[i]);
+                    cmd.Parameters.AddWithValue("@RoundType", round);
+                    cmd.CommandText = sql;
+                    res = Convert.ToInt64(utils.ExecuteScalarCommand(cmd, true));
+                    int id = (int)res;                    if (id != 0)                    {                        AccountHistory = credit.Where(x => x.Agency.ToUpper() == agencyname[i]).ToList();                        AddCreditReportItems(AccountHistory, id, agencyname[i], round, sno);                        Inquires = inquires.Where(x => x.CreditBureau.ToUpper() == agencyname[i]).ToList();                        AddCreditInquiries(Inquires, id, AgentId, round, sno);                    }
+
+
+                }
+                ReportId = res.ToString();                long result = InsertPaymentHistory(round, clientId.StringToLong(0), monthlyPayStatusHistoryDetails, sno);            }            catch (Exception ex) { ex.insertTrace(""); }            return ReportId;        }
+        public string RefreshCreditReportBKUP(List<AccountHistory> credit, List<Inquires> inquires , List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails,string clientId, string mode = "", string round = "")        {            string ReportId = ""; string sql = string.Empty; string roundtype = string.Empty;            List<AccountHistory> AccountHistory = new List<AccountHistory>();            string AgentId = HttpContext.Current.Session["UserId"].ToString();            string[] agencyname = { "EQUIFAX", "EXPERIAN", "TRANSUNION" };            int i = 0;            long res = 0;
             List<Inquires> Inquires = new List<Inquires>();
 
             int sno = getsno(clientId);            try            {                if (mode == "reset")                {                    sql = "delete from CreditReportItemChallenges Where CredRepItemsId in "                      + " (select CredRepItemsId from CreditReportItems where CredReportId in "                     + " (Select CreditReportId from CreditReport where ClientId =" + clientId + " and RoundType = '" + round + "')) ";                    utils.ExecuteString(sql, true);

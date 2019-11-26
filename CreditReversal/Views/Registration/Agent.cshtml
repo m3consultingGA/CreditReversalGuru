@@ -693,13 +693,41 @@
 
                                                     </div>
                                                 </div>
+                                                @{
+                                                    List<string> billingtype = new List<string>();
+                                                    billingtype.Add("Monthly");
+                                                    billingtype.Add("Quarterly");
+                                                    billingtype.Add("Half-Yearly");
+                                                    billingtype.Add("Annually");
+                                                }
                                                 <div class="form-group">
                                                     <div class="row">
                                                         <div class="col-sm-3">
                                                             <label>Billing Type <span class="text-danger">*</span></label>
                                                         </div>
                                                         <div class="col-sm-7">
-                                                            <input type="text" class="form-control" name="BillingType" placeholder="Billing Type" maxlength="50" id="txtBillingType" value="@Model.BillingType" required onchange="RemoveValidation(this);">
+                                                            @*<input type="text" class="form-control" name="BillingType" placeholder="Billing Type" maxlength="50" id="txtBillingType" value="@Model.BillingType" required onchange="RemoveValidation(this);">*@
+                                                            <select class="form-control" id="txtBillingType" name="BillingType" required onchange="RemoveValidation(this);">
+                                                                <option value="">Select</option>
+                                                                @foreach (var item in billingtype)
+                                                                {
+                                                                    if (!string.IsNullOrEmpty(Model.BillingType))
+                                                                    {
+                                                                        if (Model.BillingType == item)
+                                                                        {
+                                                                            <option value="@item" selected>@item</option>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <option value="@item">@item</option>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="@item" selected>@item</option>
+                                                                    }
+                                                                }
+                                                            </select>
                                                             <div id="Msg_txtBillingType" class="text-danger">
 
                                                             </div>

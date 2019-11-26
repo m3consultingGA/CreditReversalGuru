@@ -70,6 +70,7 @@ namespace CreditReversal.Models
         public string PaymentType { get; set; }
         public string PaymentStatus { get; set; }
         public string PaymentDate { get; set; }
+        public string SCreatedDate { get; set; }        public string NumberofStaff { get; set; }        public string NextBillingDate { get; set; }        public string RegisteredClients { get; set; }        public string PrimaryUser { get; set; }        public string ActiveClients { get; set; }        public string PricingPlans { get; set; }
 
     }
     public class AgentStaff

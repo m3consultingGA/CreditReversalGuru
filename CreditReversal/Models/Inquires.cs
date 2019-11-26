@@ -19,5 +19,6 @@ namespace CreditReversal.Models
         public string EXPERIAN { get; set; }
         public string TRANSUNION { get; set; }
         public string RoundType { get; set; }
+        public string ChallengeStatus { get; set; }
     }
 }

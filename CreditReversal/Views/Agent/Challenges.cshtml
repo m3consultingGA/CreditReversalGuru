@@ -29,7 +29,7 @@
                     <div class="col-md-6">
                         @if (ViewBag.creditreportfile != null && ViewBag.creditreportfile.Count > 0)
                         {
-                            <strong>  Client: @ViewBag.creditreportfile[0].ClientName</strong>
+                            <strong> Client: @ViewBag.creditreportfile[0].ClientName</strong>
                         }
 
                     </div>
@@ -50,15 +50,22 @@
                             }
                             @if (ViewBag.creditreportfile != null && ViewBag.creditreportfile.Count > 0)
                             {
-                                <tbody>
-                                    @{ int i = 0;
-                                    }
-                                    @foreach (var item in ViewBag.creditreportfile)
+                        <tbody>
+                            @{
+                                int i = 0;
+                                int j = 0;
+                                int k = 0;
+                            }
+                               
+                               @foreach (var item in ViewBag.creditreportfile)
+                                {
+                                    if (item.RoundType == "First Round")
                                     {
                                         <tr>
                                             @*<td>@item.ClientName</td>*@
                                             <td>@item.RoundType</td>
-                                            <td>@item.RoundType-1.@i.ToString()</td>
+                                            <td>@item.CAgency - @item.RoundType-1.@i.ToString()</td>
+                                            
                                             @{
                                                 string file = item.CRFilename;
 
@@ -72,7 +79,50 @@
                                         </tr>
                                         i++;
                                     }
-                                </tbody>
+
+                                    if (item.RoundType == "Second Round")
+                                    {
+                                        <tr>
+                                            @*<td>@item.ClientName</td>*@
+                                            <td>@item.RoundType</td>
+                                            <td>@item.CAgency - @item.RoundType-1.@j.ToString()</td>
+                                            @{
+                                                string file = item.CRFilename;
+
+                                                path = file.Replace(" ", "");
+                                            }
+
+                                            <td>
+                                                <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
+                                            </td>
+
+                                        </tr>
+                                        j++;
+                                    }
+
+                                    if (item.RoundType == "Third Round")
+                                    {
+                                        <tr>
+                                            @*<td>@item.ClientName</td>*@
+                                            <td>@item.RoundType</td>
+                                            <td>@item.CAgency - @item.RoundType-1.@k.ToString()</td>
+                                            @{
+                                                string file = item.CRFilename;
+
+                                                path = file.Replace(" ", "");
+                                            }
+
+                                            <td>
+                                                <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
+                                            </td>
+
+                                        </tr>
+                                        k++;
+                                    }
+
+
+                                }
+                            </tbody>
                             }
                             else
                             {

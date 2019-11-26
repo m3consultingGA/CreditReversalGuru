@@ -481,7 +481,7 @@ stringWriter
             // return the HTML code
             return stringWriter.ToString();
         }
-        public JsonResult ClientChallengeform(List<CreditReportItems> credit, int Id, string[] values)        {            string date = string.Empty; bool status = false;            try
+        public JsonResult ClientChallengeform(List<CreditReportItems> credit, int Id, string[] values)        {            string date = string.Empty; bool status = false;                        try
             {
 
 
@@ -504,13 +504,14 @@ stringWriter
                 try
                 {
                     ClientData cd = new ClientData();
-                   int sno =  cd.getsnofromitems(Id.ToString());
+                   int sno =  cd.getsnofromitems(Id.ToString(),values[3]);
                     if (credit != null)
                     {
 
                         for (i = 0; i < count; i++)
                         {
-                            cfunction.AddReportItemChallenges(credit[i],sno);
+                            
+                            cfunction.AddReportItemChallenges(credit[i],sno,Id);
                             dynamic model = new ExpandoObject();
                             string AgentId = sessionData.GetAgentId();
                             string staffId = sessionData.GetStaffId();
@@ -548,7 +549,7 @@ stringWriter
                     for (int k = 0; k < credite.Count; k++)
                     {
                         CreditReportItems cr = new CreditReportItems();
-
+                        
                         if (credite[k].Agency == "TRANSUNION" && credite[k].ChallengeText != "NO CHALLENGE")
                         {
                             cr.MerchantName = credite[k].MerchantName;
@@ -562,6 +563,7 @@ stringWriter
                             cr.ChallengeText = credite[k].ChallengeText;
                             cr.Status = credite[k].Status;
                             cr.CredRepItemsId = credite[k].CredRepItemsId;
+                            cr.RoundType = credite[k].RoundType;
                             crediteTRANSUNION.Add(cr);
                         }
                         if ("EXPERIAN" == credite[k].Agency && credite[k].ChallengeText != "NO CHALLENGE")
@@ -577,6 +579,8 @@ stringWriter
                             cr.ChallengeText = credite[k].ChallengeText;
                             cr.Status = credite[k].Status;
                             cr.CredRepItemsId = credite[k].CredRepItemsId;
+                            cr.RoundType = credite[k].RoundType;
+                            // var round = credite[k].CredRepItemsId.Split(' ');
                             crediteEXPERIAN.Add(cr);
                         }
                         if ("EQUIFAX" == credite[k].Agency && credite[k].ChallengeText != "NO CHALLENGE")
@@ -592,6 +596,7 @@ stringWriter
                             cr.ChallengeText = credite[k].ChallengeText;
                             cr.Status = credite[k].Status;
                             cr.CredRepItemsId = credite[k].CredRepItemsId;
+                            cr.RoundType = credite[k].RoundType;
                             crediteEQUIFAX.Add(cr);
                         }
 
@@ -608,12 +613,13 @@ stringWriter
                         Session["values"] = StringList;
                         objDocTRANSUNION = objPdf.CreateDocument();
                         dynamic model = new ExpandoObject();
+                        int trcount = crediteTRANSUNION.Count - 1;
                         model.clientcredit = crediteTRANSUNION;
                         string htmlToConvert = RenderViewAsString("ClientChallengeform", model);
                         objDocTRANSUNION.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");
-                        filename = "Challenge-Account-TRANSUNION" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf";
+                        filename = "Challenge-Account-TRANSUNION" + "-" + values[0] + "-" + values[1] + "-" + crediteTRANSUNION[trcount].RoundType + "-" + date + ".pdf";
                         filename = filename.Replace(" ", "");
-                        filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-TRANSUNION" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf");
+                        filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-TRANSUNION" + "-" + values[0] + "-" + values[1] + "-" + crediteTRANSUNION[trcount].RoundType + "-" + date + ".pdf");
                         // filepath = Server.MapPath("~/Documents/Challenge/Challenge-TRANSUNION.pdf"); // + "-" + values[0] + "-" + values[1] + "-" + DateTime.Now.ToShortDateString() + "-" + values[3] + ".pdf");
                         filepath = filepath.Replace(" ", "");
                         objDocTRANSUNION.Save(filepath, false);
@@ -622,7 +628,8 @@ stringWriter
                         objDocTRANSUNION.Close();
 
                         CreditReportFiles files = new CreditReportFiles();
-                        files.RoundType = values[3];
+                        //files.RoundType = values[3];
+                        files.RoundType = crediteTRANSUNION[trcount].RoundType;
                         files.CRFilename = filename;
                         files.ClientId = Id;
                         filenames.Add(files);
@@ -642,12 +649,13 @@ stringWriter
                         Session["values"] = StringList;
                         objDocEXPERIAN = objPdf.CreateDocument();
                         dynamic model = new ExpandoObject();
+                        int excount = crediteEXPERIAN.Count-1;
                         model.clientcredit = crediteEXPERIAN;
                         string htmlToConvert = RenderViewAsString("ClientChallengeform", model);
                         objDocEXPERIAN.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");
-                        filename = "Challenge-Account-EXPERIAN" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf";
+                        filename = "Challenge-Account-EXPERIAN" + "-" + values[0] + "-" + values[1] + "-" + crediteEXPERIAN[excount].RoundType + "-" + date + ".pdf";
                         filename = filename.Replace(" ", "");
-                        filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-EXPERIAN" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf");
+                        filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-EXPERIAN" + "-" + values[0] + "-" + values[1] + "-" + crediteEXPERIAN[excount].RoundType + "-" + date + ".pdf");
                         //filepath = Server.MapPath("~/Documents/Challenge/Challenge-EXPERIAN.pdf");
                         filepath = filepath.Replace(" ", "");
                         objDocEXPERIAN.Save(filepath, false);
@@ -656,7 +664,8 @@ stringWriter
                         objDocEXPERIAN.Close();
 
                         CreditReportFiles files = new CreditReportFiles();
-                        files.RoundType = values[3];
+                        //files.RoundType = values[3];
+                        files.RoundType = crediteEXPERIAN[excount].RoundType;
                         files.CRFilename = filename;
                         files.ClientId = Id;
                         filenames.Add(files);
@@ -675,13 +684,14 @@ stringWriter
                         Session["values"] = StringList;
                         objDocEQUIFAX = objPdf.CreateDocument();
                         dynamic model = new ExpandoObject();
+                        int eqcount = crediteEQUIFAX.Count - 1;
                         model.clientcredit = crediteEQUIFAX;
                         string htmlToConvert = RenderViewAsString("ClientChallengeform", model);
 
                         objDocEQUIFAX.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");
-                        filename = "Challenge-Account-EQUIFAX" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf";
+                        filename = "Challenge-Account-EQUIFAX" + "-" + values[0] + "-" + values[1] + "-" + crediteEQUIFAX[eqcount].RoundType + "-" + date + ".pdf";
                         filename = filename.Replace(" ", "");
-                        filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-EQUIFAX" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf");
+                        filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-EQUIFAX" + "-" + values[0] + "-" + values[1] + "-" + crediteEQUIFAX[eqcount].RoundType + "-" + date + ".pdf");
                         //filepath = Server.MapPath("~/Documents/Challenge/Challenge-EQUIFAX.pdf");
                         filepath = filepath.Replace(" ", "");
                         objDocEQUIFAX.Save(filepath, false);
@@ -690,7 +700,8 @@ stringWriter
                         objDocEQUIFAX.Close();
 
                         CreditReportFiles files = new CreditReportFiles();
-                        files.RoundType = values[3];
+                        //files.RoundType = values[3];
+                       files.RoundType = crediteEQUIFAX[eqcount].RoundType;
                         files.CRFilename = filename;
                         files.ClientId = Id;
                         filenames.Add(files);
@@ -717,20 +728,20 @@ stringWriter
                     inquires = tuple.inquiryDetails;
                     try
                     {
-                        List<CreditReportFiles> files = cfunction.GetCreditReportsFilesByround(clientId, round);
-                        if (files.Count > 0)
-                        {
-                            foreach (CreditReportFiles file in files)
-                            {
-                                // Check if file exists with its full path    
-                                string filepath = Server.MapPath("~/documents/Challenge/" + file.CRFilename);
-                                if (System.IO.File.Exists(filepath))
-                                {
-                                    // If file found, delete it    
-                                    System.IO.File.Delete(filepath);
-                                }
-                            }
-                        }
+                        //List<CreditReportFiles> files = cfunction.GetCreditReportsFilesByround(clientId, round);
+                        //if (files.Count > 0)
+                        //{
+                        //    foreach (CreditReportFiles file in files)
+                        //    {
+                        //        // Check if file exists with its full path    
+                        //        string filepath = Server.MapPath("~/documents/Challenge/" + file.CRFilename);
+                        //        if (System.IO.File.Exists(filepath))
+                        //        {
+                        //            // If file found, delete it    
+                        //            System.IO.File.Delete(filepath);
+                        //        }
+                        //    }
+                        //}
                     }
                     catch (Exception ex)
                     { string msg = ex.Message; }
@@ -780,54 +791,6 @@ stringWriter
 
         //	return Json(status);
         //}
-        public ActionResult CreditPullBKUP(string clientId, string from = "", string mode = "")
-        {
-            //bool status = false;
-            string ReportId = "";
-            IdentityIQInfo objidentity = new IdentityIQInfo();
-            try
-            {
-                bool checkclientexist = functions.GetCreditReportStatus(clientId);
-                if (checkclientexist && mode == "Edit")
-                {
-                    return RedirectToAction("CreditItems", "Client", new { @ClientId = clientId, @from = from, @mode = mode });
-                }
-                objidentity = IQfunction.CheckIdentityIQInfo(clientId);
-
-                if (objidentity.Password != null && objidentity.UserName != null && objidentity.Answer != null)
-                {
-                    List<AccountHistory> accountHistories = new List<AccountHistory>();
-                    List<Inquires> inquires = new List<Inquires>();
-                    CreditReportData tuple = GetCreditReportItemsbyReading(objidentity);
-                    //string ds = "";
-                    if (tuple.AccHistory.Count > 0 && tuple.inquiryDetails.Count > 0)
-                    {
-                        accountHistories = tuple.AccHistory;
-                        inquires = tuple.inquiryDetails;
-                        ReportId = cfunction.AddCreditReport(accountHistories, inquires, tuple.monthlyPayStatusHistoryDetails, clientId, mode);
-                        return RedirectToAction("CreditItems", "Client", new { @ClientId = clientId, @from = from, @mode = mode });
-                    }
-                    else
-                    {
-                        TempData["from"] = "InvalidIdentityIQ";
-                        return RedirectToAction("Agent", "dashboard");
-
-                    }
-                }
-                else
-                {
-                    TempData["from"] = "error";
-                    return RedirectToAction("Agent", "dashboard");
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["from"] = "error";
-                return RedirectToAction("Agent", "dashboard");
-            }
-
-
-        }
         public ActionResult CreditPullFirstTime(string clientId, string from = "", string mode = "")
         {
             //bool status = false;
@@ -875,6 +838,11 @@ stringWriter
             }
         }
         public ActionResult CreditPull(string clientId, string from = "", string mode = "")        {
+            IdentityIQInfo objidentity = new IdentityIQInfo();            try            {
+                return RedirectToAction("CreditItems", "Client", new { @ClientId = clientId, @from = from, @mode = mode });            }            catch (Exception ex)
+            {                return RedirectToAction("Agent", "dashboard");            }
+        }
+        public ActionResult CreditPullBKUP(string clientId, string from = "", string mode = "")        {
             //bool status = false;
             string ReportId = "";            IdentityIQInfo objidentity = new IdentityIQInfo();            try            {                ClientData cd = new ClientData();
                 string roundtype = cd.checkLastDateReport(clientId);                bool status = cd.checkDateReport(clientId);                bool checkclientexist = functions.GetCreditReportStatus(clientId);                if (status == true || roundtype != "")
@@ -1117,15 +1085,17 @@ stringWriter
             }            return creditReportData;        }
         public JsonResult ClientChallengeInquiresform(List<Inquires> credit, int Id, string[] values)        {            string date = string.Empty;            date = DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Year.ToString()                + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();            List<Inquires> InquiresTRANSUNION = new List<Inquires>();            List<Inquires> InquiresEXPERIAN = new List<Inquires>();            List<Inquires> InquiresEQUIFAX = new List<Inquires>();            List<CreditReportFiles> filenames = new List<CreditReportFiles>();            bool status = false;            int count = 0;            if (credit != null)            {                count = credit.Count();            }            int i = 0;            byte[] pdfBuffer = null;            PdfManager objPdf = new PdfManager();            PdfDocument objDocTRANSUNION = objPdf.CreateDocument();            PdfDocument objDocEXPERIAN = objPdf.CreateDocument();            PdfDocument objDocEQUIFAX = objPdf.CreateDocument();            MemoryStream pdfStream = new MemoryStream();            string filepath = "", filename = "";            try            {
                 ClientData cd = new ClientData();
-                int sno = cd.getsnofromitems(Id.ToString());                if (credit != null)                {                    for (i = 0; i < count; i++)                    {                        cfunction.AddReportItemInquiriesChallenges(credit[i],values[3],sno);                        dynamic model = new ExpandoObject();                        string AgentId = sessionData.GetAgentId();                        string staffId = sessionData.GetStaffId();                        string fullname = "";                        cfunction.AddInquiresChallenge(credit[i], AgentId, staffId);                        ViewBag.CreditReportItems = credit[i];                        model.clientcredit = credit[i];                        if (Session["Name"] != null)                        {                            fullname = Session["Name"].ToString();                        }                        var names = fullname.Split(' ');                        string name = names[0];                        int clientid = Id;                        string Report = credit[i].CreditInqId;                    }                }                List<Inquires> Inquires = functions.GetInquiriesChallengesAgentById(credit, Id);                string client = Id.ToString();                ClientModel clientModel = cfunction.GetClient(client);                List<string> StringList = new List<string>();                StringList.Add(clientModel.FirstName);                StringList.Add(clientModel.LastName);                StringList.Add(values[2]);                StringList.Add(values[3]);                StringList.Add(clientModel.SSN);                for (int k = 0; k < Inquires.Count; k++)                {                    Inquires cr = new Inquires();                    if (Inquires[k].CreditBureau == "TransUnion" && Inquires[k].ChallengeText != "NO CHALLENGE")                    {                        cr.CreditorName = Inquires[k].CreditorName;                        cr.TypeofBusiness = Inquires[k].TypeofBusiness;                        cr.Dateofinquiry = Inquires[k].Dateofinquiry;                        cr.CreditBureau = Inquires[k].CreditBureau;                        cr.ChallengeText = Inquires[k].ChallengeText;                        InquiresTRANSUNION.Add(cr);                    }                    if ("Experian" == Inquires[k].CreditBureau && Inquires[k].ChallengeText != "NO CHALLENGE")                    {                        cr.CreditorName = Inquires[k].CreditorName;                        cr.TypeofBusiness = Inquires[k].TypeofBusiness;                        cr.Dateofinquiry = Inquires[k].Dateofinquiry;                        cr.CreditBureau = Inquires[k].CreditBureau;                        cr.ChallengeText = Inquires[k].ChallengeText;                        InquiresEXPERIAN.Add(cr);                    }                    if ("Equifax" == Inquires[k].CreditBureau && Inquires[k].ChallengeText != "NO CHALLENGE")                    {                        cr.CreditorName = Inquires[k].CreditorName;                        cr.TypeofBusiness = Inquires[k].TypeofBusiness;                        cr.Dateofinquiry = Inquires[k].Dateofinquiry;                        cr.CreditBureau = Inquires[k].CreditBureau;                        cr.ChallengeText = Inquires[k].ChallengeText;                        InquiresEQUIFAX.Add(cr);                    }                }                filenames = new List<CreditReportFiles>();                if (InquiresTRANSUNION.Count > 0)                {                    StringList.Add("TRANSUNION");                    Session["values"] = StringList;                    objDocTRANSUNION = objPdf.CreateDocument();                    dynamic model = new ExpandoObject();                    model.clientcredit = InquiresTRANSUNION;                    string htmlToConvert = RenderViewAsString("ClientInquiriesChallengeform", model);                    objDocTRANSUNION.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");                    filename = "Challenge-Inquires-TRANSUNION" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf";
-                    filename = filename.Replace(" ", "");                    filepath = Server.MapPath("~/Documents/Challenge/Challenge-Inquires-TRANSUNION" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf");
+                int sno = cd.getsnofromitems(Id.ToString(),values[3]);                if (credit != null)                {                    for (i = 0; i < count; i++)                    {                        cfunction.AddReportItemInquiriesChallenges(credit[i],values[3],sno,Id);                        dynamic model = new ExpandoObject();                        string AgentId = sessionData.GetAgentId();                        string staffId = sessionData.GetStaffId();                        string fullname = "";                        cfunction.AddInquiresChallenge(credit[i], AgentId, staffId);                        ViewBag.CreditReportItems = credit[i];                        model.clientcredit = credit[i];                        if (Session["Name"] != null)                        {                            fullname = Session["Name"].ToString();                        }                        var names = fullname.Split(' ');                        string name = names[0];                        int clientid = Id;                        string Report = credit[i].CreditInqId;                    }                }                List<Inquires> Inquires = functions.GetInquiriesChallengesAgentById(credit, Id);                string client = Id.ToString();                ClientModel clientModel = cfunction.GetClient(client);                List<string> StringList = new List<string>();                StringList.Add(clientModel.FirstName);                StringList.Add(clientModel.LastName);                StringList.Add(values[2]);                StringList.Add(values[3]);                StringList.Add(clientModel.SSN);                for (int k = 0; k < Inquires.Count; k++)                {                    Inquires cr = new Inquires();                    if (Inquires[k].CreditBureau == "TransUnion" && Inquires[k].ChallengeText != "NO CHALLENGE")                    {                        cr.CreditorName = Inquires[k].CreditorName;                        cr.TypeofBusiness = Inquires[k].TypeofBusiness;                        cr.Dateofinquiry = Inquires[k].Dateofinquiry;                        cr.CreditBureau = Inquires[k].CreditBureau;                        cr.ChallengeText = Inquires[k].ChallengeText;                        cr.RoundType = Inquires[k].RoundType;                        InquiresTRANSUNION.Add(cr);                    }                    if ("Experian" == Inquires[k].CreditBureau && Inquires[k].ChallengeText != "NO CHALLENGE")                    {                        cr.CreditorName = Inquires[k].CreditorName;                        cr.TypeofBusiness = Inquires[k].TypeofBusiness;                        cr.Dateofinquiry = Inquires[k].Dateofinquiry;                        cr.CreditBureau = Inquires[k].CreditBureau;                        cr.ChallengeText = Inquires[k].ChallengeText;
+                        cr.RoundType = Inquires[k].RoundType;                        InquiresEXPERIAN.Add(cr);                    }                    if ("Equifax" == Inquires[k].CreditBureau && Inquires[k].ChallengeText != "NO CHALLENGE")                    {                        cr.CreditorName = Inquires[k].CreditorName;                        cr.TypeofBusiness = Inquires[k].TypeofBusiness;                        cr.Dateofinquiry = Inquires[k].Dateofinquiry;                        cr.CreditBureau = Inquires[k].CreditBureau;                        cr.ChallengeText = Inquires[k].ChallengeText;
+                        cr.RoundType = Inquires[k].RoundType;                        InquiresEQUIFAX.Add(cr);                    }                }                filenames = new List<CreditReportFiles>();                if (InquiresTRANSUNION.Count > 0)                {                    StringList.Add("TRANSUNION");                    Session["values"] = StringList;                    objDocTRANSUNION = objPdf.CreateDocument();                    dynamic model = new ExpandoObject();                    int trcount = InquiresTRANSUNION.Count-1;                    model.clientcredit = InquiresTRANSUNION;                    string htmlToConvert = RenderViewAsString("ClientInquiriesChallengeform", model);                    objDocTRANSUNION.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");                    filename = "Challenge-Inquires-TRANSUNION" + "-" + values[0] + "-" + values[1] + "-" + InquiresTRANSUNION[trcount].RoundType + "-" + date + ".pdf";
+                    filename = filename.Replace(" ", "");                    filepath = Server.MapPath("~/Documents/Challenge/Challenge-Inquires-TRANSUNION" + "-" + values[0] + "-" + values[1] + "-" + InquiresTRANSUNION[trcount].RoundType + "-" + date + ".pdf");
                     // filepath = Server.MapPath("~/Documents/Challenge/Challenge-TRANSUNION.pdf"); // + "-" + values[0] + "-" + values[1] + "-" + DateTime.Now.ToShortDateString() + "-" + values[3] + ".pdf");
-                    filepath = filepath.Replace(" ", "");                    objDocTRANSUNION.Save(filepath, false);                    pdfBuffer = System.IO.File.ReadAllBytes(filepath);                    System.IO.File.WriteAllBytes(filepath, pdfBuffer);                    objDocTRANSUNION.Close();                    CreditReportFiles files = new CreditReportFiles();                    files.RoundType = values[3];                    files.CRFilename = filename;                    files.ClientId = Id;                    filenames.Add(files);                }                if (InquiresEXPERIAN.Count > 0)                {                    if (StringList.Count == 5)                    {                        StringList.Add("EXPERIAN");                    }                    else                    {                        StringList[5] = "";                        StringList[5] = "EXPERIAN";                    }                    Session["values"] = StringList;                    objDocEXPERIAN = objPdf.CreateDocument();                    dynamic model = new ExpandoObject();                    model.clientcredit = InquiresEXPERIAN;                    string htmlToConvert = RenderViewAsString("ClientInquiriesChallengeform", model);                    objDocEXPERIAN.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");                    filename = "Challenge-Inquires-EXPERIAN" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf";
-                    filename = filename.Replace(" ", "");                    filepath = Server.MapPath("~/documents/Challenge/Challenge-Inquires-EXPERIAN" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf");
+                    filepath = filepath.Replace(" ", "");                    objDocTRANSUNION.Save(filepath, false);                    pdfBuffer = System.IO.File.ReadAllBytes(filepath);                    System.IO.File.WriteAllBytes(filepath, pdfBuffer);                    objDocTRANSUNION.Close();                    CreditReportFiles files = new CreditReportFiles();                    files.RoundType = InquiresTRANSUNION[trcount].RoundType;                    files.CRFilename = filename;                    files.ClientId = Id;                    filenames.Add(files);                }                if (InquiresEXPERIAN.Count > 0)                {                    if (StringList.Count == 5)                    {                        StringList.Add("EXPERIAN");                    }                    else                    {                        StringList[5] = "";                        StringList[5] = "EXPERIAN";                    }                    Session["values"] = StringList;                    objDocEXPERIAN = objPdf.CreateDocument();                    dynamic model = new ExpandoObject();                    int excount = InquiresEXPERIAN.Count-1;                    model.clientcredit = InquiresEXPERIAN;                    string htmlToConvert = RenderViewAsString("ClientInquiriesChallengeform", model);                    objDocEXPERIAN.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");                    filename = "Challenge-Inquires-EXPERIAN" + "-" + values[0] + "-" + values[1] + "-" + InquiresEXPERIAN[excount].RoundType + "-" + date + ".pdf";
+                    filename = filename.Replace(" ", "");                    filepath = Server.MapPath("~/documents/Challenge/Challenge-Inquires-EXPERIAN" + "-" + values[0] + "-" + values[1] + "-" + InquiresEXPERIAN[excount].RoundType + "-" + date + ".pdf");
                     //filepath = Server.MapPath("~/Documents/Challenge/Challenge-EXPERIAN.pdf");
-                    filepath = filepath.Replace(" ", "");                    objDocEXPERIAN.Save(filepath, false);                    pdfBuffer = System.IO.File.ReadAllBytes(filepath);                    System.IO.File.WriteAllBytes(filepath, pdfBuffer);                    objDocEXPERIAN.Close();                    CreditReportFiles files = new CreditReportFiles();                    files.RoundType = values[3];                    files.CRFilename = filename;                    files.ClientId = Id;                    filenames.Add(files);                }                if (InquiresEQUIFAX.Count > 0)                {                    if (StringList.Count == 4)                    {                        StringList.Add("EQUIFAX");                    }                    else                    {                        StringList[5] = "";                        StringList[5] = "EQUIFAX";                    }                    Session["values"] = StringList;                    objDocEQUIFAX = objPdf.CreateDocument();                    dynamic model = new ExpandoObject();                    model.clientcredit = InquiresEQUIFAX;                    string htmlToConvert = RenderViewAsString("ClientInquiriesChallengeform", model);                    objDocEQUIFAX.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");                    filename = "Challenge-Inquires-EQUIFAX" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf";
-                    filename = filename.Replace(" ", "");                    filepath = Server.MapPath("~/documents/Challenge/Challenge-Inquires-EQUIFAX" + "-" + values[0] + "-" + values[1] + "-" + values[3] + "-" + date + ".pdf");
+                    filepath = filepath.Replace(" ", "");                    objDocEXPERIAN.Save(filepath, false);                    pdfBuffer = System.IO.File.ReadAllBytes(filepath);                    System.IO.File.WriteAllBytes(filepath, pdfBuffer);                    objDocEXPERIAN.Close();                    CreditReportFiles files = new CreditReportFiles();                    files.RoundType = InquiresEXPERIAN[excount].RoundType;                    files.CRFilename = filename;                    files.ClientId = Id;                    filenames.Add(files);                }                if (InquiresEQUIFAX.Count > 0)                {                    if (StringList.Count == 4)                    {                        StringList.Add("EQUIFAX");                    }                    else                    {                        StringList[5] = "";                        StringList[5] = "EQUIFAX";                    }                    Session["values"] = StringList;                    objDocEQUIFAX = objPdf.CreateDocument();                    dynamic model = new ExpandoObject();                    int eqcount = InquiresEQUIFAX.Count-1;                    model.clientcredit = InquiresEQUIFAX;                    string htmlToConvert = RenderViewAsString("ClientInquiriesChallengeform", model);                    objDocEQUIFAX.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");                    filename = "Challenge-Inquires-EQUIFAX" + "-" + values[0] + "-" + values[1] + "-" + InquiresEQUIFAX[eqcount].RoundType + "-" + date + ".pdf";
+                    filename = filename.Replace(" ", "");                    filepath = Server.MapPath("~/documents/Challenge/Challenge-Inquires-EQUIFAX" + "-" + values[0] + "-" + values[1] + "-" + InquiresEQUIFAX[eqcount].RoundType + "-" + date + ".pdf");
                     //filepath = Server.MapPath("~/Documents/Challenge/Challenge-EQUIFAX.pdf");
-                    filepath = filepath.Replace(" ", "");                    objDocEQUIFAX.Save(filepath, false);                    pdfBuffer = System.IO.File.ReadAllBytes(filepath);                    System.IO.File.WriteAllBytes(filepath, pdfBuffer);                    objDocEQUIFAX.Close();                    CreditReportFiles files = new CreditReportFiles();                    files.RoundType = values[3];                    files.CRFilename = filename;                    files.ClientId = Id;                    filenames.Add(files);                }                if (filenames.Count > 0)                {                    functions.updatechallengefilepath(filenames,sno);                }                status = true;            }            catch (Exception ex)            {                status = true;            }            return Json(status);        }
+                    filepath = filepath.Replace(" ", "");                    objDocEQUIFAX.Save(filepath, false);                    pdfBuffer = System.IO.File.ReadAllBytes(filepath);                    System.IO.File.WriteAllBytes(filepath, pdfBuffer);                    objDocEQUIFAX.Close();                    CreditReportFiles files = new CreditReportFiles();                    files.RoundType = InquiresEQUIFAX[eqcount].RoundType;                    files.CRFilename = filename;                    files.ClientId = Id;                    filenames.Add(files);                }                if (filenames.Count > 0)                {                    functions.updatechallengefilepath(filenames,sno);                }                status = true;            }            catch (Exception ex)            {                status = true;            }            return Json(status);        }
     }
 }

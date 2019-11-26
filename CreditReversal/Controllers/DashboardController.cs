@@ -69,9 +69,10 @@ namespace CreditReversal.Controllers
         public ActionResult Admin()
         {
             ViewBag.Dasboard = sessionData.getDasboard();
-            ViewBag.TotalStaff = functions.GetTotalStaff("admin");
-            ViewBag.TotalClients = functions.GetTotalClients("admin");
-            ViewBag.TotalAgents = functions.GetTotalAgents("admin");
+            //ViewBag.TotalStaff = functions.GetTotalStaff("admin");
+            //ViewBag.TotalClients = functions.GetTotalClients("admin");
+            //ViewBag.TotalAgents = functions.GetTotalAgents("admin");
+            ViewBag.GetBillingDates = functions.GetAgentBillings();
             return View();
         }
         [Route("staff")]

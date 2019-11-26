@@ -32,15 +32,15 @@
         height: 100px;
         -webkit-animation: spin 2s linear infinite; /* Safari */
         animation: spin 2s linear infinite;
-    }
 
-    .loader1 {
-        position: absolute;
-        top: 1%;
+       position: fixed;
+        top: 50%;
         left: 50%;
         margin: -50px 0px 0px -50px;
         z-index: 50;
     }
+
+   
 
     @@-webkit-keyframes spin {
         0% {
@@ -154,20 +154,12 @@
                                 {
                                     var i = 0;
                                     var j = 0;
-                                    //string StatusEQUIFAX = "";
-                                    //string StatusEXPERIAN = "";
-                                    //string StatusTRANSUNION = "";
+
 
                                     foreach (var item in ViewBag.challenges)
                                     {
 
-                                        //if (i == 7)
-                                        //{
 
-                                        //    StatusEQUIFAX = item.EQUIFAX;
-                                        //    StatusEXPERIAN = item.EXPERIAN;
-                                        //    StatusTRANSUNION = item.TRANSUNION;
-                                        //}
                                         <tr>
 
                                             @if (role.ToUpper() != "CLIENT" && item.Heading != "CreditreportId")
@@ -220,13 +212,14 @@
                                                                     <span class="input-group-addon">
                                                                         <input type="checkbox" class="use-address" name="case[]" id="chkTRANS_@j">
                                                                     </span>
-                                                                    <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="TRANSChallenge_@j" name="TRChallenge" style="width:200px" />
-                                                                    <datalist id="challenges" class="dropdown">
+                                                                    <input type="text" list="challengesTRU1_@j" class="form-control challengestext" placeholder="Select challenge" id="TRANSChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                    <datalist id="challengesTRU1_@j" class="dropdown">
                                                                         @if (ViewBag.challengeMasters.Count > 0)
                                                                         {
                                                                             foreach (var challengeitem in ViewBag.challengeMasters)
                                                                             {
-                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                                string challengeFirst = "First Round-" + @challengeitem.ChallengeText;
+                                                                                <option value="@challengeFirst" />
                                                                             }
                                                                         }
                                                                     </datalist>
@@ -234,20 +227,72 @@
 
                                                             </td>
                                                         }
-                                                        else
+                                                        else if (!string.IsNullOrEmpty(@item.TRANSUNION))
                                                         {
                                                             <td>
                                                                 <div class="input-group">
                                                                     <span class="input-group-addon">
-                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkTRANS_@j" checked disabled>
+                                                                        @{
+                                                                            string challengetextTU = @item.TRANSUNION;
+                                                                            string[] strTU = challengetextTU.Split('-');
+                                                                            string roundTU = "";
+                                                                        }
+                                                                        @if (strTU[0] == "First Round")
+                                                                        {
+                                                                            roundTU = "Second Round";
+                                                                        }
+                                                                        else if (strTU[0] == "Second Round")
+                                                                        {
+                                                                            roundTU = "Third Round";
+                                                                        }
+
+                                                                        @if (challengetextTU.Contains("Round"))
+                                                                        {
+                                                                            if (challengetextTU.Contains("Third Round"))
+                                                                            {
+                                                                                <input type="checkbox" class="use-address" name="case[]" id="chkTRANS_@j" checked disabled>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input type="checkbox" class="use-address" name="case[]" id="chkTRANS_@j" onchange="EnableCheckBox('TRANSChallenge_@j');">
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkTRANS_@j" checked disabled>
+                                                                        }
+
                                                                     </span>
-                                                                    <input type="text" list="challenges" class="form-control challengestext" value="@item.TRANSUNION" placeholder="Select challenge" id="TRANSChallenge_@j" name="TRChallenge" style="width:200px" disabled />
-                                                                    <datalist id="challenges" class="dropdown">
+                                                                    @if (challengetextTU.Contains("Round"))
+                                                                    {
+                                                                        if (challengetextTU.Contains("Third Round"))
+                                                                        {
+                                                                            <input type="text" list="challengesTRU2_@j" class="form-control challengestext" value="@item.TRANSUNION" placeholder="Select challenge" id="TRANSChallenge_@j" name="TRChallenge" style="width:200px" disabled />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="text" list="challengesTRU2_@j" class="form-control challengestext" value="@item.TRANSUNION" placeholder="Select challenge" id="TRANSChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="text" list="challengesTRU2_@j" class="form-control challengestext" value="@item.TRANSUNION" placeholder="Select challenge" id="TRANSChallenge_@j" name="TRChallenge" style="width:200px" disabled />
+                                                                    }
+
+                                                                    <datalist id="challengesTRU2_@j" class="dropdown">
                                                                         @if (ViewBag.challengeMasters.Count > 0)
                                                                         {
                                                                             foreach (var challengeitem in ViewBag.challengeMasters)
                                                                             {
-                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                                if (challengetextTU.Contains("Round"))
+                                                                                {
+                                                                                    string challengeTU = @roundTU + "-" + @challengeitem.ChallengeText;
+                                                                                    <option value="@challengeTU" />
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <option value="@challengeitem.ChallengeText" />
+                                                                                }
                                                                             }
                                                                         }
                                                                     </datalist>
@@ -268,13 +313,14 @@
                                                                     <span class="input-group-addon">
                                                                         <input type="checkbox" class="use-address" name="case[]" id="chkEXPE_@j">
                                                                     </span>
-                                                                    <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="EXPEChallenge_@j" name="TRChallenge" style="width:200px" />
-                                                                    <datalist id="challenges" class="dropdown">
+                                                                    <input type="text" list="challengesEX1_@j" class="form-control challengestext" placeholder="Select challenge" id="EXPEChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                    <datalist id="challengesEX1_@j" class="dropdown">
                                                                         @if (ViewBag.challengeMasters.Count > 0)
                                                                         {
                                                                             foreach (var challengeitem in ViewBag.challengeMasters)
                                                                             {
-                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                                string challengeFirst = "First Round-" + @challengeitem.ChallengeText;
+                                                                                <option value="@challengeFirst" />
                                                                             }
                                                                         }
                                                                     </datalist>
@@ -282,20 +328,74 @@
 
                                                             </td>
                                                         }
-                                                        else
+                                                        else if (!string.IsNullOrEmpty(@item.EXPERIAN))
                                                         {
                                                             <td>
                                                                 <div class="input-group">
                                                                     <span class="input-group-addon">
-                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkEXPE_@j" checked disabled>
+                                                                        @{
+                                                                            string challengetextEX = @item.EXPERIAN;
+                                                                            string[] strEX = challengetextEX.Split('-');
+                                                                            string roundEX = "";
+                                                                        }
+                                                                        @if (strEX[0] == "First Round")
+                                                                        {
+                                                                            roundEX = "Second Round";
+                                                                        }
+                                                                        else if (strEX[0] == "Second Round")
+                                                                        {
+                                                                            roundEX = "Third Round";
+                                                                        }
+
+                                                                        @if (challengetextEX.Contains("Round"))
+                                                                        {
+                                                                            if (challengetextEX.Contains("Third Round"))
+                                                                            {
+                                                                                <input type="checkbox" class="use-address" name="case[]" id="chkEXPE_@j" checked disabled>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input type="checkbox" class="use-address" name="case[]" id="chkEXPE_@j" onchange="EnableCheckBox('EXPEChallenge_@j');">
+                                                                            }
+
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkEXPE_@j" checked disabled>
+                                                                        }
+
                                                                     </span>
-                                                                    <input type="text" list="challenges" class="form-control challengestext" value="@item.EXPERIAN" placeholder="Select challenge" id="EXPEChallenge_@j" name="TRChallenge" style="width:200px" disabled />
-                                                                    <datalist id="challenges" class="dropdown">
+
+                                                                    @if (challengetextEX.Contains("Round"))
+                                                                    {
+                                                                        if (challengetextEX.Contains("Third Round"))
+                                                                        {
+                                                                            <input type="text" list="challengesEX2_@j" class="form-control challengestext" value="@item.EXPERIAN" placeholder="Select challenge" id="EXPEChallenge_@j" name="TRChallenge" style="width:200px" disabled />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="text" list="challengesEX2_@j" class="form-control challengestext" value="@item.EXPERIAN" placeholder="Select challenge" id="EXPEChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="text" list="challengesEX2_@j" class="form-control challengestext" value="@item.EXPERIAN" placeholder="Select challenge" id="EXPEChallenge_@j" name="TRChallenge" style="width:200px" disabled />
+                                                                    }
+
+                                                                    <datalist id="challengesEX2_@j" class="dropdown">
                                                                         @if (ViewBag.challengeMasters.Count > 0)
                                                                         {
                                                                             foreach (var challengeitem in ViewBag.challengeMasters)
                                                                             {
-                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                                if (challengetextEX.Contains("Round"))
+                                                                                {
+                                                                                    <option value="@roundEX-@challengeitem.ChallengeText" />
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <option value="@challengeitem.ChallengeText" />
+                                                                                }
+
                                                                             }
                                                                         }
                                                                     </datalist>
@@ -315,13 +415,14 @@
                                                                     <span class="input-group-addon">
                                                                         <input type="checkbox" class="use-address" name="case[]" id="chkEQUI_@j">
                                                                     </span>
-                                                                    <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="EQUIChallenge_@j" name="TRChallenge" style="width:200px" />
-                                                                    <datalist id="challenges" class="dropdown">
+                                                                    <input type="text" list="challengesEQ1_@j" class="form-control challengestext" placeholder="Select challenge" id="EQUIChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                    <datalist id="challengesEQ1_@j" class="dropdown">
                                                                         @if (ViewBag.challengeMasters.Count > 0)
                                                                         {
                                                                             foreach (var challengeitem in ViewBag.challengeMasters)
                                                                             {
-                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                                string challengeFirst = "First Round-" + @challengeitem.ChallengeText;
+                                                                                <option value="@challengeFirst" />
                                                                             }
                                                                         }
                                                                     </datalist>
@@ -329,20 +430,71 @@
 
                                                             </td>
                                                         }
-                                                        else
+                                                        else if (!string.IsNullOrEmpty(@item.EQUIFAX))
                                                         {
                                                             <td>
                                                                 <div class="input-group">
                                                                     <span class="input-group-addon">
-                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkEQUI_@j" checked disabled>
+                                                                        @{
+                                                                            string challengetextEQ = @item.EQUIFAX;
+                                                                            string[] strEQ = challengetextEQ.Split('-');
+                                                                            string roundEQ = "";
+                                                                        }
+                                                                        @if (strEQ[0] == "First Round")
+                                                                        {
+                                                                            roundEQ = "Second Round";
+                                                                        }
+                                                                        else if (strEQ[0] == "Second Round")
+                                                                        {
+                                                                            roundEQ = "Third Round";
+                                                                        }
+
+                                                                        @if (challengetextEQ.Contains("Round"))
+                                                                        {
+                                                                            if (challengetextEQ.Contains("Third Round"))
+                                                                            {
+                                                                                <input type="checkbox" class="use-address" name="case[]" id="chkEQUI_@j" checked disabled>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input type="checkbox" class="use-address" name="case[]" id="chkEQUI_@j" onchange="EnableCheckBox('EQUIChallenge_@j');">
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkEQUI_@j" checked disabled>
+                                                                        }
+
                                                                     </span>
-                                                                    <input type="text" list="challenges" class="form-control challengestext" value="@item.EQUIFAX" placeholder="Select challenge" id="EQUIChallenge_@j" name="TRChallenge" style="width:200px" ; disabled />
-                                                                    <datalist id="challenges" class="dropdown">
+                                                                    @if (challengetextEQ.Contains("Round"))
+                                                                    {
+                                                                        if (challengetextEQ.Contains("Third Round"))
+                                                                        {
+                                                                            <input type="text" list="challengesEQ2_@j" class="form-control challengestext" value="@item.EQUIFAX" placeholder="Select challenge" id="EQUIChallenge_@j" name="TRChallenge" style="width:200px" ; disabled />
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="text" list="challengesEQ2_@j" class="form-control challengestext" value="@item.EQUIFAX" placeholder="Select challenge" id="EQUIChallenge_@j" name="TRChallenge" style="width:200px" ; />
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="text" list="challengesEQ2_@j" class="form-control challengestext" value="@item.EQUIFAX" placeholder="Select challenge" id="EQUIChallenge_@j" name="TRChallenge" style="width:200px" ; disabled />
+                                                                    }
+
+                                                                    <datalist id="challengesEQ2_@j" class="dropdown">
                                                                         @if (ViewBag.challengeMasters.Count > 0)
                                                                         {
                                                                             foreach (var challengeitem in ViewBag.challengeMasters)
                                                                             {
-                                                                                <option value="@challengeitem.ChallengeText" />
+                                                                                if (challengetextEQ.Contains("Round"))
+                                                                                {
+                                                                                    <option value="@roundEQ-@challengeitem.ChallengeText" />
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <option value="@challengeitem.ChallengeText" />
+                                                                                }
                                                                             }
                                                                         }
                                                                     </datalist>
@@ -398,9 +550,6 @@
                                                             }
 
                                                         }
-
-
-
 
                                                         //showing Late 30 Days challenge text in red background
                                                         if (negativeitemTU != "0" && i == 7)
@@ -471,7 +620,6 @@
 
                 @*anothertablae*@
                 <div class="row" style="padding-bottom:12px;">
-
                     <span class="pull-left"><h5>Inquiries</h5></span>
                     @if (role.ToUpper() != "CLIENT")
                     {
@@ -479,7 +627,6 @@
                             <button class="btn btn-secondary" id="AddInquiriesChallenge">Create Challenge</button>
                         </span>
                     }
-
                 </div>
 
                 <div class="row">
@@ -488,11 +635,9 @@
                             <thead>
                                 <tr>
                                     <th width="20%"></th>
-
                                     <th width="23%" style="text-align:center;background-color:#DAB96A;color:#fff;">TransUnion</th>
                                     <th width="23%" style="text-align:center;background-color:#98BDC5;color:#fff;">Experian</th>
                                     <th width="23%" style="text-align:center;background-color:#CBD06C;color:#fff;">Equifax</th>
-
                                 </tr>
                             </thead>
                             <tbody>
@@ -504,219 +649,300 @@
 
                                     foreach (var item in ViewBag.Inquires)
                                     {
+                                        <tr>
 
-
-                                <tr>
-
-                                    @if (role.ToUpper() != "CLIENT" && item.Heading != "CreditInqId")
-                                    {
-                                        //displaying all headings except creditreportid for agent
-                                        <td class="tdClass">@item.Heading</td>
-                                    }
-                                    else
-                                    {
-                                        //displaying all headings except Challenge and creditreportid for client
-                                        if (item.Heading != "Challenge" && item.Heading != "CreditInqId")
-                                        {
-                                            <td class="tdClass">@item.Heading</td>
-                                        }
-
-                                    }
-
-
-                                    @if (i == 0)
-                                    {
-
-                                        //bank name bold color
-                                        <td style="font-weight:600">@item.TRANSUNION</td>
-                                        <td style="font-weight:600">@item.EXPERIAN</td>
-                                        <td style="font-weight:600">@item.EQUIFAX</td>
-                                    }
-                                    else
-                                    {
-
-                                        if (i == 3)
-                                        {
-                                            if (role.ToUpper() != "CLIENT")
+                                            @if (role.ToUpper() != "CLIENT" && item.Heading != "CreditInqId")
                                             {
-                                                //if (role.ToUpper() == "AGENTADMIN")
-                                                //{
-
-                                                //transunion challenge text dropdown
-
-                                                if (item.TRANSUNION == "" || item.TRANSUNION == "-")
+                                                //displaying all headings except creditreportid for agent
+                                                <td class="tdClass">@item.Heading</td>
+                                            }
+                                            else
+                                            {
+                                                //displaying all headings except Challenge and creditreportid for client
+                                                if (item.Heading != "Challenge" && item.Heading != "CreditInqId")
                                                 {
-                                                    <td>
-                                                        <div class="input-group">
-                                                            <span class="input-group-addon">
-                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j">
-                                                            </span>
-                                                            <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="TRANSInquiriesChallenge_@j" name="TRChallenge" style="width:200px" />
-                                                            <datalist id="challenges" class="dropdown">
-                                                                @if (ViewBag.challengeMasters.Count > 0)
-                                                                {
-                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
-                                                                    {
-                                                                        <option value="@challengeitem.ChallengeText" />
-                                                                    }
-                                                                }
-                                                            </datalist>
-                                                        </div>
-
-                                                    </td>
-                                                }
-                                                else
-                                                {
-                                                    <td>
-                                                        <div class="input-group">
-                                                            <span class="input-group-addon">
-                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" checked disabled>
-                                                            </span>
-                                                            <input type="text" list="challenges" class="form-control challengestext" value="@item.TRANSUNION" placeholder="Select challenge" id="TRANSInquiriesChallenge_@j" name="TRChallenge" style="width:200px" disabled />
-                                                            @if (item.TRANSUNION != "")
-                                                            {
-                                                                <lable id="hdnTRANSUNIONchallgtxt" hidden>@item.TRANSUNION</lable>
-                                                            }
-                                                            <datalist id="challenges" class="dropdown">
-                                                                @if (ViewBag.challengeMasters.Count > 0)
-                                                                {
-                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
-                                                                    {
-                                                                        <option value="@challengeitem.ChallengeText" />
-                                                                    }
-                                                                }
-                                                            </datalist>
-                                                        </div>
-                                                    </td>
-                                                }
-
-
-                                                //EXPERIAN challenge text dropdown
-
-                                                if (item.EXPERIAN == "" || item.EXPERIAN == "-")
-                                                {
-                                                    <td>
-                                                        <div class="input-group">
-                                                            <span class="input-group-addon">
-                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j">
-                                                            </span>
-                                                            <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="EXPEInquiriesChallenge_@j" name="TRChallenge" style="width:200px" />
-                                                            <datalist id="challenges" class="dropdown">
-                                                                @if (ViewBag.challengeMasters.Count > 0)
-                                                                {
-                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
-                                                                    {
-                                                                        <option value="@challengeitem.ChallengeText" />
-                                                                    }
-                                                                }
-                                                            </datalist>
-                                                        </div>
-
-                                                    </td>
-                                                }
-                                                else
-                                                {
-                                                    <td>
-                                                        <div class="input-group">
-                                                            <span class="input-group-addon">
-                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" checked disabled>
-                                                            </span>
-                                                            <input type="text" list="challenges" class="form-control challengestext" value="@item.EXPERIAN" placeholder="Select challenge" id="EXPEInquiriesChallenge_@j" name="TRChallenge" style="width:200px" disabled />
-                                                            @if (item.EXPERIAN != "")
-                                                            {
-                                                                <lable id="hdnEXPERIANchallgtxt" hidden>@item.EXPERIAN</lable>
-                                                            }
-
-                                                            <datalist id="challenges" class="dropdown">
-                                                                @if (ViewBag.challengeMasters.Count > 0)
-                                                                {
-                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
-                                                                    {
-                                                                        <option value="@challengeitem.ChallengeText" />
-                                                                    }
-                                                                }
-                                                            </datalist>
-                                                        </div>
-                                                    </td>
-                                                }
-
-                                                //EQUIFAX challenge text dropdown
-
-                                                if (item.EQUIFAX == "" || item.EQUIFAX == "-")
-                                                {
-                                                    <td>
-                                                        <div class="input-group">
-                                                            <span class="input-group-addon">
-                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j">
-                                                            </span>
-                                                            <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="EQUIInquiriesChallenge_@j" name="TRChallenge" style="width:200px" />
-                                                            <datalist id="challenges" class="dropdown">
-                                                                @if (ViewBag.challengeMasters.Count > 0)
-                                                                {
-                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
-                                                                    {
-                                                                        <option value="@challengeitem.ChallengeText" />
-                                                                    }
-                                                                }
-                                                            </datalist>
-                                                        </div>
-
-                                                    </td>
-                                                }
-                                                else
-                                                {
-                                                    <td>
-                                                        <div class="input-group">
-                                                            <span class="input-group-addon">
-                                                                <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" checked disabled>
-                                                            </span>
-                                                            <input type="text" list="challenges" class="form-control challengestext" value="@item.EQUIFAX" placeholder="Select challenge" id="EQUIInquiriesChallenge_@j" name="TRChallenge" style="width:200px" disabled />
-                                                            @if (item.EQUIFAX != "")
-                                                            {
-                                                                <lable id="hdnEQUIFAXchallgtxt" hidden>@item.EQUIFAX</lable>
-                                                            }
-
-                                                            <datalist id="challenges" class="dropdown">
-                                                                @if (ViewBag.challengeMasters.Count > 0)
-                                                                {
-                                                                    foreach (var challengeitem in ViewBag.challengeMasters)
-                                                                    {
-                                                                        <option value="@challengeitem.ChallengeText" />
-                                                                    }
-                                                                }
-                                                            </datalist>
-                                                        </div>
-                                                    </td>
+                                                    <td class="tdClass">@item.Heading</td>
                                                 }
                                             }
-
-                                        }
-                                        else
-                                        {
-                                            if (item.Heading != "CreditInqId")
+                                            @if (i == 0)
                                             {
-                                                <td>@item.TRANSUNION</td>
-                                                <td>@item.EXPERIAN</td>
-                                                <td>@item.EQUIFAX</td>
+
+                                                //bank name bold color
+                                                <td style="font-weight:600">@item.TRANSUNION</td>
+                                                <td style="font-weight:600">@item.EXPERIAN</td>
+                                                <td style="font-weight:600">@item.EQUIFAX</td>
+                                            }
+                                            else
+                                            {
+
+                                                if (i == 4)
+                                                {
+                                                    if (role.ToUpper() != "CLIENT")
+                                                    {
+                                                        //if (role.ToUpper() == "AGENTADMIN")
+                                                        //{
+
+                                                        //transunion challenge text dropdown
+
+                                                        if (item.TRANSUNION == "" || item.TRANSUNION == "-")
+                                                        {
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j">
+                                                                    </span>
+                                                                    <input type="text" list="challengesITU1_@j" class="form-control challengestext" placeholder="Select challenge" id="TRANSInquiriesChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                    <datalist id="challengesITU1_@j" class="dropdown">
+                                                                        @if (ViewBag.challengeMasters.Count > 0)
+                                                                        {
+                                                                            foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                            {
+                                                                                string challengeFirst = "First Round-" + @challengeitem.ChallengeText;
+                                                                                <option value="@challengeFirst" />
+                                                                            }
+                                                                        }
+                                                                    </datalist>
+                                                                </div>
+
+                                                            </td>
+                                                        }
+                                                        else if (!string.IsNullOrEmpty(@item.TRANSUNION))
+                                                        {
+                                                            <td>
+                                                                @{
+                                                                    string challengetextTU = @item.TRANSUNION;
+                                                                    string[] strTU = challengetextTU.Split('-');
+                                                                    string roundTU = "";
+                                                                }
+                                                                @if (strTU[0] == "First Round")
+                                                                {
+                                                                    roundTU = "Second Round";
+                                                                }
+                                                                else if (strTU[0] == "Second Round")
+                                                                {
+                                                                    roundTU = "Third Round";
+                                                                }
+                                                                <div class="input-group">
+
+                                                                    <span class="input-group-addon">
+                                                                        @{string strchecked = "", strdisabled = ""; }
+                                                                        @if (challengetextTU.Contains("Round"))
+                                                                        {
+                                                                            if (challengetextTU.Contains("Third Round"))
+                                                                            {
+                                                                                strchecked = "checked"; strdisabled = "disabled";
+                                                                            }
+                                                                        }
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" @strchecked @strdisabled onchange="EnableCheckBox('TRANSInquiriesChallenge_@j');">
+                                                                    </span>
+                                                                    <input type="text" list="challengesITU2_@j" class="form-control challengestext" value="@item.TRANSUNION" placeholder="Select challenge" id="TRANSInquiriesChallenge_@j" name="TRChallenge" style="width:200px" @strdisabled />
+                                                                    @if (item.TRANSUNION != "")
+                                                                    {
+                                                                        <lable id="hdnTRANSUNIONchallgtxt" hidden>@item.TRANSUNION</lable>
+                                                                    }
+                                                                    <datalist id="challengesITU2_@j" class="dropdown">
+                                                                        @if (ViewBag.challengeMasters.Count > 0)
+                                                                        {
+                                                                            foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                            {
+                                                                                if (challengetextTU.Contains("Round"))
+                                                                                {
+                                                                                    string challengeTU = @roundTU + "-" + @challengeitem.ChallengeText;
+                                                                                    <option value="@challengeTU" />
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <option value="@challengeitem.ChallengeText" />
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    </datalist>
+                                                                </div>
+                                                            </td>
+                                                        }
+
+
+                                                        //EXPERIAN challenge text dropdown
+
+                                                        if (item.EXPERIAN == "" || item.EXPERIAN == "-")
+                                                        {
+                                                            <td>                                                               
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">                                                                      
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j">
+                                                                    </span>
+                                                                    <input type="text" list="challengesIEX1_@j" class="form-control challengestext" placeholder="Select challenge" id="EXPEInquiriesChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                    <datalist id="challengesIEX1_@j" class="dropdown">
+                                                                        @if (ViewBag.challengeMasters.Count > 0)
+                                                                        {
+                                                                            foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                            {
+                                                                                string challengeFirst = "First Round-" + @challengeitem.ChallengeText;
+                                                                                <option value="@challengeFirst" />
+                                                                            }
+                                                                        }
+                                                                    </datalist>
+                                                                </div>
+
+                                                            </td>
+                                                        }
+                                                        else if (!string.IsNullOrEmpty(@item.EXPERIAN))
+                                                        {
+                                                            <td>
+                                                                @{
+                                                                    string challengetextEX = @item.EXPERIAN;
+                                                                    string[] strEX = challengetextEX.Split('-');
+                                                                    string roundEX = "";
+                                                                }
+                                                                @if (strEX[0] == "First Round")
+                                                                {
+                                                                    roundEX = "Second Round";
+                                                                }
+                                                                else if (strEX[0] == "Second Round")
+                                                                {
+                                                                    roundEX = "Third Round";
+                                                                }
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        @{string strchecked = "", strdisabled = ""; }
+                                                                        @if (challengetextEX.Contains("Round"))
+                                                                        {
+                                                                            if (challengetextEX.Contains("Third Round"))
+                                                                            {
+                                                                                strchecked = "checked"; strdisabled = "disabled";
+                                                                            }
+                                                                        }
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" @strchecked @strdisabled onchange="EnableCheckBox('EXPEInquiriesChallenge_@j');">
+                                                                    </span>
+                                                                    <input type="text" list="challengesIEX2_@j" class="form-control challengestext" value="@item.EXPERIAN" placeholder="Select challenge" id="EXPEInquiriesChallenge_@j" name="TRChallenge" style="width:200px" @strdisabled />
+                                                                    @if (item.EXPERIAN != "")
+                                                                    {
+                                                                        <lable id="hdnEXPERIANchallgtxt" hidden>@item.EXPERIAN</lable>
+                                                                    }
+                                                                        <datalist id="challengesIEX2_@j" class="dropdown">
+                                                                            @if (ViewBag.challengeMasters.Count > 0)
+                                                                            {
+                                                                                foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                                {
+                                                                                    if (challengetextEX.Contains("Round"))
+                                                                                    {
+                                                                                        string challengeTU = roundEX + "-" + @challengeitem.ChallengeText;
+                                                                                        <option value="@challengeTU" />
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <option value="@challengeitem.ChallengeText" />
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        </datalist>
+                                                                </div>
+                                                            </td>
+                                                        }
+
+                                                        //EQUIFAX challenge text dropdown
+
+                                                        if (item.EQUIFAX == "" || item.EQUIFAX == "-")
+                                                        {
+                                                            <td>
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j">
+                                                                    </span>
+                                                                    <input type="text" list="challengesIEQ1_@j" class="form-control challengestext" placeholder="Select challenge" id="EQUIInquiriesChallenge_@j" name="TRChallenge" style="width:200px" />
+                                                                    <datalist id="challengesIEQ1_@j" class="dropdown">
+                                                                        @if (ViewBag.challengeMasters.Count > 0)
+                                                                        {
+                                                                            foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                            {
+                                                                                string challengeFirst = "First Round-" + @challengeitem.ChallengeText;
+                                                                                <option value="@challengeFirst" />
+                                                                            }
+                                                                        }
+                                                                    </datalist>
+                                                                </div>
+
+                                                            </td>
+                                                        }
+                                                        else if (!string.IsNullOrEmpty(@item.EQUIFAX))
+                                                        {
+                                                            <td>
+                                                                @{
+                                                                    string challengetextEQ = @item.EXPERIAN;
+                                                                    string[] strEQ = challengetextEQ.Split('-');
+                                                                    string roundEQ = "";
+                                                                }
+                                                                @if (strEQ[0] == "First Round")
+                                                                {
+                                                                    roundEQ = "Second Round";
+                                                                }
+                                                                else if (strEQ[0] == "Second Round")
+                                                                {
+                                                                    roundEQ = "Third Round";
+                                                                }
+                                                                <div class="input-group">
+                                                                    <span class="input-group-addon">
+                                                                        @{string strchecked = "", strdisabled = ""; }
+                                                                        @if (challengetextEQ.Contains("Round"))
+                                                                        {
+                                                                            if (challengetextEQ.Contains("Third Round"))
+                                                                            {
+                                                                                strchecked = "checked"; strdisabled = "disabled";
+                                                                            }
+                                                                        }
+                                                                        <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" @strchecked @strdisabled onchange="EnableCheckBox('EQUIInquiriesChallenge_@j');">
+                                                                    </span>
+                                                                    <input type="text" list="challengesIEQ2_@j" class="form-control challengestext" value="@item.EQUIFAX" placeholder="Select challenge" id="EQUIInquiriesChallenge_@j" name="TRChallenge" style="width:200px" @strdisabled />
+                                                                    @if (item.EQUIFAX != "")
+                                                                    {
+                                                                        <lable id="hdnEQUIFAXchallgtxt" hidden>@item.EQUIFAX</lable>
+                                                                    }
+
+                                                                        <datalist id="challengesIEQ2_@j" class="dropdown">
+                                                                            @if (ViewBag.challengeMasters.Count > 0)
+                                                                            {
+                                                                                foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                                {
+                                                                                    if (challengetextEQ.Contains("Round"))
+                                                                                    {
+                                                                                        string challengeEQ = roundEQ + "-" + @challengeitem.ChallengeText;
+                                                                                        <option value="@challengeEQ" />
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <option value="@challengeitem.ChallengeText" />
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        </datalist>
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    if (item.Heading != "CreditInqId")
+                                                    {
+                                                        <td>@item.TRANSUNION</td>
+                                                        <td>@item.EXPERIAN</td>
+                                                        <td>@item.EQUIFAX</td>
+                                                    }
+                                                }
 
                                             }
-
-
-                                        }
-
-
-                                    }
-                                </tr>
+                                        </tr>
 
                                         i++;
                                         j++;
-                                        if (i == 5)
+                                        if (i == 6)
                                         {
                                             <lable id="hdnEXPECreditInqId_@j" hidden>@item.EXPERIAN</lable>
                                             <lable id="hdnEQUICreditInqId_@j" hidden>@item.EQUIFAX</lable>
                                             <lable id="hdnTRANSCreditInqId_@j" hidden>@item.TRANSUNION</lable>
                                         }
-                                        if (i == 5)
+                                        if (i == 6)
                                         {
                                             <tr>
                                                 <td> </td>
@@ -757,6 +983,9 @@
                 $("#AddChallenge").attr("disabled", true);
             }
         }
+
+        disableChallengetxtAH();
+        disableChallengetxtINQ();
     });
 
     var getUrlParameter = function getUrlParameter(sParam) {
@@ -764,7 +993,6 @@
             sURLVariables = sPageURL.split('&'),
             sParameterName,
             i;
-
         for (i = 0; i < sURLVariables.length; i++) {
             sParameterName = sURLVariables[i].split('=');
 
@@ -846,45 +1074,50 @@
                 var isCheckboxdisabled = $('#chkEQUI_' + i).is(':disabled');
                 if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditRepItemId != "" && isCheckboxdisabled == false) {
                     debugger
-                    
+
                     if ($("#chkEQUI_" + i).prop("checked") == true) {
                         AllAgenciesvalues.push({
                             'Challenge': EQUIChallenge,
                             'CredRepItemsId': hdnEQUICreditRepItemId,
                         });
                     } else {
-                        Swal.fire("Warning!", "Please check challenge !", 'warning');
-                        return false;
+                        if ($("#EQUIChallenge_" + i).prop('disabled') == false) {
+                            Swal.fire("Warning!", "Please check challenge !", 'warning');
+                            return false;
+                        }                        
                     }
                 }
 
                  var isCheckboxdisabled = $('#chkEXPE_' + i).is(':disabled');
                 if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditRepItemId != "" && isCheckboxdisabled == false) {
                     //debugger;
-                    
-                    if ($("#chkEXPE_" + i).prop("checked") == true) {
 
+                    if ($("#chkEXPE_" + i).prop("checked") == true) {
                         AllAgenciesvalues.push({
                             'Challenge': EXPEChallenge,
                             'CredRepItemsId': hdnEXPECreditRepItemId,
                         });
                     } else {
-                        Swal.fire("Warning!", "Please check challenge !", 'warning');
-                        return false;
+                       if ($("#EXPEChallenge_" + i).prop('disabled') == false) {
+                            Swal.fire("Warning!", "Please check challenge !", 'warning');
+                            return false;
+                        }
                     }
                 }
 
                 var isCheckboxdisabled = $('#chkTRANS_' + i).is(':disabled');
                 if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditRepItemId != ""  && isCheckboxdisabled == false) {
-                    
+
                     if ($("#chkTRANS_" + i).prop("checked") == true) {
                         AllAgenciesvalues.push({
                             'Challenge': TRANSChallenge,
                             'CredRepItemsId': hdnTRANSCreditRepItemId,
                         });
                     } else {
-                        Swal.fire("Warning!", "Please check challenge !", 'warning');
-                        return false;
+                        if ($("#TRANSChallenge_" + i).prop('disabled') == false) {
+                            Swal.fire("Warning!", "Please check challenge !", 'warning');
+                            return false;
+                        }
                     }
                 }
 
@@ -897,11 +1130,8 @@
                 return false;
             }
 
-
-
             var values = new Array();
             var ClientId = getUrlParameter('ClientId');
-
             var res = 0;
             values.push(@Html.Raw(Json.Encode(ViewBag.AgentName)));
             values.push(@Html.Raw(Json.Encode(ViewBag.Cname)));
@@ -930,30 +1160,28 @@
                         {
                             if (role == "agentadmin")
                             {
-								window.location.href = "/dashboard/agent";
+								//window.location.href = "/dashboard/agent";
+								window.location.href = "/Agent/Challenges?ClientId="+ Id;
                             }
-                            else if (role == "agentstaff") {
-								window.location.href = "/dashboard/staff";
+                            else if (role == "agentstaff")
+                            {
+								//window.location.href = "/dashboard/staff";
+                                window.location.href = "/Agent/Challenges?ClientId="+ Id;
 							}
                         }
                         else
                         {
                            window.location.href = "/Client/CreditItems?ClientId=" + Id;
-
                         }
                     })
                 }
                 else {
-
                     $(".loader1").hide();
                     $("#overlay").hide();
                     location.reload();
-
                 }
             }
         });
-
-
 
 
     });
@@ -969,12 +1197,12 @@
 
             for (var i = 0; i < items.length; i++) {
 
-                //Reading  Inquiries challenge text from Inquiries table 
+                //Reading  Inquiries challenge text from Inquiries table
                     var EQUIChallenge = $("#EQUIInquiriesChallenge_" + i).val();
                     var EXPEChallenge = $("#EXPEInquiriesChallenge_" + i).val();
                     var TRANSChallenge = $("#TRANSInquiriesChallenge_" + i).val();
 
-                //Reading  CreditInqId from  Inquiries table 
+                //Reading  CreditInqId from  Inquiries table
                 var k = i + 2;
                 var hdnEQUICreditInqId = $("#hdnEQUICreditInqId_" + k).text();
                 var hdnEXPECreditInqId = $("#hdnEXPECreditInqId_" + k).text();
@@ -983,21 +1211,24 @@
 
                 var isCheckboxdisabled = $('#chkInquiriesEQUI_' + i).is(':disabled');
                 if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditInqId != "" && isCheckboxdisabled == false) {
-                    
+
                     if ($("#chkInquiriesEQUI_" + i).prop("checked") == true) {
                         AllAgenciesvalues.push({
                             'ChallengeText': EQUIChallenge,
                             'CreditInqId': hdnEQUICreditInqId,
                         });
                     } else {
-                        Swal.fire("Warning!", "Please check challenge !", 'warning');
-                        return false;
+                        if ($("#EQUIInquiriesChallenge_" + i).prop('disabled') == false) {
+                           Swal.fire("Warning!", "Please check challenge !", 'warning');
+                           return false;
+                        }
+                        
                     }
                 }
                  var isCheckboxdisabled = $('#chkInquiriesEXPE_' + i).is(':disabled');
                 if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditInqId != "" && isCheckboxdisabled == false) {
                     //debugger;
-                   
+
                     if ($("#chkInquiriesEXPE_" + i).prop("checked") == true) {
 
                         AllAgenciesvalues.push({
@@ -1005,21 +1236,25 @@
                             'CreditInqId': hdnEXPECreditInqId,
                         });
                     } else {
-                        Swal.fire("Warning!", "Please check challenge !", 'warning');
-                        return false;
+                        if ($("#EXPEInquiriesChallenge_" + i).prop('disabled') == false) {
+                           Swal.fire("Warning!", "Please check challenge !", 'warning');
+                           return false;
+                        }
                     }
                 }
                 var isCheckboxdisabled = $('#chkInquiriesTRANS_' + i).is(':disabled');
                 if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditInqId != "" && isCheckboxdisabled == false) {
-                    
+
                     if ($("#chkInquiriesTRANS_" + i).prop("checked") == true) {
                         AllAgenciesvalues.push({
                             'ChallengeText': TRANSChallenge,
                             'CreditInqId': hdnTRANSCreditInqId,
                         });
                     } else {
-                        Swal.fire("Warning!", "Please check challenge !", 'warning');
-                        return false;
+                        if ($("#TRANSInquiriesChallenge_" + i).prop('disabled') == false) {
+                           Swal.fire("Warning!", "Please check challenge !", 'warning');
+                           return false;
+                        }
                     }
                 }
 
@@ -1033,11 +1268,9 @@
             }
 
 
-
             var values = new Array();
-
             var Id = getUrlParameter('ClientId');
-           
+
             values.push(@Html.Raw(Json.Encode(ViewBag.AgentName)));
             values.push(@Html.Raw(Json.Encode(ViewBag.Cname)));
             values.push(@Html.Raw(Json.Encode(ViewBag.DateReportPulls)));
@@ -1065,16 +1298,17 @@
                         {
                             if (role == "agentadmin")
                             {
-								window.location.href = "/dashboard/agent";
+                                window.location.href = "/Agent/Challenges?ClientId="+ Id;
+								//window.location.href = "/dashboard/agent";
                             }
                             else if (role == "agentstaff") {
-								window.location.href = "/dashboard/staff";
+                                //window.location.href = "/dashboard/staff";
+                                window.location.href = "/Agent/Challenges?ClientId="+ Id;                                
 							}
                         }
                         else
                         {
                            window.location.href = "/Client/CreditItems?ClientId=" + Id;
-
                         }
                     })
                 }
@@ -1144,19 +1378,19 @@
 
     $("#RefreshCreditPull").click(function () {
         debugger;
-        
+
         //inquiries start
         var items=@Html.Raw(Json.Encode(ViewBag.Inquires));
             var i = 0;
             var AllAgenciesInquiresvalues = new Array();
             for (var i = 0; i < items.length; i++) {
 
-                //Reading  Inquiries challenge text from Inquiries table 
+                //Reading  Inquiries challenge text from Inquiries table
                     var EQUIChallenge = $("#EQUIInquiriesChallenge_" + i).val();
                     var EXPEChallenge = $("#EXPEInquiriesChallenge_" + i).val();
                     var TRANSChallenge = $("#TRANSInquiriesChallenge_" + i).val();
 
-                //Reading  CreditInqId from  Inquiries table 
+                //Reading  CreditInqId from  Inquiries table
                 var k = i + 2;
                 var hdnEQUICreditInqId = $("#hdnEQUICreditInqId_" + k).text();
                 var hdnEXPECreditInqId = $("#hdnEXPECreditInqId_" + k).text();
@@ -1165,7 +1399,7 @@
 
                 var isCheckboxdisabled = $('#chkInquiriesEQUI_' + i).is(':disabled');
                 if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditInqId != "" && isCheckboxdisabled == true) {
-                    
+
                     if ($("#chkInquiriesEQUI_" + i).prop("checked") == true) {
                         AllAgenciesInquiresvalues.push({
                             'ChallengeText': EQUIChallenge,
@@ -1176,29 +1410,29 @@
                  var isCheckboxdisabled = $('#chkInquiriesEXPE_' + i).is(':disabled');
                 if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditInqId != "" && isCheckboxdisabled == true) {
                     //debugger;
-                   
+
                     if ($("#chkInquiriesEXPE_" + i).prop("checked") == true) {
 
                         AllAgenciesInquiresvalues.push({
                             'ChallengeText': EXPEChallenge,
                             'CreditInqId': hdnEXPECreditInqId,
                         });
-                    } 
+                    }
                 }
                 var isCheckboxdisabled = $('#chkInquiriesTRANS_' + i).is(':disabled');
                 if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditInqId != "" && isCheckboxdisabled == true) {
-                    
+
                     if ($("#chkInquiriesTRANS_" + i).prop("checked") == true) {
                         AllAgenciesInquiresvalues.push({
                             'ChallengeText': TRANSChallenge,
                             'CreditInqId': hdnTRANSCreditInqId,
                         });
                     }
-                    
+
                 }
 
-            }      
-        
+            }
+
         //inquies end
 
 
@@ -1220,12 +1454,12 @@
 
 
 
-                
+
 
                 var isCheckboxdisabled = $('#chkEQUI_' + i).is(':disabled');
                 if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditRepItemId != "" && isCheckboxdisabled == true) {
                     debugger
-                    
+
                     if ($("#chkEQUI_" + i).prop("checked") == true) {
                         AllAgenciesvalues.push({
                             'Challenge': EQUIChallenge,
@@ -1240,7 +1474,7 @@
                  var isCheckboxdisabled = $('#chkEXPE_' + i).is(':disabled');
                 if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditRepItemId != "" && isCheckboxdisabled == true) {
                     //debugger;
-                    
+
                     if ($("#chkEXPE_" + i).prop("checked") == true) {
 
                         AllAgenciesvalues.push({
@@ -1255,7 +1489,7 @@
 
                 var isCheckboxdisabled = $('#chkTRANS_' + i).is(':disabled');
                 if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditRepItemId != "" && isCheckboxdisabled == true) {
-                    
+
                     if ($("#chkTRANS_" + i).prop("checked") == true) {
                         AllAgenciesvalues.push({
                             'Challenge': TRANSChallenge,
@@ -1273,7 +1507,7 @@
 
         if (AllAgenciesvalues.length > 0 || AllAgenciesInquiresvalues.length > 0) {
             debugger
-          
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: "Challenges already created. Do you want to refresh!",
@@ -1291,14 +1525,8 @@
             })
         } else {
              refreshcreditpull();
-            
+
         }
-        
-
-
-       
-
-       
 
 
 
@@ -1515,4 +1743,85 @@
         });
 
     });
+
+
+
+    
+    //account history
+    function disableChallengetxtAH() {
+        debugger;
+            var items=@Html.Raw(Json.Encode(ViewBag.challenges));
+            var i = 0;
+            for (var i = 0; i < items.length; i++) {
+
+                    var EQUIChallenge = $("#EQUIChallenge_" + i).val();
+                    var EXPEChallenge = $("#EXPEChallenge_" + i).val();
+                    var TRANSChallenge = $("#TRANSChallenge_" + i).val();
+
+                var k = i + 2;
+                var hdnEQUICreditRepItemId = $("#hdnEQUICreditRepItemId_" + k).text();
+                var hdnEXPECreditRepItemId = $("#hdnEXPECreditRepItemId_" + k).text();
+                var hdnTRANSCreditRepItemId = $("#hdnTRANSCreditRepItemId_" + k).text();
+               
+                if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditRepItemId != "") {
+                    debugger                 
+                    $("#EQUIChallenge_" + i).attr('disabled', 'disabled');
+                }                 
+                if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditRepItemId != "") {
+                    debugger
+                    $("#EXPEChallenge_" + i).attr('disabled', 'disabled');
+                }                
+                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditRepItemId != "") {
+                     debugger
+                    $("#TRANSChallenge_" + i).attr('disabled', 'disabled');
+                }
+            }
+
+    }
+
+    //inquiries
+    function disableChallengetxtINQ() {
+        debugger;
+          var items=@Html.Raw(Json.Encode(ViewBag.Inquires));
+            var i = 0;
+        for (var i = 0; i < items.length; i++)
+        {
+
+                //Reading  Inquiries challenge text from Inquiries table
+                    var EQUIChallenge = $("#EQUIInquiriesChallenge_" + i).val();
+                    var EXPEChallenge = $("#EXPEInquiriesChallenge_" + i).val();
+                    var TRANSChallenge = $("#TRANSInquiriesChallenge_" + i).val();
+
+                //Reading  CreditInqId from  Inquiries table
+                var k = i + 2;
+                var hdnEQUICreditInqId = $("#hdnEQUICreditInqId_" + k).text();
+                var hdnEXPECreditInqId = $("#hdnEXPECreditInqId_" + k).text();
+                var hdnTRANSCreditInqId = $("#hdnTRANSCreditInqId_" + k).text();
+               
+                if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditInqId != "") {
+                    $("#EQUIInquiriesChallenge_" + i).attr('disabled', 'disabled');
+                }
+                
+                if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditInqId != "") {
+                     $("#EXPEInquiriesChallenge_" + i).attr('disabled', 'disabled');
+                }
+               
+                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditInqId != "") {
+                      $("#TRANSInquiriesChallenge_" + i).attr('disabled', 'disabled');
+                }
+        }
+            
+    }
+
+
+    //enabel checkbox
+    function EnableCheckBox(id)
+    {                
+        
+        if ($("#" + id).prop('disabled') == true) {
+            $("#" + id).removeAttr('disabled', 'disabled');
+        } else {
+            $("#" + id).attr('disabled', 'disabled');
+        } 
+    }
 </script>

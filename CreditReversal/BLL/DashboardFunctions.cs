@@ -207,7 +207,7 @@ namespace CreditReversal.BLL
             return res;
         }
 
-        public string getNagativeItemsCount(string ClientId,string round)
+        public string getNagativeItemsCount(string ClientId, string round)
         {
             string items = "";
             try            {
@@ -215,8 +215,8 @@ namespace CreditReversal.BLL
                 //string sql = "SELECT  COUNT(negativeitems) FROM CreditReportItems where  negativeitems !=0 and CredReportId in " +
                 //    "(select CredReportId from CreditReport where ClientId=" + ClientId + ")";
                 string sql = "select distinct AccountNo, Agency from PaymentHistory "
-                 +" where ClientId =" + ClientId +" and RoundType = '"+ round + "' and(PHStatus != 'C' AND PHStatus != 'U' AND PHStatus != ' ' and "
-                 +" PHStatus != 7 and PHStatus != 9)";
+                 + " where ClientId =" + ClientId + " and RoundType = '" + round + "' and(PHStatus != 'C' AND PHStatus != 'U' AND PHStatus != ' ' and "
+                 + " PHStatus != 7 and PHStatus != 9)";
                 DataTable dt = utilities.GetDataTable(sql);
                 items = dt.Rows.Count.ToString();
             }
@@ -226,13 +226,6 @@ namespace CreditReversal.BLL
             }
             return items;
         }
-
-
-
-
-
-
-
         #region Credit Report Summary        public List<CreditItems> GetCreditReportChallenges(int id, string agency = null)        {            List<CreditReportItems> EQUIFAXCRI = new List<CreditReportItems>();            List<CreditReportItems> EXPERIANCRI = new List<CreditReportItems>();            List<CreditReportItems> TRANSUNIONCRI = new List<CreditReportItems>();            List<CreditReportItems> CRI = new List<CreditReportItems>();
 
             List<CreditItems> CreditItems = new List<CreditItems>();            string sql = "";            DataTable dt;            try            {                sql = "SELECT ( STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId+'~'+OpenDate+'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+Status)" +                     " FROM CreditReportItems US join CreditReport cr on US.CredRepItemsId=cr.CreditReportId where Agency='EQUIFAX' and CR.ClientId='" + id + "'" +                     "FOR XML PATH('')), 1, 1, ''))" +                    "as 'EQUIFAX' ," +                    "STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId+'~'+OpenDate+'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+Status)" +                    " FROM CreditReportItems US join CreditReport cr on US.CredRepItemsId=cr.CreditReportId where Agency='EXPERIAN' and CR.ClientId='" + id + "'" +                    "FOR XML PATH('')), 1, 1, '')" +                    " as 'EXPERIAN'," +                    "(SELECT STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId+'~'+OpenDate+'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+Status)" +                     " FROM CreditReportItems US join CreditReport cr on US.CredRepItemsId=cr.CreditReportId where Agency='TRANSUNION' and CR.ClientId='" + id + "'" +                     " FOR XML PATH('')), 1, 1, ''))" +                    "as   'TRANSUNION'";                dt = utilities.GetDataTable(sql);                for (int r = 0; r < dt.Rows.Count; r++)                {
@@ -247,7 +240,7 @@ namespace CreditReversal.BLL
 
 
             }            catch (Exception ex) { ex.insertTrace(""); }            return CreditItems;        }
-        public List<string> getHeadings()        {            List<string> Headings = new List<string>();            Headings.Add("Merchant Name/Account");            Headings.Add("Account #");            Headings.Add("Date Opened");            Headings.Add("High Credit");            Headings.Add("Balance");            Headings.Add("Monthly Payment");            Headings.Add("Last Reported");            Headings.Add("Payment Status");            Headings.Add("Challenge");            Headings.Add("CreditreportId");            Headings.Add("Negativeitems");            Headings.Add("");            return Headings;        }
+        public List<string> getHeadings()        {            List<string> Headings = new List<string>();            Headings.Add("Merchant Name/Account");            Headings.Add("Account #");            Headings.Add("Date Opened");            Headings.Add("High Credit");            Headings.Add("Balance");            Headings.Add("Monthly Payment");            Headings.Add("Last Reported");            Headings.Add("Payment Status");            Headings.Add("Challenge");            Headings.Add("CreditreportId");            Headings.Add("Negativeitems");            Headings.Add("Negativeitems");            return Headings;        }
 
         #endregion
 
@@ -432,6 +425,10 @@ namespace CreditReversal.BLL
 
 
 
+
+
+
+
         #region AgentNamefrmCId        public List<CreditReportItems> GetAgentNamefrmCId(string Cid)        {            List<CreditReportItems> CRI = new List<CreditReportItems>();            string sql = "";            DataTable dt;            try            {                sql = "Select top 1 cr.ClientId,cr.RoundType,a.AgentId,isnull(a.FirstName, '') + ' ' + isnull(a.LastName, '') as Fullname,Convert(varchar(15),cr.DateReportPulls,101)as  DatePulls " +                             "from CreditReport cr  inner join Client c on cr.ClientId = c.ClientId left join agent a on " +                             "a.AgentId = c.AgentId where c.ClientId ='" + Cid + "'";                dt = utilities.GetDataTable(sql);                foreach (DataRow dr in dt.Rows)                {                    CreditReportItems cri = new CreditReportItems();                    cri.DatePulls = dr["DatePulls"].ToString();                    cri.Agent = dr["Fullname"].ToString();                    cri.RoundType = dr["RoundType"].ToString();                    CRI.Add(cri);                }            }            catch (Exception ex)            {                System.Diagnostics.Debug.WriteLine(ex.Message);            }            return CRI;        }        #endregion
         public List<ClientModel> GetStaffsByAgent(string agentID)        {            List<ClientModel> Staffs = new List<ClientModel>();            DataRow row1;            try            {                string sql = "select * from AgentStaff where AgentId='" + agentID + "'";                DataTable dataTable = utilities.GetDataTable(sql, true);                if (dataTable.Rows.Count > 0)                {                    foreach (DataRow row in dataTable.Rows)                    {
                         int AgentStaffId = row["AgentStaffId"].ToString().StringToInt(0);
@@ -557,19 +554,62 @@ namespace CreditReversal.BLL
 " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  from CreditReport where ClientId = '" + id + "')" +
 " FOR XML PATH('')), 1, 1, ''))" +
 " as 'TRANSUNION'";                dt = utilities.GetDataTable(sql);                for (int r = 0; r < dt.Rows.Count; r++)                {                    string EQUIFAX = dt.Rows[r]["EQUIFAX"].ToString();                    string TRANSUNION = dt.Rows[r]["TRANSUNION"].ToString();                    string EXPERIAN = dt.Rows[r]["EXPERIAN"].ToString();                    string[] strTRANSUNION = TRANSUNION.Split('^');                    string newstrTRANSUNION = strTRANSUNION.ToString();                    string[] strEQUIFAX = EQUIFAX.Split('^');                    string[] strEXPERIAN = EXPERIAN.Split('^');                    for (int j = 0; j < strTRANSUNION.Count(); j++)                    {                        string[] strTRANSUNION1 = strTRANSUNION[j].Split('~');                        string[] strEQUIFAX1 = strEQUIFAX[j].Split('~');                        string[] strEXPERIAN1 = strEXPERIAN[j].Split('~');                        for (int i = 0; i < 10; i++)                        {                            CreditItems CreditItem = new CreditItems();                            CreditItem.Heading = getHeadings()[i];                            CreditItem.EQUIFAX = strEQUIFAX1[i].ToString();                            CreditItem.EXPERIAN = strEXPERIAN1[i].ToString();                            CreditItem.TRANSUNION = strTRANSUNION1[i].ToString();                            if (i == 8)                            {                                CreditItem.Empty = "Empty";                            }                            CreditItems.Add(CreditItem);                        }                    }                }            }            catch (Exception ex) { ex.insertTrace(""); }            return CreditItems;        }
-        public List<CreditReportItems> GetCreditReportChallengesAgentById(List<CreditReportItems> credit, int id)        {            List<CreditReportItems> CreditItems = new List<CreditReportItems>();            string sql = "";            DataTable dt;            try            {                for (int i = 0; i < credit.Count; i++)                {                    sql = "select cr.MerchantName,cr.AccountId,cr.OpenDate,cr.HighestBalance,cr.CurrentBalance,cr.MonthlyPayment,cr.LastReported,";                    sql += "cr.Agency,crc.ChallengeText,cr.Status,cr.CredRepItemsId from CreditReportItemChallenges as crc inner join CreditReportItems as cr on crc.CredRepItemsId = cr.CredRepItemsId ";                    sql += "inner join CreditReport as c on c.CreditReportId = cr.CredReportId ";                    sql += "where c.ClientId = '" + id + "' and crc.CredRepItemsId='" + credit[i].CredRepItemsId + "'";                    sql += "order by cr.Agency";                    dt = utilities.GetDataTable(sql);                    foreach (DataRow row in dt.Rows)                    {                        CreditReportItems clientbar = new CreditReportItems();                        clientbar.MerchantName = row["MerchantName"].ToString();                        clientbar.AccountId = row["AccountId"].ToString();                        clientbar.OpenDate = row["OpenDate"].ToString();                        clientbar.HighestBalance = row["HighestBalance"].ToString();                        clientbar.CurrentBalance = row["CurrentBalance"].ToString();                        clientbar.MonthlyPayment = row["MonthlyPayment"].ToString();                        clientbar.LastReported = row["LastReported"].ToString();                        clientbar.Agency = row["Agency"].ToString();                        clientbar.ChallengeText = row["ChallengeText"].ToString();                        clientbar.Status = row["Status"].ToString();                        clientbar.CredRepItemsId = row["CredRepItemsId"].ToString().StringToInt(0);                        CreditItems.Add(clientbar);                    }                }
+        public List<CreditReportItems> GetCreditReportChallengesAgentById(List<CreditReportItems> credit, int id)        {            List<CreditReportItems> CreditItems = new List<CreditReportItems>();            string sql = "";            DataTable dt;            try            {                for (int i = 0; i < credit.Count; i++)                {                    sql = "select cr.MerchantName,cr.AccountId,cr.OpenDate,cr.HighestBalance,cr.CurrentBalance,cr.MonthlyPayment,cr.LastReported,crc.RoundType, ";                    sql += "cr.Agency,crc.ChallengeText,cr.Status,cr.CredRepItemsId from CreditReportItemChallenges as crc inner join CreditReportItems as cr on crc.CredRepItemsId = cr.CredRepItemsId ";                    sql += "inner join CreditReport as c on c.CreditReportId = cr.CredReportId ";                    sql += "where c.ClientId = '" + id + "' and crc.CredRepItemsId='" + credit[i].CredRepItemsId + "'";                    sql += "order by cr.Agency";                    dt = utilities.GetDataTable(sql);                    foreach (DataRow row in dt.Rows)                    {                        CreditReportItems clientbar = new CreditReportItems();                        clientbar.MerchantName = row["MerchantName"].ToString();                        clientbar.AccountId = row["AccountId"].ToString();                        clientbar.OpenDate = row["OpenDate"].ToString();                        clientbar.HighestBalance = row["HighestBalance"].ToString();                        clientbar.CurrentBalance = row["CurrentBalance"].ToString();                        clientbar.MonthlyPayment = row["MonthlyPayment"].ToString();                        clientbar.LastReported = row["LastReported"].ToString();                        clientbar.Agency = row["Agency"].ToString();                        clientbar.ChallengeText = row["ChallengeText"].ToString();                        clientbar.Status = row["Status"].ToString();                        clientbar.RoundType = row["RoundType"].ToString();                        clientbar.CredRepItemsId = row["CredRepItemsId"].ToString().StringToInt(0);                        CreditItems.Add(clientbar);                    }                }
 
             }            catch (Exception ex) { ex.insertTrace(""); }            return CreditItems;        }
 
+        
+        public string getChallengeTextPrev(int clientid, string accountno, string agency, int sno)
+        {
+            string res = "";
+            try
+            {
+                sno = sno - 1;
+                string sql = " Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from CreditReportItemChallenges where "
+                    + " AccountId='" + accountno.Trim() + "' and Agency='" + agency + "' and clientid=" + clientid + " and sno=" + sno
+                     + " order by CrdRepItemChallengeId desc";
+                res = utilities.ExecuteScalar(sql, true).ToString();
+            }
+            catch (Exception ex)
+            { string msg = ex.Message; res = ""; }
+            return res;
+        }
+        public string getINQChallengeTextPrev(int clientid, string merchant, string agency, int sno)
+        {
+            string res = "";
+            try
+            {
+                sno = sno - 1;
+                string sql = " Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from CreditReportItemChallenges where "
+                    + " MerchantName='" + merchant.Trim() + "' and Agency='" + agency + "' and clientid=" + clientid + " and sno=" + sno
+                     + " order by CrdRepItemChallengeId desc";
+                res = utilities.ExecuteScalar(sql, true).ToString();
+            }
+            catch (Exception ex)
+            { string msg = ex.Message; res = ""; }
+            return res;
+        }
         public List<CreditItems> GetCreditReportChallengesAgent(int id, string agency = null, string role = "")        {            List<CreditItems> CreditItems = new List<CreditItems>();            string sql = "";            DataTable dt;            DataTable dt1;            try            {
+                int sno = 0;
+                sql = "select top 1 sno from CreditReportItems where AccountId !='-' and "
+               + " CredReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ")  order by CredRepItemsId desc";                try
+                {
+                    sno = utilities.ExecuteScalar(sql, true).ConvertObjectToIntIfNotNull();
+                }
+                catch (Exception)
+                { }
+
+
                 string addnagitiveitems = "", payhistory = "";
                 //payhistory = " isnull((SELECT ' 30 Days Late in ' + convert(varchar,max(convert(datetime,a.phdate)),101)   as pdate FROM PaymentHistory a, "
                 //    + " CreditReportItems b, CreditReport c where a.AccountNo = b.AccountId and a.Agency = b.Agency and a.Merchant = b.MerchantName "
                 //    + " and b.CredReportId = c.CreditReportId and a.ClientId = c.ClientId and a.RoundType = c.RoundType and a.Agency = c.AgencyName "
                 //    + " and(PHStatus != 'C' AND PHStatus != 'U' AND PHStatus != ' ' and PHStatus != 7) and a.AccountNo = US.AccountId  "; 
 
-                payhistory = " isnull((SELECT top 1 convert(varchar,(PHStatus*30)) +' Days late in ' + convert(varchar,FORMAT(max(convert(datetime,a.phdate)), 'MMM-yyyy'),101)   as pdate "
-                    +" FROM PaymentHistory a, CreditReportItems b, CreditReport c where a.AccountNo = b.AccountId and a.Agency = b.Agency and a.Merchant = b.MerchantName "
+                payhistory = " isnull((SELECT top 1 convert(varchar,(PHStatus*30)) +' Days late in ' + "
+                    + " convert(varchar,FORMAT(max(convert(datetime,a.phdate)), 'MMM-yyyy'),101)   as pdate "
+                    + " FROM PaymentHistory a, CreditReportItems b, CreditReport c where a.AccountNo = b.AccountId and b.sno=" + sno
+                    + " and a.Agency = b.Agency and a.Merchant = b.MerchantName "
                    + " and b.CredReportId = c.CreditReportId and a.ClientId = c.ClientId and a.RoundType = c.RoundType and a.Agency = c.AgencyName "
                    + " and(PHStatus != 'C' AND PHStatus != 'U' AND PHStatus != ' ' and PHStatus != 7 and PHStatus != 9) and a.AccountNo = US.AccountId  ";
                 if (role != "client")
@@ -582,8 +622,13 @@ namespace CreditReversal.BLL
                 }
 
 
-                sql = "SELECT ( STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId+'~'+OpenDate+'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select ChallengeText from CreditReportItemChallenges where CredRepItemsId=US.CredRepItemsId),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END))  +'~'+ Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Equifax' group by PayHistoryId, PHStatus order by PayHistoryId asc),''))" +
-                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EQUIFAX' and CR.ClientId='" + id + "'" + addnagitiveitems +
+                sql = "SELECT ( STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId+'~'+OpenDate+'~'+ HighestBalance +'~'+ "
+                    + " CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
+                    + " from CreditReportItemChallenges where  AccountId=US.AccountId and Agency=us.Agency and sno=" + sno + " and clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) "
+                    + "+'~'+ Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Equifax' "
+                    + " group by PayHistoryId, PHStatus order by PayHistoryId asc),''))" +
+                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EQUIFAX' and us.sno=" + sno
+                      + " and CR.ClientId='" + id + "'" + addnagitiveitems +
 
                 //if (role== "agentadmin") {
                 //  sql += "  and US.negativeitems > 0 "+
@@ -592,22 +637,37 @@ namespace CreditReversal.BLL
                 " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  from CreditReport where ClientId = '" + id + "')" +
                       " FOR XML PATH('')), 1, 1, '')) " +
                       " as 'EQUIFAX' ," +
-                      " STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId+'~'+OpenDate+'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select ChallengeText from CreditReportItemChallenges where CredRepItemsId=US.CredRepItemsId),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by PayHistoryId, PHStatus order by PayHistoryId asc),''))" +
-                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EXPERIAN' and CR.ClientId='" + id + "'" + addnagitiveitems +
+                      " STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId+'~'+OpenDate+'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
+                      + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
+                      + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and sno=" + sno + " and clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                      + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by  "
+                      + " PayHistoryId, PHStatus order by PayHistoryId asc),''))" +
+                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EXPERIAN' and us.sno=" + sno
+                      + " and CR.ClientId='" + id + "'" + addnagitiveitems +
                       //if (role== "agentadmin") {
                       //  sql += "  and US.negativeitems > 0 "+
                       //}
 
 
-                      " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  from CreditReport where ClientId = '" + id + "')" +
+                      " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  "
+                      + " from CreditReport where ClientId = '" + id + "')" +
                       " FOR XML PATH('')), 1, 1, '')" +
                       " as 'EXPERIAN'," +
-                      " (SELECT STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId+'~'+OpenDate+'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select ChallengeText from CreditReportItemChallenges where CredRepItemsId=US.CredRepItemsId),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='TransUnion' group by PayHistoryId, PHStatus order by PayHistoryId asc),''))" +
-                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='TRANSUNION' and CR.ClientId='" + id + "'" + addnagitiveitems +
+                      " (SELECT STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId+'~'+OpenDate+'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
+                      + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
+                      + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and sno=" + sno + " and clientid="+id+" order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                      + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='TransUnion' group by "
+                      + " PayHistoryId, PHStatus order by PayHistoryId asc),''))" +
+                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='TRANSUNION' and us.sno=" + sno
+                      + " and CR.ClientId='" + id + "'" + addnagitiveitems +
                       //"  and US.negativeitems > 0 " +
-                      " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  from CreditReport where ClientId = '" + id + "')" +
+                      " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  "
+                      + " from CreditReport where ClientId = '" + id + "')" +
                       " FOR XML PATH('')), 1, 1, ''))" +
-                      " as 'TRANSUNION'";                dt = utilities.GetDataTable(sql);                sql = "";                sql = "select distinct accountId from[CreditRepair].[dbo].[CreditReportItems] where AccountId !='-'";                dt1 = utilities.GetDataTable(sql);                string value = "";                for (int r = 0; r < dt.Rows.Count; r++)                {                    string EQUIFAX = dt.Rows[r]["EQUIFAX"].ToString();                    string TRANSUNION = dt.Rows[r]["TRANSUNION"].ToString();                    string EXPERIAN = dt.Rows[r]["EXPERIAN"].ToString();                    string[] strTRANSUNION = TRANSUNION.Split('^');                    string newstrTRANSUNION = strTRANSUNION.ToString();                    string[] strEQUIFAX = EQUIFAX.Split('^');                    string[] strEXPERIAN = EXPERIAN.Split('^');
+                      " as 'TRANSUNION'";                dt = utilities.GetDataTable(sql);                sql = "";                sql = "select distinct accountId from CreditReportItems where AccountId !='-' and "                + " CredReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ") and sno=" + sno;                dt1 = utilities.GetDataTable(sql);
+
+
+                string value = "";                for (int r = 0; r < dt.Rows.Count; r++)                {                    string EQUIFAX = dt.Rows[r]["EQUIFAX"].ToString();                    string TRANSUNION = dt.Rows[r]["TRANSUNION"].ToString();                    string EXPERIAN = dt.Rows[r]["EXPERIAN"].ToString();                    string[] strTRANSUNION = TRANSUNION.Split('^');                    string newstrTRANSUNION = strTRANSUNION.ToString();                    string[] strEQUIFAX = EQUIFAX.Split('^');                    string[] strEXPERIAN = EXPERIAN.Split('^');
 
                     List<AccountHistory> achquifax = new List<AccountHistory>();                    List<AccountHistory> achexperian = new List<AccountHistory>();                    List<AccountHistory> achtransunion = new List<AccountHistory>();                    if (TRANSUNION != "")
                     {
@@ -623,8 +683,17 @@ namespace CreditReversal.BLL
                             ah.Balance = strTRANS1[4];
                             ah.MonthlyPayment = strTRANS1[5];
                             ah.LastReported = strTRANS1[6];
+                            string challengestatus = "";
+                            if (strTRANS1[8] == "0" || strTRANS1[8].Trim() == "")
+                            {
+                                challengestatus = getChallengeTextPrev(id, strTRANS1[1], "TRANSUNION", sno);
+                            }
+                            else
+                            {
+                                challengestatus = strTRANS1[8];
+                            }
+                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strTRANS1[8] : challengestatus;
                             ah.PaymentStatus = strTRANS1[7] + "~" + strTRANS1[10] + "~" + strTRANS1[11];
-                            ah.Comments = strTRANS1[8];
                             ah.PastDue = strTRANS1[9];
                             ah.negativeitems = strTRANS1[10].StringToInt(0);
                             achtransunion.Add(ah);
@@ -642,8 +711,17 @@ namespace CreditReversal.BLL
                             ah.Balance = strEQUIFAX1[4];
                             ah.MonthlyPayment = strEQUIFAX1[5];
                             ah.LastReported = strEQUIFAX1[6];
+                            string challengestatus = "";
+                            if (strEQUIFAX1[8] == "0" || strEQUIFAX1[8].Trim() == "")
+                            {
+                                challengestatus = getChallengeTextPrev(id, strEQUIFAX1[1], "EQUIFAX", sno);
+                            }
+                            else
+                            {
+                                challengestatus = strEQUIFAX1[8];
+                            }
                             ah.PaymentStatus = strEQUIFAX1[7] + "~" + strEQUIFAX1[10] + "~" + strEQUIFAX1[11];
-                            ah.Comments = strEQUIFAX1[8];
+                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEQUIFAX1[8] : challengestatus;
                             ah.PastDue = strEQUIFAX1[9];
                             ah.negativeitems = strEQUIFAX1[10].StringToInt(0);
                             achquifax.Add(ah);
@@ -663,8 +741,17 @@ namespace CreditReversal.BLL
                             ah.Balance = strEXPERIAN1[4];
                             ah.MonthlyPayment = strEXPERIAN1[5];
                             ah.LastReported = strEXPERIAN1[6];
+                            string challengestatus = "";
+                            if (strEXPERIAN1[8] == "0" || strEXPERIAN1[8].Trim() == "")
+                            {
+                                challengestatus = getChallengeTextPrev(id, strEXPERIAN1[1], "EXPERIAN", sno);
+                            }
+                            else
+                            {
+                                challengestatus = strEXPERIAN1[8];
+                            }
+                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEXPERIAN1[8] : challengestatus;
                             ah.PaymentStatus = strEXPERIAN1[7] + "~" + strEXPERIAN1[10] + "~" + strEXPERIAN1[11];
-                            ah.Comments = strEXPERIAN1[8];
                             ah.PastDue = strEXPERIAN1[9];
                             ah.negativeitems = strEXPERIAN1[10].StringToInt(0);
                             achexperian.Add(ah);
@@ -675,18 +762,60 @@ namespace CreditReversal.BLL
                             }                            else
                             {                                CreditItems.Add(CreditItem);                            }
 
-                        }                    }                }            }            catch (Exception ex) { ex.insertTrace(""); }            return CreditItems;        }
-        public List<Inquires> GetCreditReportInquiresAgent(int id, string agency = null, string role = "")        {            List<Inquires> Inquires = new List<Inquires>();            string sql = "";            DataTable dt;            DataTable dt1;            try            {                sql = "SELECT (" +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),103)" +                " + '~' + isnull(Convert(varchar, ((Select ChallengeText from CreditReportItemChallenges" +                " where CreditInqId = us.CreditInqId))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'EQUIFAX' and CR.ClientId = '" + id + "'" +                " FOR XML PATH('')), 1, 1, '')) " +                " as 'EQUIFAX'," +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),103)" +                " + '~' + isnull(Convert(varchar, ((Select ChallengeText from CreditReportItemChallenges" +                " where CreditInqId = us.CreditInqId))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'EXPERIAN' and CR.ClientId = '" + id + "'" +                " FOR XML PATH('')), 1, 1, '')" +                " as 'EXPERIAN'," +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),103)" +                " + '~' + isnull(Convert(varchar, ((Select ChallengeText from CreditReportItemChallenges" +                " where CreditInqId = us.CreditInqId))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'TRANSUNION' and CR.ClientId = '" + id + "'" +                " FOR XML PATH('')), 1, 1, '')" +                " as 'TRANSUNION'";                dt = utilities.GetDataTable(sql);                sql = "";                sql = "select distinct CreditorName from CreditInquiries";                dt1 = utilities.GetDataTable(sql);                for (int r = 0; r < dt.Rows.Count; r++)                {                    string EQUIFAX = dt.Rows[r]["EQUIFAX"].ToString();                    string TRANSUNION = dt.Rows[r]["TRANSUNION"].ToString();                    string EXPERIAN = dt.Rows[r]["EXPERIAN"].ToString();                    string[] strTRANSUNION = TRANSUNION.Split('^');                    string newstrTRANSUNION = strTRANSUNION.ToString();                    string[] strEQUIFAX = EQUIFAX.Split('^');                    string[] strEXPERIAN = EXPERIAN.Split('^');                    List<Inquires> inqquifax = new List<Inquires>();                    List<Inquires> inqexperian = new List<Inquires>();                    List<Inquires> inqtransunion = new List<Inquires>();                    if (TRANSUNION != "")                    {                        for (int k = 0; k < strTRANSUNION.Length; k++)                        {                            string[] strTRANS1 = strTRANSUNION[k].Split('~');                            Inquires inq = new Inquires();                            inq.CreditorName = strTRANS1[0];                            inq.TypeofBusiness = strTRANS1[1];                            inq.Dateofinquiry = strTRANS1[2];                            inq.ChallengeText = strTRANS1[3];                            inq.CreditInqId = strTRANS1[4];                            inqtransunion.Add(inq);                        }                    }                    if (EQUIFAX != "")                    {                        for (int k = 0; k < strEQUIFAX.Length; k++)                        {                            string[] strEQUIFAX1 = strEQUIFAX[k].Split('~');                            Inquires inq = new Inquires();                            inq.CreditorName = strEQUIFAX1[0];                            inq.TypeofBusiness = strEQUIFAX1[1];                            inq.Dateofinquiry = strEQUIFAX1[2];                            inq.ChallengeText = strEQUIFAX1[3];                            inq.CreditInqId = strEQUIFAX1[4];                            inqquifax.Add(inq);                        }                    }                    if (EXPERIAN != "")                    {                        for (int l = 0; l < strEXPERIAN.Length; l++)                        {                            string[] strEXPERIAN1 = strEXPERIAN[l].Split('~');                            Inquires inq = new Inquires();                            inq.CreditorName = strEXPERIAN1[0];                            inq.TypeofBusiness = strEXPERIAN1[1];                            inq.Dateofinquiry = strEXPERIAN1[2];                            inq.ChallengeText = strEXPERIAN1[3];                            inq.CreditInqId = strEXPERIAN1[4];                            inqexperian.Add(inq);                        }                    }                    for (int x = 0; x < dt1.Rows.Count; x++)                    {
+                        }                    }                }            }            catch (Exception ex) { ex.insertTrace(""); }            return CreditItems;        }
+        public List<Inquires> GetCreditReportInquiresAgent(int id, string agency = null, string role = "")        {            List<Inquires> Inquires = new List<Inquires>();            string sql = "";            DataTable dt;            DataTable dt1;            try            {
+                int sno = 0;
+                sql = "select top 1 sno from CreditInquiries where   "
+               + " CreditReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ")  order by CreditInqId desc";                try
+                {
+                    sno = utilities.ExecuteScalar(sql, true).ConvertObjectToIntIfNotNull();
+                }
+                catch (Exception)
+                { }                sql = "SELECT (" +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),103)" +                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid ="+id+" and sno=" + sno                 + " order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'EQUIFAX' and CR.ClientId = '" + id + "' and us.sno=" + sno                + " FOR XML PATH('')), 1, 1, '')) " +                " as 'EQUIFAX'," +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),103)" +                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and sno=" + sno
+                + " order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'EXPERIAN' and CR.ClientId = '" + id + "' and us.sno=" + sno +                " FOR XML PATH('')), 1, 1, '')" +                " as 'EXPERIAN'," +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),103)" +                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges  "                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and sno=" + sno
+                + " order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'TRANSUNION' and CR.ClientId = '" + id + "' and us.sno=" + sno +                " FOR XML PATH('')), 1, 1, '')" +                " as 'TRANSUNION'";                dt = utilities.GetDataTable(sql);                sql = "";                sql = "select distinct CreditorName from CreditInquiries where  "                + " CreditReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ") and sno=" + sno;                dt1 = utilities.GetDataTable(sql);                for (int r = 0; r < dt.Rows.Count; r++)                {                    string EQUIFAX = dt.Rows[r]["EQUIFAX"].ToString();                    string TRANSUNION = dt.Rows[r]["TRANSUNION"].ToString();                    string EXPERIAN = dt.Rows[r]["EXPERIAN"].ToString();                    string[] strTRANSUNION = TRANSUNION.Split('^');                    string newstrTRANSUNION = strTRANSUNION.ToString();                    string[] strEQUIFAX = EQUIFAX.Split('^');                    string[] strEXPERIAN = EXPERIAN.Split('^');                    List<Inquires> inqquifax = new List<Inquires>();                    List<Inquires> inqexperian = new List<Inquires>();                    List<Inquires> inqtransunion = new List<Inquires>();                    if (TRANSUNION != "")                    {                        for (int k = 0; k < strTRANSUNION.Length; k++)                        {                            string[] strTRANS1 = strTRANSUNION[k].Split('~');                            Inquires inq = new Inquires();
+                            inq.CreditorName = strTRANS1[0];                            inq.TypeofBusiness = strTRANS1[1];                            inq.Dateofinquiry = strTRANS1[2];                            inq.ChallengeStatus = strTRANS1[3];                            inq.ChallengeText = strTRANS1[4];                            inq.CreditInqId = strTRANS1[5];                            if (inq.ChallengeText != "NO CHALLENGE")                            {                                inqtransunion.Add(inq);                            }
+                            string challengestatus = "";
+                            if (strTRANS1[4] == "0" || strTRANS1[4].Trim() == "" || strTRANS1[4] == "-")
+                            {
+                                challengestatus = getINQChallengeTextPrev(id, strTRANS1[0], "TRANSUNION", sno);
+                            }
+                            else
+                            {
+                                challengestatus = strTRANS1[4];
+                            }
+                            inq.ChallengeText = string.IsNullOrEmpty(challengestatus) ? strTRANS1[4] : challengestatus;
+                        }                    }                    if (EQUIFAX != "")                    {                        for (int k = 0; k < strEQUIFAX.Length; k++)                        {                            string[] strEQUIFAX1 = strEQUIFAX[k].Split('~');                            Inquires inq = new Inquires();                            inq.CreditorName = strEQUIFAX1[0];                            inq.TypeofBusiness = strEQUIFAX1[1];                            inq.Dateofinquiry = strEQUIFAX1[2];                            inq.ChallengeStatus = strEQUIFAX1[3];                            inq.ChallengeText = strEQUIFAX1[4];                            inq.CreditInqId = strEQUIFAX1[5];                            if (inq.ChallengeText != "NO CHALLENGE")                            {                                inqquifax.Add(inq);                            }
+                            string challengestatus = "";
+                            if (strEQUIFAX1[4] == "0" || strEQUIFAX1[4].Trim() == "")
+                            {
+                                challengestatus = getINQChallengeTextPrev(id, strEQUIFAX1[0], "EQUIFAX", sno);
+                            }
+                            else
+                            {
+                                challengestatus = strEQUIFAX1[4];
+                            }
+                            inq.ChallengeText = string.IsNullOrEmpty(challengestatus) ? strEQUIFAX1[4] : challengestatus;
+                        }                    }                    if (EXPERIAN != "")                    {                        for (int l = 0; l < strEXPERIAN.Length; l++)                        {                            string[] strEXPERIAN1 = strEXPERIAN[l].Split('~');                            Inquires inq = new Inquires();                            inq.CreditorName = strEXPERIAN1[0];                            inq.TypeofBusiness = strEXPERIAN1[1];                            inq.Dateofinquiry = strEXPERIAN1[2];                            inq.ChallengeStatus = strEXPERIAN1[3];                            inq.ChallengeText = strEXPERIAN1[4];                            inq.CreditInqId = strEXPERIAN1[5];                            if (inq.ChallengeText != "NO CHALLENGE")
+                            {                                inqexperian.Add(inq);                            }
+                            string challengestatus = "";
+                            if (strEXPERIAN1[4] == "0" || strEXPERIAN1[4].Trim() == "")
+                            {
+                                challengestatus = getINQChallengeTextPrev(id, strEXPERIAN1[0], "EXPERIAN", sno);
+                            }
+                            else
+                            {
+                                challengestatus = strEXPERIAN1[4];
+                            }
+                            inq.ChallengeText = string.IsNullOrEmpty(challengestatus) ? strEXPERIAN1[4] : challengestatus;
+                        }                    }                    for (int x = 0; x < dt1.Rows.Count; x++)                    {
                         //string accountid = dt1.Rows[x]["accountId"].ToString();
-                        for (int i = 0; i < 5; i++)                        {                            Inquires Inq = new Inquires();                            Inq.Heading = getHeadingsForInquires()[i];                            if (Inq.Heading == "Creditor Name")                            {
+                        for (int i = 0; i < 6; i++)                        {                            Inquires Inq = new Inquires();                            Inq.Heading = getHeadingsForInquires()[i];                            if (Inq.Heading == "Creditor Name")                            {
 
-                                //var equifax = inqquifax.FirstOrDefault(t => t.Account == accountid);
                                 if (inqquifax[x].CreditorName != null)                                {                                    Inq.EQUIFAX = inqquifax[x].CreditorName;                                }                                else                                {                                    Inq.EQUIFAX = "-";                                }
 
-                                //var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
                                 if (inqtransunion[x].CreditorName != null)                                {                                    Inq.TRANSUNION = inqtransunion[x].CreditorName;                                }                                else                                {                                    Inq.TRANSUNION = "-";                                }
 
-                                //var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
                                 if (inqexperian[x].CreditorName != null)                                {                                    Inq.EXPERIAN = inqexperian[x].CreditorName;                                }                                else                                {                                    Inq.EXPERIAN = "-";                                }                            }                            if (Inq.Heading == "Type Of Business")                            {
 
                                 //var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
@@ -698,11 +827,19 @@ namespace CreditReversal.BLL
                                 //var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
                                 if (inqexperian[x].TypeofBusiness != null && inqexperian[x].TypeofBusiness != "")                                {                                    Inq.EXPERIAN = inqexperian[x].TypeofBusiness;                                }                                else                                {                                    Inq.EXPERIAN = "-";                                }                            }                            if (Inq.Heading == "Date Of Inquiry")                            {                                if (inqquifax[x].Dateofinquiry != null)                                {                                    Inq.EQUIFAX = inqquifax[x].Dateofinquiry;                                }                                else                                {                                    Inq.EQUIFAX = "-";                                }
 
-                                //var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+
                                 if (inqtransunion[x].Dateofinquiry != null)                                {                                    Inq.TRANSUNION = inqtransunion[x].Dateofinquiry;                                }                                else                                {                                    Inq.TRANSUNION = "-";                                }
 
-                                //var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
-                                if (inqexperian[x].Dateofinquiry != null)                                {                                    Inq.EXPERIAN = inqexperian[x].Dateofinquiry;                                }                                else                                {                                    Inq.EXPERIAN = "-";                                }                            }                            if (Inq.Heading == "Challenge")                            {                                if (inqquifax[x].ChallengeText != null && inqquifax[x].ChallengeText != "-")                                {                                    Inq.EQUIFAX = inqquifax[x].ChallengeText;                                }                                else                                {                                    Inq.EQUIFAX = "-";                                }
+
+                                if (inqexperian[x].Dateofinquiry != null)                                {                                    Inq.EXPERIAN = inqexperian[x].Dateofinquiry;                                }                                else                                {                                    Inq.EXPERIAN = "-";                                }                            }
+
+                            if (Inq.Heading == "Challenge Status")                            {                                if (inqquifax[x].ChallengeStatus != null)                                {                                    Inq.EQUIFAX = inqquifax[x].ChallengeStatus;                                }                                else                                {                                    Inq.EQUIFAX = "-";                                }
+
+
+                                if (inqtransunion[x].ChallengeStatus != null)                                {                                    Inq.TRANSUNION = inqtransunion[x].ChallengeStatus;                                }                                else                                {                                    Inq.TRANSUNION = "-";                                }
+
+
+                                if (inqexperian[x].ChallengeStatus != null)                                {                                    Inq.EXPERIAN = inqexperian[x].ChallengeStatus;                                }                                else                                {                                    Inq.EXPERIAN = "-";                                }                            }                            if (Inq.Heading == "Challenge")                            {                                if (inqquifax[x].ChallengeText != null && inqquifax[x].ChallengeText != "-")                                {                                    Inq.EQUIFAX = inqquifax[x].ChallengeText;                                }                                else                                {                                    Inq.EQUIFAX = "-";                                }
 
                                 //var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
                                 if (inqtransunion[x].ChallengeText != null && inqtransunion[x].ChallengeText != "-")                                {                                    Inq.TRANSUNION = inqtransunion[x].ChallengeText;                                }                                else                                {                                    Inq.TRANSUNION = "-";                                }
@@ -727,12 +864,70 @@ namespace CreditReversal.BLL
                             //}
 
                         }                    }                }            }            catch (Exception ex) { ex.insertTrace(""); }            return Inquires;        }
-        public List<string> getHeadingsForInquires()        {            List<string> Headings = new List<string>();            Headings.Add("Creditor Name");            Headings.Add("Type Of Business");            Headings.Add("Date Of Inquiry");
-            Headings.Add("Challenge");
-            Headings.Add("CreditInqId");            return Headings;        }
-        public List<Inquires> GetInquiriesChallengesAgentById(List<Inquires> credit, int id)        {            List<Inquires> Inquires = new List<Inquires>();            string sql = "";            DataTable dt;            try            {                for (int i = 0; i < credit.Count; i++)                {                    sql = "select ci.CreditorName,ci.TypeOfBusiness,ci.DateOfInquiry,ci.Agency, ";                    sql += "crc.ChallengeText from CreditReportItemChallenges as crc inner join CreditInquiries as ci on crc.CreditInqId = ci.CreditInqId ";                    sql += "inner join CreditReport as c on c.CreditReportId = ci.CreditReportId ";                    sql += "where c.ClientId = '" + id + "' and crc.CreditInqId ='" + credit[i].CreditInqId + "'";                    sql += "order by ci.Agency";                    dt = utilities.GetDataTable(sql);                    foreach (DataRow row in dt.Rows)                    {                        Inquires Inq = new Inquires();                        Inq.CreditorName = row["CreditorName"].ToString();                        Inq.TypeofBusiness = row["TypeofBusiness"].ToString();                        Inq.Dateofinquiry = row["Dateofinquiry"].ToString();                        Inq.CreditBureau = row["Agency"].ToString();                        Inq.ChallengeText = row["ChallengeText"].ToString();                        Inquires.Add(Inq);                    }                }
+        public List<string> getHeadingsForInquires()        {            List<string> Headings = new List<string>();            Headings.Add("Creditor Name");            Headings.Add("Type Of Business");            Headings.Add("Date Of Inquiry");            Headings.Add("Challenge Status");            Headings.Add("Challenge");            Headings.Add("CreditInqId");            return Headings;        }
+        public List<Inquires> GetInquiriesChallengesAgentById(List<Inquires> credit, int id)        {            List<Inquires> Inquires = new List<Inquires>();            string sql = "";            DataTable dt;            try            {                for (int i = 0; i < credit.Count; i++)                {                    sql = "select ci.CreditorName,ci.TypeOfBusiness,ci.DateOfInquiry,ci.Agency,crc.RoundType, ";                    sql += "crc.ChallengeText from CreditReportItemChallenges as crc inner join CreditInquiries as ci on crc.CreditInqId = ci.CreditInqId ";                    sql += "inner join CreditReport as c on c.CreditReportId = ci.CreditReportId ";                    sql += "where c.ClientId = '" + id + "' and crc.CreditInqId ='" + credit[i].CreditInqId + "'";                    sql += "order by ci.Agency";                    dt = utilities.GetDataTable(sql);                    foreach (DataRow row in dt.Rows)                    {                        Inquires Inq = new Inquires();                        Inq.CreditorName = row["CreditorName"].ToString();                        Inq.TypeofBusiness = row["TypeofBusiness"].ToString();                        Inq.Dateofinquiry = row["Dateofinquiry"].ToString();                        Inq.CreditBureau = row["Agency"].ToString();                        Inq.ChallengeText = row["ChallengeText"].ToString();                        Inq.RoundType=row["RoundType"].ToString();                        Inquires.Add(Inq);                    }                }
 
             }            catch (Exception ex) { ex.insertTrace(""); }            return Inquires;        }
-        public long updatechallengefilepath(List<CreditReportFiles> files,int sno)        {            long res = 0;            try            {                StringBuilder sb = new StringBuilder();                for (int i = 0; i < files.Count; i++)                {                    sb.AppendFormat(" insert into CreditReportFiles(CRFilename,RoundType,ClientId,sno) "                        +" values('{0}','{1}',{2},{3})", files[i].CRFilename, files[i].RoundType, files[i].ClientId, sno);                }                var cmd1 = new SqlCommand();                cmd1.CommandText = sb.ToString();                res = utilities.ExecuteInsertCommand(cmd1, true);                return res;            }            catch (Exception ex) { ex.insertTrace(""); }            return res;        }
+        public long updatechallengefilepath(List<CreditReportFiles> files, int sno)        {            long res = 0;            try            {                StringBuilder sb = new StringBuilder();                for (int i = 0; i < files.Count; i++)                {                    sb.AppendFormat(" insert into CreditReportFiles(CRFilename,RoundType,ClientId,sno) "                        + " values('{0}','{1}',{2},{3})", files[i].CRFilename, files[i].RoundType, files[i].ClientId, sno);                }                var cmd1 = new SqlCommand();                cmd1.CommandText = sb.ToString();                res = utilities.ExecuteInsertCommand(cmd1, true);                return res;            }            catch (Exception ex) { ex.insertTrace(""); }            return res;        }
+
+
+        public List<Agent> GetAgentBillings()        {            List<Agent> objAgent = new List<Agent>();            string strStatus = "";            try            {                string sql = "Select a.AgentId, a.BusinessName as AgencyName,isnull((select CompanyType from CompanyTypes where CompanyTypeId = a.TypeOfComp),'')as TypeofCompany, " +                            "isnull((select Count(AgentStaffId) from AgentStaff where AgentId = a.AgentId and status = 1),'')as NumberofStaff, " +                            "isnull(Convert(varchar(15), a.createddate, 101), '') as MemberSince, " +                            "isnull((select Count(AgentId) from Client  where AgentId = a.AgentId),'')as RegisteredClients, " +                            "isnull((isnull(a.FirstName, '') + ' ' + isnull(a.LastName, '')), '') as PrimaryUser, " +                            "isnull(a.BillingEmail, '')as BMail ,isnull(a.BillingPhone, '') as BPhone, " +                            "isnull((select Count(cr.ClientId) as ActiveClients from CreditReport cr , Client c where  cr.ClientId = c.ClientId and c.AgentId = a.AgentId and " +                            "cr.AgencyName = 'EQUIFAX' and cr.RoundType = 'First Round'),'')as ActiveClients, " +                            "isnull((select(case when u.Status = '1' then 'Active' else 'Inactive' end)from users u where AgentClientId = a.AgentId and UserRole = 'agentadmin'),'') as AgencyStatus, " +                            "isnull((select PricingType from Pricing where PricingId = a.PricingPlan),'')as PricingPlan, " +                            "isnull((select top 1 BillingType from AgentBilling where AgentId=a.AgentId),'')as BillingType, " +                            "isnull((select(case BillingType" +                            " when 'Monthly'     then(select top 1 Convert(varchar(15), DATEADD(MONTH, 1, CreatedDate), 101) from AgentBilling where AgentId = a.AgentId) " +                            " when 'Quarterly'   then(select top 1 Convert(varchar(15), DATEADD(MONTH, 3, CreatedDate), 101) from AgentBilling where AgentId = a.AgentId) " +                            " when 'Half-Yearly' then(select top 1  Convert(varchar(15), DATEADD(MONTH, 6, CreatedDate), 101) from AgentBilling where AgentId = a.AgentId) " +                            " when 'Annually'    then(select top 1  Convert(varchar(15), DATEADD(YEAR, 1, CreatedDate), 101)  from AgentBilling where AgentId = a.AgentId) " +                            " else '' end)), '') as NextBillingDate from Agent a,AgentBilling ab where ab.isPrimary = 1 and a.AgentId = ab.AgentId";                DataTable dt = utilities.GetDataTable(sql);                if (dt.Rows.Count > 0)                {                    foreach (DataRow dr in dt.Rows)                    {                        Agent mAgent = new Agent();                        mAgent.AgentId = Convert.ToInt32(dr["AgentId"].ToString());                        mAgent.BusinessName = dr["AgencyName"].ToString();                        mAgent.TypeOfComp = dr["TypeofCompany"].ToString();
+                        mAgent.NumberofStaff = dr["NumberofStaff"].ToString();                        mAgent.SCreatedDate = dr["MemberSince"].ToString();                        mAgent.RegisteredClients = dr["RegisteredClients"].ToString();
+                        mAgent.PrimaryUser = dr["PrimaryUser"].ToString();                        mAgent.BillingEmail = dr["BMail"].ToString();                        mAgent.BillingPhone = dr["BPhone"].ToString();                        mAgent.ActiveClients = dr["ActiveClients"].ToString();                        strStatus = AgentStatus(Convert.ToString(mAgent.AgentId));
+                        mAgent.Status = strStatus;
+                        // mAgent.Status = dr["AgencyStatus"].ToString();
+                        mAgent.PricingPlans = dr["PricingPlan"].ToString();
+                        mAgent.BillingType = dr["BillingType"].ToString();
+                        mAgent.NextBillingDate = dr["NextBillingDate"].ToString();                        objAgent.Add(mAgent);                    }                }            }            catch (Exception ex)            {                System.Diagnostics.Debug.WriteLine(ex.Message);            }            return objAgent;        }
+        public string AgentStatus(string agentId)
+        {
+            string sql = "", res = "";
+            bool flag = true;
+
+            try
+            {
+                sql = "select status from Users where UserRole='agentadmin' and AgentClientId='" + agentId + "'";
+                res = utilities.ExecuteScalar(sql, flag).ToString();
+                if (res == "False")
+                {
+                    return "InActive";
+                }
+                else
+                {
+                    sql = "Select Convert(varchar(15), max(paymentdate), 101) as PaymentDate,PaymentStatus " +
+                        "from Billing where AgentId = '" + agentId + "'  group by PaymentStatus";
+
+                    DataTable dt = utilities.GetDataTable(sql, flag);
+                    if (dt.Rows.Count > 0)
+                    {
+                        res = dt.Rows[0]["PaymentStatus"].ToString();
+                        if (res != "")
+                        {
+                            if (res.ToUpper() == "FAILURE")
+                            {
+                                return "Suspended";
+                            }
+                            else
+                            {
+                                return "Success";
+                            }
+                        }
+                        else
+                        {
+                            return "Pending";
+                        }
+                    }
+                    else
+                    {
+                        return "Pending";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            return res;
+        }
     }
 }

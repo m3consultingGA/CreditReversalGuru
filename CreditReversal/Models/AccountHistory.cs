@@ -7,6 +7,7 @@ namespace CreditReversal.Models
 {
     public class AccountHistory
     {
+        public string ChallengeText { get; set; }
         public string Account { get; set; }
         public string AccountType { get; set; }       
         public string AccountTypeDetail { get; set; }       

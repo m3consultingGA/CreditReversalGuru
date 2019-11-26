@@ -10,6 +10,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.IO;
 using System.Net.Http;
+using CreditReversal.DAL;
+using System.Text;
 
 namespace CreditReversal.Controllers
 {
@@ -39,7 +41,7 @@ namespace CreditReversal.Controllers
             }
             catch (Exception e)
             {
-             
+
             }
             return ipAddress;
         }
@@ -53,7 +55,7 @@ namespace CreditReversal.Controllers
         {
             try
             {
-               
+
                 DataRow row = functions.Login(UserName, Password);
                 string role = "";
                 if (row != null)
@@ -131,10 +133,123 @@ namespace CreditReversal.Controllers
         }
         public ActionResult HowItWorks()
         {
+            //SendMails();
             return View();
+        }
+        public int SendMails()
+        {
+            int res = 0;
+            try
+            {
+                string sql = " SELECT c.FirstName+' '+c.LastName agentname,c.BillingEmail, a.AgentId, "
+                  +" max(a.PaymentDate) paydate,b.BillingType FROM Billing a, AgentBilling b,Agent c"
+                  + " where a.PaymentMethodId = b.AgentBillingId and c.AgentId = b.AgentId "
+                  + " group by c.BillingEmail, a.AgentId,b.BillingType,FirstName,LastName";
+                DBUtilities utilities = new DBUtilities();
+                DataTable dt = utilities.GetDataTable(sql);
+                StringBuilder sb14 = new StringBuilder(); StringBuilder sb7 = new StringBuilder();
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    DateTime currentdate = DateTime.Now.Date;
+                    DateTime nextdue = DateTime.Now.Date;
+                    DateTime paydate =  Convert.ToDateTime(dt.Rows[i]["paydate"].ToString());
+                    string BillingType = dt.Rows[i]["BillingType"].ToString();
+                    if (BillingType.ToUpper() == "MONTHLY")
+                    {
+                        nextdue = paydate.AddMonths(1);
+                    }
+                    else if (BillingType.ToUpper() == "Quarterly")
+                    {
+                        nextdue = paydate.AddMonths(4);
+                    }
+                    else if (BillingType.ToUpper() == "Half-Yearly")
+                    {
+                        nextdue = paydate.AddMonths(6);
+                    }
+                    else if (BillingType.ToUpper() == "Annually")
+                    {
+                        nextdue = paydate.AddMonths(12);
+                    }
+                   if(nextdue.AddDays(-14) == currentdate)
+                    {
+                        sb14.Append(dt.Rows[i]["agentname"].ToString() + "~" + dt.Rows[i]["BillingEmail"].ToString() + "~14^");
+                    }
+                    else if (nextdue.AddDays(-7) == currentdate)
+                    {
+                        sb7.Append(dt.Rows[i]["agentname"].ToString() + "~" + dt.Rows[i]["BillingEmail"].ToString() + "~7^");
+                    }
+                }
+                string[] str14C = sb14.ToString().Split('^');
+                
+                for(int i=1;i< str14C.Length;i++)
+                {
+                    string[] str14T = str14C[i].Split('~');
+                    string agent = str14T[0]; string email = str14T[1]; string mode = str14T[2];
+                    //send mails
+                }
+            }
+            catch (Exception ex)
+            { }
+            return res;
+        }
+        public int AgentPayments()
+        {
+            int res = 0;
+            try
+            {
+                string sql = " SELECT p.SetupFee,b.CardNumber,b.CardType,b.CVV,b.ExpiryDate , "
+                  +" c.FirstName+' '+c.LastName agentname,c.BillingEmail, a.AgentId, "
+                  + " max(a.PaymentDate) paydate,b.BillingType FROM Billing a, AgentBilling b,Agent c"
+                  + " where a.PaymentMethodId = b.AgentBillingId and c.AgentId = b.AgentId "
+                  + " group by c.BillingEmail, a.AgentId,b.BillingType,FirstName,LastName, "
+                  +" b.CardNumber,b.CardType,b.CVV,b.ExpiryDate , p.SetupFee";
+                DBUtilities utilities = new DBUtilities();
+                DataTable dt = utilities.GetDataTable(sql);
+                StringBuilder sb14 = new StringBuilder(); StringBuilder sb7 = new StringBuilder();
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    DateTime currentdate = DateTime.Now.Date;
+                    DateTime nextdue = DateTime.Now.Date;
+                    DateTime paydate = Convert.ToDateTime(dt.Rows[i]["paydate"].ToString());
+                    string BillingType = dt.Rows[i]["BillingType"].ToString();
+                    if (BillingType.ToUpper() == "MONTHLY")
+                    {
+                        nextdue = paydate.AddMonths(1);
+                    }
+                    else if (BillingType.ToUpper() == "Quarterly")
+                    {
+                        nextdue = paydate.AddMonths(4);
+                    }
+                    else if (BillingType.ToUpper() == "Half-Yearly")
+                    {
+                        nextdue = paydate.AddMonths(6);
+                    }
+                    else if (BillingType.ToUpper() == "Annually")
+                    {
+                        nextdue = paydate.AddMonths(12);
+                    }
+                    if (nextdue == currentdate)
+                    {
+                        sb14.Append(dt.Rows[i]["agentname"].ToString() + "~" + dt.Rows[i]["BillingEmail"].ToString() + "~14^");
+                    }
+                   
+                }
+                string[] str14C = sb14.ToString().Split('^');
+
+                for (int i = 1; i < str14C.Length; i++)
+                {
+                    string[] str14T = str14C[i].Split('~');
+                    string agent = str14T[0]; string email = str14T[1]; string mode = str14T[2];
+                    //send mails
+                }
+            }
+            catch (Exception ex)
+            { }
+            return res;
         }
         public ActionResult ContactUs()
         {
+
             ////var response = AuthPayment.Pay(500);
             //AuthorizeDotNetModel parentModel = new AuthorizeDotNetModel();
             //CreditCardDetailsModel creditCardDetails = new CreditCardDetailsModel();
@@ -274,7 +389,7 @@ namespace CreditReversal.Controllers
             {
                 using (HttpContent content = response.Content)
                 {
-                     result = content.ReadAsStringAsync().Result;
+                    result = content.ReadAsStringAsync().Result;
                 }
             }
 
