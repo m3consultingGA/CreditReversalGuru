@@ -54,7 +54,8 @@ namespace CreditReversal.Controllers
             ViewBag.Dasboard = sessionData.getDasboard();
             ViewBag.TotalStaff = functions.GetTotalStaff("agentadmin", sessionData.GetAgentId());
             ViewBag.Clients = functions.GetClients(agentID.StringToInt(0));
-            ViewBag.ActiveClients = functions.GetActiveClients(agentID.StringToInt(0));
+            ViewBag.ActiveClients = functions.GetActiveClientsnew(agentID.StringToInt(0));
+            // ViewBag.ActiveClients = functions.GetActiveClients(agentID.StringToInt(0));
 
             //Staff By Agent And Client By Staff
             ViewBag.TotalStaffAndClients = functions.GetStaffsByAgent(agentID);

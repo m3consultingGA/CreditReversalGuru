@@ -675,15 +675,56 @@ namespace CreditReversal.DAL
 
                 for (i = 0; i < 3; i++)
                 {
-                    sql = "select CreditReportId from  CreditReport where ClientId=@ClientId and RoundType=@RoundType and AgencyName=@AgencyName";
+                    try
+                    {
+                        //update creditreport datereportpull and round when exceed the datereportpulls date
+                        sql = "select DateReportPulls from  CreditReport where ClientId=@ClientId  and AgencyName=@AgencyName";
+                        SqlCommand cmd = new SqlCommand();
+                        cmd.CommandText = sql;
+                        cmd.Parameters.AddWithValue("@ClientId", clientId);
+                        cmd.Parameters.AddWithValue("@AgencyName", agencyname[i]);
+                        cmd.CommandText = sql;
+                        string datereportpulls = utils.ExecuteScalarCommand(cmd, true).ToString();
+                        DateTime date = Convert.ToDateTime(datereportpulls);
+                        DateTime DueDate = date.AddDays(30);
+                        // int value = DateTime.Compare(DueDate.ToShortDateString().MMDDYYStringToDateTime("MM-dd-yyyy"), System.DateTime.Now.ToShortDateString().MMDDYYStringToDateTime("MM-dd-yyyy"));
+                       // int value = DateTime.Compare(DueDate.ToShortDateString().MMDDYYStringToDateTime("MM-dd-yyyy"), System.DateTime.Now.ToShortDateString().MMDDYYStringToDateTime("MM-dd-yyyy"));
+                        if (DueDate.Date <= DateTime.Now.Date)
+                        {
+                            sql = "Update CreditReport" + nl;
+                            sql += "set DateReportPulls=@DateReportPulls," + nl;
+                            sql += "RoundType=@RoundType where ClientId=@ClientId and AgencyName=@AgencyName" + nl;
+                            cmd = new SqlCommand();
+                            cmd.Parameters.AddWithValue("@ClientId", clientId);
+                            if (round == "First Round")
+                            {
+                                cmd.Parameters.AddWithValue("@RoundType", "Second Round");
+                            }
+                            if (round == "Second Round")
+                            {
+                                cmd.Parameters.AddWithValue("@RoundType", "Third Round");
+                            }
 
-                    SqlCommand cmd = new SqlCommand();
-                    cmd.CommandText = sql;
-                    cmd.Parameters.AddWithValue("@ClientId", clientId);
-                    cmd.Parameters.AddWithValue("@AgencyName", agencyname[i]);
-                    cmd.Parameters.AddWithValue("@RoundType", round);
-                    cmd.CommandText = sql;
-                    res = Convert.ToInt64(utils.ExecuteScalarCommand(cmd, true));
+                            cmd.Parameters.AddWithValue("@DateReportPulls", DueDate);
+                            cmd.Parameters.AddWithValue("@AgencyName", agencyname[i]);
+                            cmd.CommandText = sql;
+                            res = utils.ExecuteInsertCommand(cmd, true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ex.insertTrace("");  }
+                    
+                  
+
+                    sql = "select CreditReportId from  CreditReport where ClientId=@ClientId  and AgencyName=@AgencyName";
+                    SqlCommand cmd1 = new SqlCommand();
+                    cmd1.CommandText = sql;
+                    cmd1.Parameters.AddWithValue("@ClientId", clientId);
+                    cmd1.Parameters.AddWithValue("@AgencyName", agencyname[i]);
+                    //cmd1.Parameters.AddWithValue("@RoundType", round);
+                    cmd1.CommandText = sql;
+                    res = Convert.ToInt64(utils.ExecuteScalarCommand(cmd1, true));
                     int id = (int)res;                    if (id != 0)                    {                        AccountHistory = credit.Where(x => x.Agency.ToUpper() == agencyname[i]).ToList();                        AddCreditReportItems(AccountHistory, id, agencyname[i], round, sno);                        Inquires = inquires.Where(x => x.CreditBureau.ToUpper() == agencyname[i]).ToList();                        AddCreditInquiries(Inquires, id, AgentId, round, sno);                    }
 
 
@@ -837,6 +878,7 @@ namespace CreditReversal.DAL
                             CreditInqId = row["CreditInqId"].ToString(),
                             CreditorName = row["CreditorName"].ToString(),
                             CreditBureau = row["Agency"].ToString(),
+                            Dateofinquiry = row["Dateofinquiry"].ToString(),
                         });
                     }
                 }            }            catch (Exception ex) { ex.insertTrace(""); }            return inquires;        }

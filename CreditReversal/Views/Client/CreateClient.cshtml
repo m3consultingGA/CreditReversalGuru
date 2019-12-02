@@ -281,7 +281,7 @@
                                                     }
                                                     else
                                                     {
-                                                        <div >
+                                                        <div>
                                                             <input type="email" class="form-control" name="CurrentEmail" id="txtCurrentEmail" value="@Model.CurrentEmail" readonly>
                                                         </div>
                                                     }
@@ -633,7 +633,7 @@
         }
     });
 
-    $("#bnt_next,#navAddress").click(function () {
+    $("#bnt_next").click(function () {
         var firstname = document.getElementById("txtFirstName");
         var lastname = document.getElementById("txtLastName");
         var dob = document.getElementById("txtDOB");
@@ -684,10 +684,16 @@
             document.getElementById("Msg_txtCurrentEmail").innerHTML = email.validationMessage;
             return false;
         } else if (!ssn.checkValidity()) {
-            $("#txtSSN").focus();
-            document.getElementById("Msg_txtSSN").innerHTML = ssn.validationMessage;
-            return false;
-        } else if (!socialcard.checkValidity()) {
+            if ($("#txtSSN").val() != "") {
+                checkssn();
+            }
+            else {
+                $("#txtSSN").focus();
+                document.getElementById("Msg_txtSSN").innerHTML = ssn.validationMessage;
+                return false;
+            }
+        }
+        else if (!socialcard.checkValidity()) {
             $("#FileSocialSecCard").focus();
             document.getElementById("Msg_FileSocialSecCard").innerHTML = "Please select file.";
             return false;
@@ -714,144 +720,70 @@
         if (!ID.checkValidity()) {
 
         } else {
-            debugger
+
             $("#" + msgID).html("");
 
         }
     }
 
-    $("#btnsub").click(function () {
+    $("#btnsub").click(function () {      
 
-        var question = document.getElementById("IdQuestion").value;
-        var answer = document.getElementById("IdAnswer").value;
-        var username = document.getElementById("IdUserName").value;
-        var password = document.getElementById("IdPassword").value;
-        var cfmpassword = document.getElementById("CfmPassword").value;
+                var question = document.getElementById("IdQuestion").value;
+                var answer = document.getElementById("IdAnswer").value;
+                var username = document.getElementById("IdUserName").value;
+                var password = document.getElementById("IdPassword").value;
+                var cfmpassword = document.getElementById("CfmPassword").value;             
 
+                if (question != "" || answer != "" || username != "" || password != "" || cfmpassword != "") {
+                    document.getElementById("IdQuestion").required = "required";
+                    document.getElementById("IdAnswer").required = "required";
+                    document.getElementById("IdUserName").required = "required";
+                    document.getElementById("IdPassword").required = "required";
+                    document.getElementById("CfmPassword").required = "required";
+                    //Identity IQ information validation
+                    if (!document.getElementById("IdQuestion").checkValidity()) {
+                        $("#IdQuestion").focus();
+                        document.getElementById("Msg_IdQuestion").innerHTML = "Please fill out this field.";
+                        return false;
+                    } else if (!document.getElementById("IdAnswer").checkValidity()) {
+                        $("#IdAnswer").focus();
+                        document.getElementById("Msg_IdAnswer").innerHTML = "Please fill out this field.";
+                        return false;
+                    } else if (!document.getElementById("IdUserName").checkValidity()) {
+                        $("#IdUserName").focus();
+                        document.getElementById("Msg_IdUserName").innerHTML = "Please fill out this field.";
+                        return false;
+                    } else if (!document.getElementById("IdPassword").checkValidity()) {
+                        $("#IdPassword").focus();
+                        document.getElementById("Msg_IdPassword").innerHTML = "Please fill out this field.";
+                        return false;
+                    } else if (!document.getElementById("CfmPassword").checkValidity()) {
+                        $("#CfmPassword").focus();
+                        document.getElementById("Msg_CfmPassword").innerHTML = "Please fill out this field.";
+                        return false;
+                    }
+                }
 
-        if (question != "" || answer != "" || username != "" || password != "" || cfmpassword != "") {
-            document.getElementById("IdQuestion").required = "required";
-            document.getElementById("IdAnswer").required = "required";
-            document.getElementById("IdUserName").required = "required";
-            document.getElementById("IdPassword").required = "required";
-            document.getElementById("CfmPassword").required = "required";
-            //Identity IQ information validation
-            if (!document.getElementById("IdQuestion").checkValidity()) {
-                $("#IdQuestion").focus();
-                document.getElementById("Msg_IdQuestion").innerHTML = "Please fill out this field.";
-                return false;
-            } else if (!document.getElementById("IdAnswer").checkValidity()) {
-                $("#IdAnswer").focus();
-                document.getElementById("Msg_IdAnswer").innerHTML = "Please fill out this field.";
-                return false;
-            } else if (!document.getElementById("IdUserName").checkValidity()) {
-                $("#IdUserName").focus();
-                document.getElementById("Msg_IdUserName").innerHTML = "Please fill out this field.";
-                return false;
-            } else if (!document.getElementById("IdPassword").checkValidity()) {
-                $("#IdPassword").focus();
-                document.getElementById("Msg_IdPassword").innerHTML = "Please fill out this field.";
-                return false;
-            } else if (!document.getElementById("CfmPassword").checkValidity()) {
-                $("#CfmPassword").focus();
-                document.getElementById("Msg_CfmPassword").innerHTML = "Please fill out this field.";
-                return false;
-            }
-        }
+                var password = document.getElementById("IdPassword").value;
+                var re_password = document.getElementById("CfmPassword").value;
 
-        var password = document.getElementById("IdPassword").value;
-        var re_password = document.getElementById("CfmPassword").value;
+                if (password != "" && re_password != "") {
+                    if (password != re_password) {
+                        $("#IdPassword").val("");
+                        $("#CfmPassword").val("");
+                        Swal.fire("!Warning", "password not matched", "warning");
+                        return false;
+                    }
+                }
+                $(".loader").show();
+                $("#overlay").show();
 
-        if (password != "" && re_password != "") {
-            if (password != re_password) {
-                $("#IdPassword").val("");
-                $("#CfmPassword").val("");
-                Swal.fire("!Warning", "password not matched", "warning");
-                return false;
-            }
-        }
-        $(".loader").show();
-        $("#overlay").show();
     });
 
-    //$(".AddClient").click(function (e) {
-
-    //	var ClientId = getUrlParameter('ClientId');
-    //	var txtFirstName = $("#txtFirstName").val();
-    //	var txtLastName = $("#txtLastName").val();
-    //	var txtCurrentEmail = $("#txtCurrentEmail").val();
-    //	var txtSSN = $("#txtSSN").val();
-    //	var SocialSecCard = document.getElementById("FileSocialSecCard").files[0];
-    //	var DrivingLicense = document.getElementById("FileDrivingLicense").files[0];
-    //	var ProofOfCard = document.getElementById("FileProofOfCard").files[0];
-    //	var lblSocialSecCard = $("#lblSocialSecCard").text();
-    //	var lblProofOfCard = $("#lblProofOfCard").text();
-    //	var lblDrivingLicense = $("#lblDrivingLicense").text();
-
-
-    //	var FileSocialSecCard = $('#FileSocialSecCard').val().split('.').pop().toLowerCase();
-    //	if (FileSocialSecCard != "") {
-    //		if ($.inArray(FileSocialSecCard, ['png', 'jpg', 'jpeg', 'pdf']) == -1) {
-    //			Swal.fire("Warning", "Select valid file (jpeg, jpg, png, pdf)", "warning");
-    //			return false
-    //		}
-    //	}
-    //	var FileDrivingLicense = $('#FileDrivingLicense').val().split('.').pop().toLowerCase();
-    //	if (FileDrivingLicense != "") {
-    //		if ($.inArray(FileDrivingLicense, ['png', 'jpg', 'jpeg', 'pdf']) == -1) {
-    //			Swal.fire("Warning", "Select valid file (jpeg, jpg, png, pdf).", "warning");
-    //			return false
-    //		}
-    //	}
-    //	var FileProofOfCard = $('#FileProofOfCard').val().split('.').pop().toLowerCase();
-    //	if (FileProofOfCard != "") {
-    //		if ($.inArray(FileProofOfCard, ['png', 'jpg', 'jpeg', 'pdf']) == -1) {
-    //			Swal.fire("Warning", "Select valid file (jpeg, jpg, png, pdf).", "warning");
-    //			return false;
-    //		}
-    //	}
-
-    //	var email = $("#txtCurrentEmail").val();
-    //	if (email !== "") {
-    //		var reg = /^([A-Za-z0-9_\-\.])+\@@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-    //		if (reg.test(email) === false) {
-    //			Swal.fire("Warning!", "Invalid Email Address", "warning");
-    //			$("#txtCurrentEmail").val('');
-    //			return false;
-    //		}
-    //	}
-
-
-
-    //	var clientModel = {
-    //		ClientId: ClientId,
-    //		FirstName: txtFirstName,
-    //		MiddleName: $("#txtMiddleName").val(),
-    //		LastName: txtLastName,
-    //		DOB: $("#txtDOB").val(),
-    //		SSN: txtSSN,
-    //		CurrentEmail: txtCurrentEmail,
-    //		CurrentPhone: $("#txtPhone").val(),
-    //		SocialSecCard: SocialSecCard,
-    //		DrivingLicense: DrivingLicense,
-    //		ProofOfCard: ProofOfCard
-    //	};
-
-
-
-    //	if (clientModel.FirstName != "" && clientModel.LastName != "" && clientModel.SSN != "" && clientModel.CurrentEmail != "") {
-    //		if ((SocialSecCard != undefined || lblSocialSecCard != "") && (ProofOfCard != undefined || lblProofOfCard != "") && (DrivingLicense != undefined || lblDrivingLicense != "")) {
-    //			e.preventDefault();
-    //			AddClient(clientModel);
-    //		}
-    //	}
-
-    //});
 
 
     function checkssn() {
         var SSN = $("#txtSSN").val();
-
         $.ajax({
             url: '/Client/CheckSSNExistorNot',
             type: 'POST',
@@ -861,31 +793,19 @@
             success: function (res) {
                 if (res == true) {
                     Swal.fire("Warning", "Social Security Number already exists.", "warning");
+                    $('#guide-tabs li:eq(0) a').tab('show');
                     $("#txtSSN").val('');
+                    $("#txtSSN").focus();
                     return false;
                 }
-
             }
         });
     }
 
 
     function checkemail() {
-        //var email = $("#txtCurrentEmail").val();
-        //if (email !== "") {
-        //    var reg = /^([A-Za-z0-9_\-\.])+\@@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-        //    if (reg.test(email) === false) {
-        //        Swal.fire("Warning!", "Invalid Email Address", "warning");
-        //        $("#txtCurrentEmail").val('');
-        //        return false;
-        //    }
-        //}
-
         var txtCurrentEmail = $("#txtCurrentEmail").val();
-
-
         var ClientId = getUrlParameter("ClientId");
-
         $.ajax({
             url: '/Client/CheckUsernameexistorNot',
             type: 'POST',
@@ -894,7 +814,6 @@
             dataType: "json",
             success: function (res) {
                 if (res == true) {
-
                     Swal.fire("Warning", "Email Address already exists", "warning");
                     $("#txtCurrentEmail").val('');
                 }
@@ -916,100 +835,6 @@
             }
         }
     }
-
-                //function AddClient(clientModel) {
-
-                //	var formData = new FormData();
-                //	formData.append('ClientId', clientModel.ClientId);
-                //	formData.append('FirstName', clientModel.FirstName);
-                //	formData.append('LastName', clientModel.LastName);
-                //	formData.append('MiddleName', clientModel.MiddleName);
-                //	formData.append('CurrentEmail', clientModel.CurrentEmail);
-                //	formData.append('CurrentPhone', clientModel.CurrentPhone);
-                //	formData.append('DOB', clientModel.DOB);
-                //	formData.append('SSN', clientModel.SSN);
-                //	formData.append("SocialSecCard", clientModel.SocialSecCard);
-                //	formData.append("DrivingLicense", clientModel.DrivingLicense);
-                //	formData.append('ProofOfCard', clientModel.ProofOfCard);
-
-                //	if (clientModel.SocialSecCard != null) {
-                //		formData.append("isSocialSecCard", 1);
-                //	}
-                //	else {
-                //		formData.append("isSocialSecCard", 0);
-                //	}
-
-                //	if (clientModel.DrivingLicense != null) {
-                //		formData.append("isDrivingLicense", 1);
-                //	}
-                //	else {
-                //		formData.append("isDrivingLicense", 0);
-                //	}
-
-                //	if (clientModel.ProofOfCard != null) {
-                //		formData.append("isProofOfCard", 1);
-                //	}
-                //	else {
-                //		formData.append("isProofOfCard", 0);
-                //	}
-
-                //	$(".loader").show();
-                //	$("#overlay").show();
-                //	var Mode = getUrlParameter('Mode');
-
-
-                //	$.ajax({
-                //		url: '/Client/CreateNewClient',
-                //		type: "POST",
-                //		enctype: 'multipart/form-data',
-                //		contentType: false, // Not to set any content header
-                //		processData: false, // Not to process data
-                //		data: formData,
-                //		success: function (res) {
-                //			debugger;
-                //			if (res > 0) {
-                //				$(".loader").hide();
-                //				$("#overlay").hide();
-                //				if (clientModel.ClientId != undefined && Mode == 'Edit') {
-                //					Swal.fire({
-                //						title: "Success!",
-                //						text: "Client updated successfully!",
-                //						type: 'success',
-
-                //					}).then(function () {
-                //						window.location.href = "/Client/Index";
-                //					})
-                //				}
-                //				if (clientModel.ClientId != undefined && Mode == 'Profile') {
-                //					Swal.fire({
-                //						title: "Success!",
-                //						text: "Client updated successfully!",
-                //						type: 'success',
-
-                //					}).then(function () {
-                //						window.location.href = "/Dashboard/Client";
-                //					})
-                //				}
-                //				if (clientModel.ClientId == undefined) {
-                //					Swal.fire({
-                //						title: "Success!",
-                //						text: "Client added successfully!",
-                //						type: 'success',
-
-                //					}).then(function () {
-                //						window.location.href = "/Client/Index";
-                //					})
-
-                //				}
-                //			}
-                //		},
-                //		error: function (err) {
-
-                //		}
-                //	});
-
-                //}
-
 
 
 </script>

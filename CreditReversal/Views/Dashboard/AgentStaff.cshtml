@@ -279,6 +279,31 @@
     $(document).ready(function () {
          $(".loader1").hide();
         $("#overlay").hide();
+
+        //new
+         var from = '@TempData["from"]';
+        if (from == "error")
+        {
+            Swal.fire({
+                title: "Warning!",
+                text: "Identity IQ Information not available.",
+                type: 'warning',
+
+            });
+        }
+        else if (from == "InvalidIdentityIQ")
+        {
+            Swal.fire({
+                title: "Warning!",
+                text: "Invalid Identity IQ Information.",
+                type: 'warning',
+
+            });
+        }
+        //
+
+
+
 		var newclients = @Html.Raw(Json.Encode(ViewBag.Clients.Count));
 		var activeclients = @Html.Raw(Json.Encode(ViewBag.ActiveClients.Count));
 

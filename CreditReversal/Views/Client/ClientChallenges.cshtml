@@ -24,20 +24,21 @@
         <div class="row" style="padding-bottom:2px;padding-top:15px;">
             <h5>Account History</h5>
         </div>
+        <div class="row" style="padding-bottom:2px;padding-top:15px;">
+            <h7>Agent : @ViewBag.Agentname</h7>
+        </div>
         <div class="row" style="padding-bottom:12px;">
 
             <div class="table-responsive">
                 <table id="tblClientChallenges" class="table table-bordered">
                     <thead>
                         <tr class="trTable">
+                            
                             <th style="cursor: pointer;">
-                                Agent
+                                Agency
                             </th>
                             <th style="cursor: pointer;">
-                                Agency Name
-                            </th>
-                            <th style="cursor: pointer;">
-                                Challenge Date
+                                RoundType
                             </th>
                             <th style="cursor: pointer;">
                                 Merchant Name
@@ -45,25 +46,8 @@
                             <th style="cursor: pointer;">
                                 Account Number
                             </th>
-                            <th style="cursor: pointer;">
-                                Open Date
-                            </th>
-                            <th style="cursor: pointer;">
-                                Current Balance
-                            </th>
-                            <th style="cursor: pointer;">
-                                Highest Balance
-                            </th>
-                            @*<th style="cursor: pointer;">
-                                Challenge Text
-                            </th>*@
-                            <th style="cursor: pointer;">
-                                Status
-                            </th>
-                            @*<th>
-                                Actions
-                            </th>*@
-                            @*<th style="max-width:100px;"> Actions</th>*@
+
+
                         </tr>
                     </thead>
                     @if (ViewBag.CreditReportItems != null && ViewBag.CreditReportItems.Count > 0)
@@ -72,14 +56,12 @@
                             @foreach (var item in ViewBag.CreditReportItems)
                             {
                                 <tr class="trBody">
-                                    <td>
-                                        <span>@item.Agent</span>
-                                    </td>
+
                                     <td>
                                         <span>@item.Agency</span>
                                     </td>
                                     <td>
-                                        <span>@item.ChallengeCreatedDate</span>
+                                        <span>@item.RoundType</span>
                                     </td>
                                     <td>
                                         <span>@item.MerchantName</span>
@@ -87,22 +69,7 @@
                                     <td>
                                         <span>@item.AccountId</span>
                                     </td>
-                                    <td>
-                                        <span>@item.OpenDate</span>
-                                    </td>
-                                    <td>
-                                        <span>@item.CurrentBalance</span>
-                                    </td>
-                                    <td>
-                                        <span>@item.HighestBalance</span>
-                                    </td>
-                                    @*<td>
-                                        <span>@item.Challenge</span>
-                                    </td>*@
 
-                                    <td>
-                                        <span>@item.Status</span>
-                                    </td>
                                     @{
                                         string path = "/Documents/Challenge/Challenge-" + @ViewBag.name + "-" + @item.CredRepItemsId + ".pdf";
                                     }
@@ -127,21 +94,18 @@
                     <thead>
                         <tr class="trTable">
                             <th style="cursor: pointer;">
+                                Agency
+                            </th>
+                            <th style="cursor: pointer;">
+                                Round Type
+                            </th>
+                            <th style="cursor: pointer;">
                                 Creditor Name
                             </th>
                             <th style="cursor: pointer;">
                                 Type of Business
                             </th>
-                            <th style="cursor: pointer;">
-                                Date of inquiry
-                            </th>
-                            <th style="cursor: pointer;">
-                                Agency
-                            </th>
-                            @*<th style="cursor: pointer;">
-                                ChallengeText
-                            </th>*@
-                           
+
                         </tr>
                     </thead>
                     @if (ViewBag.CreditReportInquiresItems != null && ViewBag.CreditReportInquiresItems.Count > 0)
@@ -151,21 +115,26 @@
                             {
                                 <tr class="trBody">
                                     <td>
+                                        <span>@item.CreditBureau</span>
+                                    </td>
+                                    <td>
+                                        <span>@item.RoundType</span>
+                                    </td>
+                                    <td>
                                         <span>@item.CreditorName</span>
                                     </td>
                                     <td>
                                         <span>@item.TypeofBusiness</span>
                                     </td>
-                                    <td>
+
+                                    @*<td>
                                         <span>@item.Dateofinquiry</span>
-                                    </td>
-                                    <td>
-                                        <span>@item.CreditBureau</span>
-                                    </td>
+                                    </td>*@
+
                                     @*<td>
                                         <span>@item.ChallengeText</span>
                                     </td>*@
-                                   
+
                                     @*@{
                                         string path = "/Documents/Challenge/Challenge-" + @ViewBag.name + "-" + @item.CredRepItemsId + ".pdf";
                                     }*@

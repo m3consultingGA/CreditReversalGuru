@@ -29,7 +29,7 @@
         </div> <!-- /.portlet-header -->
         <div class="portlet-body">
             <div class="row" style="padding:20px 20px 0px 0px;">
-                <div class="pull-right" >
+                <div class="pull-right">
                     @*<a class="btn btn-secondary btn-sm">Add Staff</a>*@
                     <button id="btnAssignStaff" class="btn btn-primary">Assign Staff</button>
                 </div>
@@ -59,7 +59,7 @@
                                     <td>@item.DBirth</td>
                                     <td class="dropdown">
                                         <select class="form-control" style="width:250px">
-                                            <option value="0">Select Staff</option>
+                                            <option value="0" id="staff">Select Staff</option>
                                             @foreach (var i in ViewBag.staff)
                                             {
                                                 if (@item.AgentStaffId == @i.AgentStaffId)
@@ -103,46 +103,50 @@
             Swal.fire("Warning!", "Please select atleast one CheckBox!", 'warning');
             return;
         }
-
+        var cnt = 0;
         $("#ChkAssignstaff:checked").each(function (i) {
 
             debugger;
             var data = $(this).parents('tr:eq(0)');
-            // var td = $(data).find('td:eq(8)').find('input').val();
-            values.push({
-                'Username': $(data).find('td:eq(1)').text(),
-                'DoB': $(data).find('td:eq(2)').text(),
-                'Staff': $(data).find('td:eq(3) option:selected').val(),
-                'ClientId': $(data).find('td:eq(4)').text(),
-            });
-
-        });
-
-        debugger;
-        console.log(values);
-
-        $.ajax({
-            method: "POST",
-            url: "/Agent/AddAssignStaff",
-            data: { client: values },
-            dataType: "json",
-            success: function (data) {
-                if (data == true) {
-                    Swal.fire({
-                        title: "Success!",
-                        text: "Successfully added Staff",
-                        type: 'success',
-
-                    }).then(function () {
-                        window.location.href = "/Agent/AssignStaff";
-                    })
-                }
+            var staff = $(data).find('td:eq(3) option:selected').val();
+            if (staff == 0) {
+                cnt = 1;
+            }
+            else {
+                values.push({
+                    'Username': $(data).find('td:eq(1)').text(),
+                    'DoB': $(data).find('td:eq(2)').text(),
+                    'Staff': $(data).find('td:eq(3) option:selected').val(),
+                    'ClientId': $(data).find('td:eq(4)').text(),
+                });
             }
 
+        });    
 
+        if (cnt == 1) {
+            Swal.fire("Warning!", "Please select staff!", 'warning');         
+            return;
+        }
+        else {
+            $.ajax({
+                method: "POST",
+                url: "/Agent/AddAssignStaff",
+                data: { client: values },
+                dataType: "json",
+                success: function (data) {
+                    if (data == true) {                       
+                        Swal.fire({
+                            title: "Success!",
+                            text: "Successfully added Staff",
+                            type: 'success',
 
-        });
-
+                        }).then(function () {
+                            window.location.href = "/Agent/AssignStaff";
+                        })
+                    }
+                }
+            });
+        }
     });
 
 </script>

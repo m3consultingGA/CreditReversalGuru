@@ -651,7 +651,7 @@
                                     {
                                         <tr>
 
-                                            @if (role.ToUpper() != "CLIENT" && item.Heading != "CreditInqId")
+                                            @if (role.ToUpper() != "CLIENT" && item.Heading != "CreditInqId" && item.Heading != "Challenge Status")
                                             {
                                                 //displaying all headings except creditreportid for agent
                                                 <td class="tdClass">@item.Heading</td>
@@ -659,7 +659,7 @@
                                             else
                                             {
                                                 //displaying all headings except Challenge and creditreportid for client
-                                                if (item.Heading != "Challenge" && item.Heading != "CreditInqId")
+                                                if (item.Heading != "Challenge" && item.Heading != "CreditInqId" && item.Heading != "Challenge Status")
                                                 {
                                                     <td class="tdClass">@item.Heading</td>
                                                 }
@@ -923,7 +923,7 @@
                                                 }
                                                 else
                                                 {
-                                                    if (item.Heading != "CreditInqId")
+                                                    if (item.Heading != "CreditInqId" && item.Heading != "Challenge Status")
                                                     {
                                                         <td>@item.TRANSUNION</td>
                                                         <td>@item.EXPERIAN</td>
@@ -1009,8 +1009,11 @@
 
     //Creating Account History Challenges
     $("#AddChallenge").click(function () {
-            //debugger;
-            var items=@Html.Raw(Json.Encode(ViewBag.challenges));
+        debugger;
+        var ClientId = getUrlParameter('ClientId');
+        try {
+
+              var items=@Html.Raw(Json.Encode(ViewBag.challenges));
             var i = 0;
 
             var AllAgenciesvalues = new Array();
@@ -1028,49 +1031,6 @@
 
 
 
-
-                //if ($("#chkEQUI_" + i).prop("checked") == true ) {
-                //    if (EQUIChallenge == "") {
-                //        Swal.fire("Warning!", "Please select challenge !", 'warning');
-                //        $("#EQUIChallenge_" + i).focus();
-                //        return false;
-                //    }
-                //}
-                //else if ($("#chkEQUI_" + i).prop("checked") == false) {
-
-                //    Swal.fire("Warning!", "Please select challenge !", 'warning');
-                //    $("#EQUIChallenge_" + i).focus();
-                //    return false;
-
-                //}
-
-                //if ($("#chkEXPE_" + i).prop("checked") == true) {
-
-                //    if (EXPEChallenge == "") {
-                //        Swal.fire("Warning!", "Please select challenge !", 'warning');
-                //        $("#EXPEChallenge_" + i).focus();
-                //        return false;
-                //    }
-                //}
-                //else if ($("#chkEXPE_" + i).prop("checked") == false) {
-                //    Swal.fire("Warning!", "Please check challenge !", 'warning');
-                //    return false;
-                //}
-
-                //if ($("#chkTRANS_" + i).prop("checked") == true) {
-
-                //    if (TRANSChallenge == "") {
-                //        Swal.fire("Warning!", "Please select challenge !", 'warning');
-                //        $("#TRANSChallenge_" + i).focus();
-                //        return false;
-                //    }
-                //}
-                //else if ($("#chkTRANS_" + i).prop("checked") == false) {
-                //    Swal.fire("Warning!", "Please check challenge !", 'warning');
-                //    $("#TRANSChallenge_" + i).focus();
-                //    return false;
-                //}
-
                 var isCheckboxdisabled = $('#chkEQUI_' + i).is(':disabled');
                 if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditRepItemId != "" && isCheckboxdisabled == false) {
                     debugger
@@ -1084,13 +1044,22 @@
                         if ($("#EQUIChallenge_" + i).prop('disabled') == false) {
                             Swal.fire("Warning!", "Please check challenge !", 'warning');
                             return false;
-                        }                        
+                        }
+                    }
+                }
+                else
+                {
+                    if (EQUIChallenge == "" && $("#chkEQUI_" + i).prop("checked") == true)
+                    {
+                        $("#EQUIChallenge_" + i).focus();
+                        Swal.fire("Warning!", "Please select challenge !", 'warning');
+                        return false;
                     }
                 }
 
                  var isCheckboxdisabled = $('#chkEXPE_' + i).is(':disabled');
                 if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditRepItemId != "" && isCheckboxdisabled == false) {
-                    //debugger;
+                    debugger;
 
                     if ($("#chkEXPE_" + i).prop("checked") == true) {
                         AllAgenciesvalues.push({
@@ -1104,9 +1073,19 @@
                         }
                     }
                 }
+                 else
+                {
+                    if (EXPEChallenge == "" && $("#chkEXPE_" + i).prop("checked") == true)
+                    {
+                        $("#EXPEChallenge_" + i).focus();
+                        Swal.fire("Warning!", "Please select challenge !", 'warning');
+                        return false;
+                    }
+                }
 
                 var isCheckboxdisabled = $('#chkTRANS_' + i).is(':disabled');
-                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditRepItemId != ""  && isCheckboxdisabled == false) {
+                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditRepItemId != "" && isCheckboxdisabled == false)
+                {
 
                     if ($("#chkTRANS_" + i).prop("checked") == true) {
                         AllAgenciesvalues.push({
@@ -1120,7 +1099,15 @@
                         }
                     }
                 }
-
+                 else
+                {
+                    if (TRANSChallenge == "" && $("#chkTRANS_" + i).prop("checked") == true)
+                    {
+                        $("#TRANSChallenge_" + i).focus();
+                        Swal.fire("Warning!", "Please select challenge !", 'warning');
+                        return false;
+                    }
+                }
             }
 
 
@@ -1182,6 +1169,10 @@
                 }
             }
         });
+        } catch (e) {
+            location.href="/Account/SignIn"
+        }
+          
 
 
     });
@@ -1225,6 +1216,17 @@
                         
                     }
                 }
+                else
+                {
+                    if (EQUIChallenge == "" && $("#chkInquiriesEQUI_" + i).prop("checked") == true)
+                    {
+                        $("#EQUIInquiriesChallenge_" + i).focus();
+                        Swal.fire("Warning!", "Please select challenge !", 'warning');
+                        return false;
+                    }
+                }
+
+
                  var isCheckboxdisabled = $('#chkInquiriesEXPE_' + i).is(':disabled');
                 if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditInqId != "" && isCheckboxdisabled == false) {
                     //debugger;
@@ -1242,8 +1244,20 @@
                         }
                     }
                 }
+                else
+                {
+                    if (EXPEChallenge == "" && $("#chkInquiriesEXPE_" + i).prop("checked") == true)
+                    {
+                        $("#EXPEInquiriesChallenge_" + i).focus();
+                        Swal.fire("Warning!", "Please select challenge !", 'warning');
+                        return false;
+                    }
+                }
+
+
                 var isCheckboxdisabled = $('#chkInquiriesTRANS_' + i).is(':disabled');
-                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditInqId != "" && isCheckboxdisabled == false) {
+                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditInqId != "" && isCheckboxdisabled == false)
+                {
 
                     if ($("#chkInquiriesTRANS_" + i).prop("checked") == true) {
                         AllAgenciesvalues.push({
@@ -1257,16 +1271,23 @@
                         }
                     }
                 }
+                else
+                {
+                    if (TRANSChallenge == "" && $("#chkInquiriesTRANS_" + i).prop("checked") == true)
+                    {
+                        $("#TRANSInquiriesChallenge_" + i).focus();
+                        Swal.fire("Warning!", "Please select challenge !", 'warning');
+                        return false;
+                    }
+                }
 
             }
-
 
             if (AllAgenciesvalues.length == 0)
             {
                 Swal.fire("Warning!", "Please select challenge !", 'warning');
                 return false;
             }
-
 
             var values = new Array();
             var Id = getUrlParameter('ClientId');
@@ -1324,7 +1345,8 @@
     });
 
     function refreshcreditpull() {
-         $(".loader1").show();
+        try {
+             $(".loader1").show();
                     $("#overlay").show();
 
                     $.ajax({
@@ -1374,7 +1396,12 @@
                             }
                         }
                     });
+        } catch (e) {
+
+        }
+        
     }
+
 
     $("#RefreshCreditPull").click(function () {
         debugger;
@@ -1453,9 +1480,6 @@
 
 
 
-
-
-
                 var isCheckboxdisabled = $('#chkEQUI_' + i).is(':disabled');
                 if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditRepItemId != "" && isCheckboxdisabled == true) {
                     debugger
@@ -1507,23 +1531,25 @@
 
         if (AllAgenciesvalues.length > 0 || AllAgenciesInquiresvalues.length > 0) {
             debugger
-
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "Challenges already created. Do you want to refresh!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Continue it!'
-            }).then((result) => {
-                if (result.value) {
-                    //debugger;
-                    refreshcreditpull();
-                    //
-                }
-            })
-        } else {
+            refreshcreditpull();
+            // Swal.fire({
+            //    title: 'Are you sure?',
+            //    text: "Challenges already created. Do you want to refresh!",
+            //    icon: 'warning',
+            //    showCancelButton: true,
+            //    confirmButtonColor: '#3085d6',
+            //    cancelButtonColor: '#d33',
+            //    confirmButtonText: 'Yes, Continue it!'
+            //}).then((result) => {
+            //    if (result.value) {
+            //        //debugger;
+            //        refreshcreditpull();
+            //        //
+            //    }
+            //})
+        }
+        else
+        {
              refreshcreditpull();
 
         }
