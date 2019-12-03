@@ -116,6 +116,7 @@ namespace CreditReversal.Controllers
 
                         case "admin":
                             return RedirectToAction("Admin", "Dashboard");
+                        case "investor":                            return RedirectToAction("Admin", "Dashboard");
                     }
                 }
                 else

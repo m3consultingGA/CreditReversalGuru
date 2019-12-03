@@ -1,16 +1,56 @@
 ﻿
 @{
-    ViewBag.Title = "Admin";
+    string role = null;
+    if (Session["UserRole"] != null)
+    {
+        role = Session["UserRole"].ToString();
+    }
+}
+@{
+    if (role == "admin")
+    {
+        ViewBag.Title = "Admin";
+    }
+    else if (role == "investor")
+    {
+        ViewBag.Title = "Investor";
+    }
     Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
 }
 
-<title>Admin Dashboard</title>
+@if (role == "admin")
+{
+    <title>Admin Dashboard</title>
+}
+else if (role == "investor")
+{
+    <title>Investor Dashboard</title>
+}
+
+@*<style>
+
+      .buttons-print {
+      background-color: red;
+      color: white;
+    }
+    .buttons-excel {
+      background-color: blue;
+      color: white;
+    }
+    </style>*@
 
 <div class="pl-4">
     <div class="col-lg-12">
         <div class="row">
             <div class="divMain">
-                <h5>Admin Dashboard</h5>
+                @if (role == "admin")
+                {
+                    <h5 style="padding-left:30px">Admin Dashboard</h5>
+                }
+                else if (role == "investor")
+                {
+                    <h5 style="padding-left:30px">Investor Dashboard</h5>
+                }
             </div>
         </div>
 
@@ -38,7 +78,7 @@
                                         <th>Pricing Plan</th>
                                         <th>Billing Type</th>
                                         <th>Next Billing Date</th>
-                                        
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -46,19 +86,19 @@
                                     {
                                         foreach (var items in ViewBag.GetBillingDates)
                                         {
-                                    <tr>
-                                        <td>@items.BusinessName</td>
-                                        <td>@items.TypeOfComp</td>
-                                        <td>@items.NumberofStaff</td>
-                                        <td>@items.SCreatedDate</td>
-                                        <td>@items.RegisteredClients</td>
-                                        <td>@items.PrimaryUser <br />@items.BillingEmail<br />@items.BillingPhone</td>
-                                        <td>@items.ActiveClients</td>
-                                        <td>@items.Status</td>
-                                        <td>@items.PricingPlans</td>
-                                        <td>@items.BillingType</td>
-                                        <td>@items.NextBillingDate</td>
-                                    </tr>
+                                            <tr>
+                                                <td>@items.BusinessName</td>
+                                                <td>@items.TypeOfComp</td>
+                                                <td>@items.NumberofStaff</td>
+                                                <td>@items.SCreatedDate</td>
+                                                <td>@items.RegisteredClients</td>
+                                                <td>@items.PrimaryUser <br />@items.BillingEmail<br />@items.BillingPhone</td>
+                                                <td>@items.ActiveClients</td>
+                                                <td>@items.Status</td>
+                                                <td>@items.PricingPlans</td>
+                                                <td>@items.BillingType</td>
+                                                <td>@items.NextBillingDate</td>
+                                            </tr>
 
                                         }
                                     }
@@ -75,13 +115,41 @@
 
     </div>
 </div>
+
 <script>
+
     $(document).ready(function () {
+        debugger;
         $('#AgentList').DataTable({
             "pagingType": "simple",
             "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+            //"dom": 'Bfrtip',
+            // "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            //dom: 'Bflrtip',
+
+            "dom": "<'row'<'col-md-3'l><'col-md-4 col-md-offset-1'B><'col-md-3 pull-right'f>>" +
+                "<'row'<'col-md-6'><'col-md-6'>>" +
+                "<'row'<'col-md-12't>>" +
+                "<'row'<'col-md-4'i><'col-md-8 pull-right'p>>",
+            //  "buttons": ['csv', 'pdf', 'print'],
+            "buttons": [
+                'csv',
+                {
+                    extend: 'pdfHtml5',
+                    orientation: 'landscape',
+                    pageSize: 'LEGAL'
+                },
+                {
+                    extend: 'print',
+                    orientation: 'landscape',
+                    pageSize: 'LEGAL'
+                }
+            ]
         });
+
     })
 </script>
+
+
 
 

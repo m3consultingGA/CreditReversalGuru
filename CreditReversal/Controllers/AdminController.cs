@@ -355,5 +355,18 @@ namespace CreditReversal.Controllers
             return Json(status);
         }
         #endregion
+
+
+        public ActionResult ServiceSettings()        {            try            {
+                ViewBag.Dasboard = objSData.getDasboard();            }            catch (Exception ex) { ex.insertTrace(""); }            return View();        }
+
+        [HttpPost]
+        public JsonResult AddServiceSettings(ServiceSettings servicesettings)        {            try            {
+                res = objAdminfunction.InsertServiceSettings(servicesettings);            }            catch (Exception ex) { ex.insertTrace(""); }            return Json(res);        }
+
+
+        [HttpPost]
+        public JsonResult GetServiceSettings()        {            ServiceSettings res = new ServiceSettings();            try            {
+                res = objAdminfunction.GetServiceSettings();            }            catch (Exception ex) { ex.insertTrace(""); }            return Json(res);        }
     }
 }

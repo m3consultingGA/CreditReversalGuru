@@ -503,5 +503,33 @@ namespace CreditReversal.BLL
 
 
         #endregion
+
+
+        #region Insert Service Settings
+        public int InsertServiceSettings(ServiceSettings servicesettings)
+        {
+            int res = 0;
+            try
+            {
+                res = objCTData.InsertServiceSettings(servicesettings);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return res;
+        }
+        #endregion
+
+        #region Insert Service Settings
+        public ServiceSettings GetServiceSettings()
+        {
+            ServiceSettings res = new ServiceSettings();
+            try
+            {
+                
+                res = objCTData.GetServiceSettings();
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return res;
+        }
+        #endregion
     }
 }
