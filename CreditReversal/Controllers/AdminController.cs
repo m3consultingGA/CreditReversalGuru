@@ -20,6 +20,13 @@ namespace CreditReversal.Controllers
         SessionData objSData = new SessionData();
 
 
+        public SessionData sessionData = new SessionData();
+        IdentityIQFunction IQfunction = new IdentityIQFunction();
+        Common objCommon = new Common();
+        ClientFunction cfunction = new ClientFunction();
+        DashboardFunctions functions = new DashboardFunctions();
+        ClientData CData = new ClientData();
+
         int res = 0;
         string strCType = string.Empty;
         bool result = false;
@@ -368,5 +375,123 @@ namespace CreditReversal.Controllers
         [HttpPost]
         public JsonResult GetServiceSettings()        {            ServiceSettings res = new ServiceSettings();            try            {
                 res = objAdminfunction.GetServiceSettings();            }            catch (Exception ex) { ex.insertTrace(""); }            return Json(res);        }
+
+
+        [HttpGet]
+        public ActionResult CreateInvestor(string InvestorId = "", string Mode = "", string from = "")
+        {
+            TempData["from"] = from;
+            string staffid = sessionData.GetStaffId();
+            int Id = Convert.ToInt32(staffid);
+
+            ViewBag.staffId = Id;
+            Investor InvestorModel = new Investor();
+            try
+            {
+                ViewBag.Dasboard = sessionData.getDasboard();
+
+                if (InvestorId != "0")
+                {
+                    if (Mode == "Edit")
+                    {
+                        InvestorModel = objAdminfunction.GetInvestor(InvestorId);
+                        InvestorModel.InvestorId = InvestorId.StringToInt(0);
+                    }
+                }
+
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return View(InvestorModel);
+        }
+
+        //Createinvestor
+        [HttpPost]
+        public ActionResult CreateInvestor(Investor InvestorModel)
+        {
+            Investor Investor = new Investor();
+            string role = sessionData.GetUserRole();
+            string from = TempData["from"] != null ? TempData["from"].ToString() : string.Empty;
+            long res = 0;
+            try
+            {
+
+                if (InvestorModel.FProofOfCard != null)
+                {
+                    string PFileName = Path.GetFileName(InvestorModel.FProofOfCard.FileName);
+                    string _path = Server.MapPath("~/documents/" + "Investor-" + InvestorModel.InvestorId + "-" + PFileName);
+                    InvestorModel.FProofOfCard.SaveAs(_path);
+                    
+                    if (InvestorModel.InvestorId != null)
+                    {
+                        InvestorModel.sProofOfCard = InvestorModel.InvestorId + "-" + PFileName;
+                    }
+                    else
+                    {
+                        InvestorModel.sProofOfCard = PFileName;
+                    }
+                }
+
+                if (InvestorModel.FDrivingLicense != null)
+                {
+                    string DFileName = Path.GetFileName(InvestorModel.FDrivingLicense.FileName);
+                    string path = Server.MapPath("~/documents/" + "Investor-" + InvestorModel.InvestorId + "-" + DFileName);
+                    InvestorModel.FDrivingLicense.SaveAs(path);
+                    
+                    if (InvestorModel.InvestorId != null)
+                    {
+                        InvestorModel.sDrivingLicense = InvestorModel.InvestorId + "-" + DFileName;
+                    }
+                    else
+                    {
+                        InvestorModel.sDrivingLicense = DFileName;
+                    }
+                }
+
+                if (InvestorModel.FSocialSecCard != null)
+                {
+                    string SFileName = Path.GetFileName(InvestorModel.FSocialSecCard.FileName);
+                    string path = Server.MapPath("~/documents/" + "Investor-" + InvestorModel.InvestorId + "-" + SFileName);
+                    InvestorModel.FSocialSecCard.SaveAs(path);
+                    if (InvestorModel.InvestorId != null)
+                    {
+                        InvestorModel.sSocialSecCard = InvestorModel.InvestorId + "-" + SFileName;
+                    }
+                    else {
+                        InvestorModel.sSocialSecCard = SFileName;
+                    }
+
+                    
+                }
+
+
+                
+                InvestorModel.Status = "1";
+                InvestorModel.CreatedBy = sessionData.GetUserID().StringToInt(0);
+                InvestorModel.UserRole = "investor";
+                InvestorModel.CreatedDate = System.DateTime.Now.ToShortDateString();
+                res = objAdminfunction.CreateInvestor(InvestorModel);
+                if (res > 0)
+                {
+                    if (role == "admin")
+                    {
+                        return RedirectToAction("Investors", "Admin");
+                    }                                     
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                ex.insertTrace("");
+            }
+            return View(InvestorModel);
+        }
+
+
+        public ActionResult Investors()        {            try            {
+                ViewBag.Dasboard = objSData.getDasboard();
+                ViewBag.Investors = objAdminfunction.GetInvestors();            }            catch (Exception ex) { ex.insertTrace(""); }            return View();        }
+        [HttpPost]        public JsonResult DeleteInvestor(string InvestorId)        {            long res = 0;            try            {
+                res = objAdminfunction.DeleteInvestor(InvestorId);            }            catch (Exception ex)            {            }            return Json(res);        }
     }
 }

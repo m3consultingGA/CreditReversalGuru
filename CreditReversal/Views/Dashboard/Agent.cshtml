@@ -202,15 +202,16 @@
                                             }
                                             @if (item.DueDate != null)
                                             {
-                                                int value = DateTime.Compare(date, item.DueDate);
+                                                int value = DateTime.Compare(date.Date, item.DueDate.Date);
 
-                                                if (value < 0)
+                                                if (value >= 0)
                                                 {
-                                                    @item.DueDate.ToString("MM/dd/yyyy")
+                                                    <span1> @item.DueDate.ToString("MM/dd/yyyy") </span1>
+
                                                 }
                                                 else
                                                 {
-                                                    <span1> @item.DueDate.ToString("MM/dd/yyyy") </span1>
+                                                    @item.DueDate.ToString("MM/dd/yyyy")
 
                                                 }
                                             }

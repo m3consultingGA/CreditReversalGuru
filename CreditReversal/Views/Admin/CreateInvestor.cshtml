@@ -1,0 +1,609 @@
+﻿
+
+@model CreditReversal.Models.Investor
+
+@{
+  
+     ViewBag.Title = "Add Investor";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+    string role = null;
+    
+
+}
+
+<div class="page-header">
+    <div style="padding-bottom:10px;">
+        <ol class="breadcrumb pull-right">
+            <li class="breadcrumb-item"><a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+            @if (role != "admin")
+            {
+                if (Request != null)
+                {
+                    if (Request.QueryString["Mode"] == "Profile")
+                    {
+                       
+                    }
+                    else if (Request.QueryString["Mode"] == "View")
+                    {
+                        <li class="active"><a href="/Client/Index"><i class="fa fa-user"></i>&nbsp;View Investors</a></li>
+
+                    }
+                }
+            }
+            else
+            {
+
+                <li class="active"><a href="/Client/Index"><i class="fa fa-user"></i>&nbsp;View Investors</a></li>
+            }
+            
+
+        </ol>
+    </div>
+</div>
+<div class="loader"> </div>
+<div id="overlay"></div>
+<div style="padding-top:10px">
+
+
+    <div class="portlet portlet-boxed">
+        <div class="portlet-header">
+            @{
+                if (Request != null)
+                {
+                    if (Request.QueryString["Mode"] == "Edit")
+                    {
+                        <h4 class="portlet-title">Edit Investor</h4>
+                    }
+                    else if (Request.QueryString["Mode"] == "Profile")
+                    {
+                        <h4 class="portlet-title">My Profile</h4>
+                    }
+                    else if (Request.QueryString["Mode"] == "View")
+                    {
+                        <h4 class="portlet-title">View Investor</h4>
+                    }
+                    else
+                    {
+                        <h4 class="portlet-title">Add Investor</h4>
+                    }
+                }
+            }
+
+
+        </div> <!-- /.portlet-header -->
+        <div class="portlet-body">
+            <div class="row" style="padding-bottom:12px;padding-top:15px;">
+              
+
+                <form method="post" id="Investorform" action="/Admin/CreateInvestor" enctype="multipart/form-data">
+                    <div class="tab-content">
+                        <div id="home" class="tab-pane fade in active">
+                            <div class="col-md-12">
+                                <input type="hidden" name="Mode" id="hdnMode" value="@Request.QueryString["Mode"]" />
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>First Name <span style="color:red">*</span></label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" name="FirstName" maxlength="50" id="txtFirstName" value="@Model.FirstName" onchange="RemoveValidation(this);" required>
+                                                    <div class="text-danger" id="Msg_txtFirstName">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Last Name <span style="color:red">*</span></label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" name="LastName" maxlength="50" id="txtLastName" onchange="RemoveValidation(this);" value="@Model.LastName" required>
+                                                    <div class="text-danger" id="Msg_txtLastName">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Middle Name</label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" maxlength="50" name="MiddleName" id="txtMiddleName" value="@Model.MiddleName">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Date Of Birth<span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control datepicker" name="DOB" id="txtDOB" onchange="RemoveValidation(this);" autocomplete="off" value="@Model.DOB" required>
+                                                    <div class="text-danger" id="Msg_txtDOB">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Address Information -->
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Address 1<span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" name="Address1" id="Address1" onchange="RemoveValidation(this);" value="@Model.Address1" required>
+                                                    <div class="text-danger" id="Msg_Address1">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Address 2</label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" name="Address2" id="Address2" value="@Model.Address2">
+                                                    <div class="text-danger" id="Msg_Address2">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>City<span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" name="City" id="City" onchange="RemoveValidation(this);" value="@Model.City" required>
+                                                    <div class="text-danger" id="Msg_City">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>State<span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" name="State" id="State" onchange="RemoveValidation(this);" value="@Model.State" required>
+                                                    <div class="text-danger" id="Msg_State">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>ZipCode<span class="text-danger">*</span></label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" name="ZipCode" id="ZipCode" onchange="RemoveValidation(this);" value="@Model.ZipCode" required>
+                                                        <span class="input-group-btn" id="Mpopover">
+                                                            <a class="btn btn-default" data-toggle="popover" title="Enter Zipcode" data-content="Must be at least 5 characters long, Format should be 00000."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                        </span>
+                                                    </div>
+                                                    <div class="text-danger" id="Msg_ZipCode">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Email Id <span style="color:red">*</span></label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="email" class="form-control" name="txtTempEmail" id="txtTempEmail" style="display:none">
+
+
+                                                    @if (string.IsNullOrEmpty(Model.CurrentEmail))
+                                                    {<div class="input-group">
+                                                            <input type="email" class="form-control" name="CurrentEmail" id="txtCurrentEmail" onchange="RemoveValidation(this),checkemail();" value="@Model.CurrentEmail" required>
+                                                            <span class="input-group-btn" id="Mpopover">
+                                                                <a class="btn btn-default" data-toggle="popover" title="Enter Email" data-content="Format should be 'john@company.com'."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                            </span>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>
+                                                            <input type="email" class="form-control" name="CurrentEmail" id="txtCurrentEmail" value="@Model.CurrentEmail" readonly>
+                                                        </div>
+                                                    }
+                                                    <div class="text-danger" id="Msg_txtCurrentEmail">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Phone</label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="text" class="form-control" maxlength="20" name="CurrentPhone" id="txtPhone" value="@Model.CurrentPhone">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Social Security Number <span style="color:red">*</span></label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control" maxlength="9" name="SSN" placeholder="Social Security Number"
+                                                               id="txtSSN" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                                                               onchange="RemoveValidation(this),checkssn();" value="@Model.SSN" required />
+                                                        <span class="input-group-btn" id="Mpopover">
+                                                            <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Must be at least 9 characters long, Format should be 000-00-0000."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                        </span>
+                                                    </div>
+                                                  
+                                                    <div class="text-danger" id="Msg_txtSSN">
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                @if (Model.sSocialSecCard == null)
+                                                {
+                                                    <div class="col-md-2">
+                                                        <label>Social Security Card <span style="color:red">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="input-group">
+                                                            <input type="file" class="form-control" name="FSocialSecCard" id="FileSocialSecCard" onchange="RemoveValidation(this);" accept=".pdf,.jpeg,.png,.jpg" required />
+                                                            <span class="input-group-btn" id="Mpopover">
+                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Social Security Card filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                            </span>
+                                                        </div>
+                                                        <div class="text-danger" id="Msg_FileSocialSecCard">
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-md-2">
+                                                        <label>Social Security Card <span style="color:red"></span></label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="input-group">
+                                                            <input type="file" class="form-control" name="FSocialSecCard" id="FileSocialSecCard" accept=".pdf,.jpeg,.png,.jpg" />
+                                                            <span class="input-group-btn" id="Mpopover">
+                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Social Security Card filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                            </span>
+                                                        </div>
+                                                        <input type="text" name="sSocialSecCard" value="@Model.sSocialSecCard" hidden />
+
+                                                        <span><label>@Model.sSocialSecCard</label></span>
+
+
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                @if (Model.sDrivingLicense == null)
+                                                {
+                                                    <div class="col-md-2">
+                                                        <label>Drivers License <span style="color:red">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="input-group">
+                                                            <input type="file" class="form-control" name="FDrivingLicense" id="FileDrivingLicense" onchange="RemoveValidation(this);" accept=".pdf,.jpeg,.png,.jpg" required />
+
+                                                            <span class="input-group-btn" id="Mpopover">
+                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Drivers License filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                            </span>
+                                                        </div>
+                                                        <div class="text-danger" id="Msg_FileDrivingLicense">
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-md-2">
+                                                        <label>Drivers License <span style="color:red"></span></label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="input-group">
+                                                            <input type="file" class="form-control" name="FDrivingLicense" id="FileDrivingLicense" accept=".pdf,.jpeg,.png,.jpg" />
+
+                                                            <span class="input-group-btn" id="Mpopover">
+                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Drivers License filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                            </span>
+                                                        </div>
+                                                        <input type="text" name="sDrivingLicense" value="@Model.sDrivingLicense" hidden />
+                                                        <span><label>@Model.sDrivingLicense</label></span>
+                                                    </div>
+
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                @if (Model.sProofOfCard == null)
+                                                {
+                                                    <div class="col-md-2">
+                                                        <label>Proof Of Address <span style="color:red">*</span></label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="input-group">
+                                                            <input type="file" class="form-control" name="FProofOfCard" id="FileProofOfCard" onchange="RemoveValidation(this)" accept=".pdf,.jpeg,.png,.jpg" required />
+
+                                                            <span class="input-group-btn" id="Mpopover">
+                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Proof of Address filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                            </span>
+                                                        </div>
+                                                        <div class="text-danger" id="Msg_FileProofOfCard">
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="col-md-2">
+                                                        <label>Proof Of Address <span style="color:red"></span></label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="input-group">
+                                                            <input type="file" class="form-control" name="FProofOfCard" id="FileProofOfCard" accept=".pdf,.jpeg,.png,.jpg" />
+                                                            <span class="input-group-btn" id="Mpopover">
+                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Proof of Address filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                            </span>
+                                                        </div>
+                                                        <input type="text" name="sProofOfCard" value="@Model.sProofOfCard" hidden />
+                                                        <span><label>@Model.sProofOfCard</label></span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                        <input type="text" name="InvestorId" value="@Model.InvestorId" hidden />
+                                        <div class="col-md-6">
+                                            <div class="row">
+                                                <div class="col-md-2 pull-right">
+                                                    <input type="submit" id="btnAddInvestor" class="btn btn-secondary" value="Submit" />
+                                                    <input type="submit" id="btnUpdateInvestor" class="btn btn-secondary" value="Update" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                       
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    $('#Investorform').on('keyup keypress', function (e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    $(document).ready(function () {
+       
+        $(".loader").hide();
+        $("#overlay").hide();
+
+        var currentDate = new Date();
+        var day = currentDate.getDate();
+        var month = currentDate.getMonth() + 1;
+        if (parseInt(month) < 10) {
+            month = "0" + month;
+        }
+
+        var year = currentDate.getFullYear() - 18;
+
+        var date = month + "/" + day + "/" + year;
+        if ($("#txtDOB").val() == "") {
+            $('#txtDOB').datepicker({
+                format: 'mm/dd/yyyy',
+                autoclose: true
+            }).datepicker("setDate", date);
+        }
+        else {
+            $('#txtDOB').datepicker({
+                format: 'mm/dd/yyyy',
+                autoclose: true
+            }).datepicker();
+        }
+
+
+        $("#btnUpdateInvestor").hide();
+        var InvestorId = getUrlParameter('InvestorId');
+        if (InvestorId != undefined) {
+            $("#btnUpdateInvestor").show();
+            $("#btnAddInvestor").hide();
+        }
+    });
+
+    $("#btnAddInvestor").click(function () {
+        var firstname = document.getElementById("txtFirstName");
+        var lastname = document.getElementById("txtLastName");
+        var dob = document.getElementById("txtDOB");
+
+        var address1 = document.getElementById("Address1");
+        var address2 = document.getElementById("Address2");
+        var city = document.getElementById("City");
+        var state = document.getElementById("State");
+        var zipcode = document.getElementById("ZipCode");
+
+        var email = document.getElementById("txtCurrentEmail");
+        var phone = document.getElementById("txtPhone");
+        var ssn = document.getElementById("txtSSN");
+        var socialcard = document.getElementById("FileSocialSecCard");
+        var license = document.getElementById("FileDrivingLicense");
+        var proofcard = document.getElementById("FileProofOfCard");
+
+        if (!firstname.checkValidity()) {
+            $("#txtFirstName").focus();
+            document.getElementById("Msg_txtFirstName").innerHTML = firstname.validationMessage;
+            return false;
+        } else if (!lastname.checkValidity()) {
+            $("#txtLastName").focus();
+            document.getElementById("Msg_txtLastName").innerHTML = lastname.validationMessage;
+            return false;
+        } else if (!dob.checkValidity()) {
+            $("#txtDOB").focus();
+            document.getElementById("Msg_txtDOB").innerHTML = dob.validationMessage;
+            return false;
+        } else if (!address1.checkValidity()) {
+            $("#Address1").focus();
+            document.getElementById("Msg_Address1").innerHTML = address1.validationMessage;
+            return false;
+        } else if (!city.checkValidity()) {
+            $("#City").focus();
+            document.getElementById("Msg_City").innerHTML = city.validationMessage;
+            return false;
+        } else if (!state.checkValidity()) {
+            $("#State").focus();
+            document.getElementById("Msg_State").innerHTML = state.validationMessage;
+            return false;
+        } else if (!zipcode.checkValidity()) {
+            $("#ZipCode").focus();
+            document.getElementById("Msg_ZipCode").innerHTML = zipcode.validationMessage;
+            return false;
+        } else if (!email.checkValidity()) {
+            $("#txtCurrentEmail").focus();
+            document.getElementById("Msg_txtCurrentEmail").innerHTML = email.validationMessage;
+            return false;
+        } else if (!ssn.checkValidity()) {
+            if ($("#txtSSN").val() != "") {
+                checkssn();
+            }
+            else {
+                $("#txtSSN").focus();
+                document.getElementById("Msg_txtSSN").innerHTML = ssn.validationMessage;
+                return false;
+            }
+        }
+        else if (!socialcard.checkValidity()) {
+            $("#FileSocialSecCard").focus();
+            document.getElementById("Msg_FileSocialSecCard").innerHTML = "Please select file.";
+            return false;
+        } else if (!license.checkValidity()) {
+            $("#FileDrivingLicense").focus();
+            document.getElementById("Msg_FileDrivingLicense").innerHTML = "Please select file.";
+            return false;
+        } else if (!proofcard.checkValidity()) {
+            $("#FileProofOfCard").focus();
+            document.getElementById("Msg_FileProofOfCard").innerHTML = "Please select file.";
+            return false;
+        }
+
+        $(".loader").show();
+        $("#overlay").show();
+
+    });
+
+    function RemoveValidation(inputid) {
+        var input = inputid.id;
+        var ID = document.getElementById(inputid.id);
+        var msgID = "Msg_" + input;
+        if (!ID.checkValidity()) {
+
+        } else {
+
+            $("#" + msgID).html("");
+
+        }
+    }
+
+  
+
+
+
+    function checkssn() {
+        var SSN = $("#txtSSN").val();
+        $.ajax({
+            url: '/Client/CheckSSNExistorNot',
+            type: 'POST',
+            data: { SSN: SSN },
+            cache: false,
+            dataType: "json",
+            success: function (res) {
+                if (res == true) {
+                    Swal.fire("Warning", "Social Security Number already exists.", "warning");
+                    $('#guide-tabs li:eq(0) a').tab('show');
+                    $("#txtSSN").val('');
+                    $("#txtSSN").focus();
+                    return false;
+                }
+            }
+        });
+    }
+
+
+    function checkemail() {
+        var txtCurrentEmail = $("#txtCurrentEmail").val();
+        var ClientId = getUrlParameter("ClientId");
+        $.ajax({
+            url: '/Client/CheckUsernameexistorNot',
+            type: 'POST',
+            data: { CurrentEmail: txtCurrentEmail, ClientId: ClientId },
+            cache: false,
+            dataType: "json",
+            success: function (res) {
+                if (res == true) {
+                    Swal.fire("Warning", "Email Address already exists", "warning");
+                    $("#txtCurrentEmail").val('');
+                }
+            }
+        });
+    }
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+    }
+
+
+</script>
+
+

@@ -531,5 +531,55 @@ namespace CreditReversal.BLL
             return res;
         }
         #endregion
+
+
+        public long CreateInvestor(Investor InvestorModel)
+        {
+            Investor clientModel = new Investor();
+            long userstatus = 0;
+            try
+            {
+                userstatus = objCTData.CreateInvestor(InvestorModel);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return userstatus;
+        }
+
+        public Investor GetInvestor(string InvestorId)
+        {
+            Investor objInvestor = new Investor();
+            try
+            {
+
+                objInvestor = objCTData.GetInvestor(InvestorId);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return objInvestor;
+        }
+
+        public List<Investor> GetInvestors()
+        {
+            List<Investor> objInvestor = new
+                 List<Investor>();
+            try
+            {
+                objInvestor = objCTData.GetInvestors();
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return objInvestor;
+        }
+
+        public long DeleteInvestor(string InvestorId)
+        {
+            Investor objInvestor = new Investor();
+            long userstatus = 0;
+            try
+            {
+                userstatus = objCTData.DeleteInvestor(InvestorId);
+                return userstatus;
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return userstatus;
+        }
     }
 }

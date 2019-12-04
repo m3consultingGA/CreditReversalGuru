@@ -101,9 +101,22 @@ namespace CreditReversal.Utilities
                         sb.Append("&nbsp; &nbsp;  User Name : " + username + " <br />");
                         sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
                     }
+                    else if(role == "Investor")
+                    {
+                        sb.Append("&nbsp; &nbsp; Your registration successfull. <br />");
+                        sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
+                        sb.Append("&nbsp; &nbsp;  User Name : " + username + " <br />");
+                        sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
+                    }
                     else
                     {
-                        sb.Append("&nbsp; &nbsp; Client: " + client + " registered successfully. <br />");
+                        if (role == "admin")
+                        {
+                            sb.Append("&nbsp; &nbsp; Investor: " + client + " registered successfully. <br />");
+                        }
+                        else {
+                            sb.Append("&nbsp; &nbsp; Client: " + client + " registered successfully. <br />");                            
+                        } 
                     }
                 }
                 if (type == "Lost_Password")

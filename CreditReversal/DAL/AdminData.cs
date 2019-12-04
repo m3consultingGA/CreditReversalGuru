@@ -8,6 +8,7 @@ using System.Configuration;
 using CreditReversal.Models;
 using CreditReversal.Utilities;
 using CreditReversal.BLL;
+using CreditReversal.DAL;
 
 namespace CreditReversal.DAL
 {
@@ -19,9 +20,14 @@ namespace CreditReversal.DAL
 		DBUtilities objUtilities = new DBUtilities();
 		string strSql = string.Empty;
 		int res = 0;
+        public SessionData sessionData = new SessionData();
+        
+        Common common = new Common();        
+        string nl = '\n'.ToString();
+       
 
-		#region Insert CompanyType
-		public int InsertCompanTYpe(CompanyTypes objCTypes)
+        #region Insert CompanyType
+        public int InsertCompanTYpe(CompanyTypes objCTypes)
 		{
 			try
 			{
@@ -495,5 +501,379 @@ namespace CreditReversal.DAL
                         ServiceSettings.SecondPaymentFailureLine2 = dr["SecondPaymentFailureLine2"].ToString();
 
                     }                }            }            catch (Exception ex) { ex.insertTrace(""); }            return ServiceSettings;        }
+
+
+        //Get Investor
+        public Investor GetInvestor(string InvestorId)
+        {
+            Investor res = new Investor();
+            try
+            {
+                strSql = "SELECT c.FirstName,c.MiddleName,c.LastName,Convert(varchar(15),c.DOB,101)as DOB,c.Address1,c.Address2,c.City,c.State,c.ZipCode,u.Password,c.SSN,c.CurrentEmail,c.CurrentPhone,c.DrivingLicense,c.SocialSecCard,c.ProofOfCard,u.UserName as uname,u.Password as passwd FROM Investor c " + nl;
+                strSql += "JOIN Users u ON c.InvestorId = u.AgentClientId " + nl;
+                strSql += "WHERE c.InvestorId= '" + InvestorId + "' and u.UserRole='investor'";
+                DataTable dt = objUtilities.GetDataTable(strSql, true);
+                if (dt.Rows.Count > 0)
+                {
+                    DataRow row = dt.Rows[0];
+                    res.FirstName = string.IsNullOrEmpty(row["FirstName"].ConvertObjectToStringIfNotNull()) ? "" : row["FirstName"].ConvertObjectToStringIfNotNull();
+                    res.MiddleName = string.IsNullOrEmpty(row["MiddleName"].ConvertObjectToStringIfNotNull()) ? "" : row["MiddleName"].ConvertObjectToStringIfNotNull();
+                    res.LastName = row["LastName"].ConvertObjectToStringIfNotNull();
+                    res.FullName = res.FirstName + " " + res.LastName;
+                    res.DOB = row["DOB"].ConvertObjectToStringIfNotNull();
+
+                    res.Address1 = row["Address1"].ConvertObjectToStringIfNotNull();
+                    res.Address2 = row["Address2"].ConvertObjectToStringIfNotNull();
+                    res.City = row["City"].ConvertObjectToStringIfNotNull();
+                    res.State = row["State"].ConvertObjectToStringIfNotNull();
+                    res.ZipCode = row["ZipCode"].ConvertObjectToStringIfNotNull();
+
+                    res.SSN = common.Decrypt(row["SSN"].ConvertObjectToStringIfNotNull());
+                    res.CurrentEmail = row["CurrentEmail"].ConvertObjectToStringIfNotNull();
+                    res.CurrentPhone = row["CurrentPhone"].ConvertObjectToStringIfNotNull();
+                    res.sDrivingLicense = row["DrivingLicense"].ConvertObjectToStringIfNotNull();
+                    res.sSocialSecCard = row["SocialSecCard"].ConvertObjectToStringIfNotNull();
+                    res.sProofOfCard = row["ProofOfCard"].ConvertObjectToStringIfNotNull();
+                    res.Password = common.Decrypt(row["Password"].ConvertObjectToStringIfNotNull());
+
+                 
+
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.insertTrace("");
+            }
+            return res;
+        }
+
+        //get investors
+        public List<Investor> GetInvestors()
+        {
+            List<Investor> Investor = new List<Investor>();
+            try
+            {
+
+                strSql = "select * from Investor";
+
+                DataTable dt = objUtilities.GetDataTable(strSql, true);
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    Investor Inv = new Investor();
+                    Inv.InvestorId = row["InvestorId"].ConvertObjectToIntIfNotNull();
+                    Inv.FirstName = row["FirstName"].ConvertObjectToStringIfNotNull();
+                    Inv.MiddleName = row["MiddleName"].ConvertObjectToStringIfNotNull();
+                    Inv.LastName = row["LastName"].ConvertObjectToStringIfNotNull();
+                    Inv.DOB = row["DOB"].ConvertObjectToStringIfNotNull();
+                    Inv.SSN = row["SSN"].ConvertObjectToStringIfNotNull();
+                    Inv.CurrentEmail = row["CurrentEmail"].ConvertObjectToStringIfNotNull();
+                    Inv.CurrentPhone = row["CurrentPhone"].ConvertObjectToStringIfNotNull();
+                    Inv.sDrivingLicense = row["DrivingLicense"].ConvertObjectToStringIfNotNull();
+                    Inv.sSocialSecCard = row["SocialSecCard"].ConvertObjectToStringIfNotNull();
+                    Inv.sProofOfCard = row["ProofOfCard"].ConvertObjectToStringIfNotNull();
+                    Inv.Status = row["Status"].ConvertObjectToStringIfNotNull();
+                    Inv.CreatedBy = row["CreatedBy"].objectToInt(0);
+                    Inv.CreatedDate = row["CreatedDate"].ConvertObjectToStringIfNotNull();
+
+                    Investor.Add(Inv);
+                }
+
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return Investor;
+        }
+
+
+
+        public long DeleteInvestor(string InvestorId)
+        {
+            long res = 0;
+            try
+            {
+                if (InvestorId != "" || InvestorId != null)
+                {
+                    strSql = "Delete from Investor where InvestorId='" + InvestorId + "'";
+                    var cmd1 = new SqlCommand();
+                    cmd1.CommandText = strSql;
+                    res = objUtilities.ExecuteInsertCommand(cmd1, true);
+                    if (res > 0)
+                    {
+                        strSql = "Delete from Users where AgentClientId='" + InvestorId + "'";
+                        var cmd = new SqlCommand();
+                        cmd.CommandText = strSql;
+                        res = objUtilities.ExecuteInsertCommand(cmd, true);
+                    }
+
+                    return res;
+                }
+
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return res;
+        }
+
+
+        //Create investor
+        public long CreateInvestor(Investor InvestorModel)
+        {
+            long res = 0;
+            string encryPassw = "";
+            try
+            {
+
+                int? id = InvestorModel.InvestorId;
+                DataTable dt = new DataTable();
+                if (id != null)
+                {
+                    strSql = "SELECT * from Investor where InvestorId='" + InvestorModel.InvestorId + "'";
+                    dt = objUtilities.GetDataTable(strSql);
+                }
+
+                InvestorModel.Password = Common.CreateRandomPassword();
+                string encrySSN = common.Encrypt(InvestorModel.SSN);
+
+                string encryptidpassword = string.IsNullOrEmpty(InvestorModel.IdPassword) ? "" : common.Encrypt(InvestorModel.IdPassword);
+                InvestorModel.IdPassword = encryptidpassword;
+                if (InvestorModel.Password != null)
+                {
+                    encryPassw = common.Encrypt(InvestorModel.Password);
+                }
+
+                if (dt.Rows.Count > 0)
+                {
+                    strSql = "Update Investor" + nl;
+                    strSql += "set FirstName=@FirstName,MiddleName=@MiddleName,LastName=@LastName,DOB=@DOB,Address1=@Address1,Address2=@Address2,City=@City,State=@State,ZipCode=@ZipCode,SSN=@SSN,CurrentEmail=@CurrentEmail,CurrentPhone=@CurrentPhone,DrivingLicense=@DrivingLicense," + nl; ;
+                    strSql += "SocialSecCard=@SocialSecCard,ProofOfCard=@ProofOfCard,Status=@Status,CreatedBy=@CreatedBy,CreatedDate=@CreatedDate where InvestorId=@InvestorId" + nl;
+                    var cmd = new SqlCommand();
+                    cmd.Parameters.AddWithValue("@InvestorId", InvestorModel.InvestorId);
+                    cmd.Parameters.AddWithValue("@FirstName", InvestorModel.FirstName);
+                    if (InvestorModel.MiddleName != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MiddleName", InvestorModel.MiddleName);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MiddleName", string.Empty);
+                    }
+
+                    if (InvestorModel.CurrentPhone != null)
+                    {
+                        cmd.Parameters.AddWithValue("@CurrentPhone", InvestorModel.CurrentPhone);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@CurrentPhone", string.Empty);
+                    }
+
+                    if (InvestorModel.DOB == "01/01/1900" || InvestorModel.DOB == "" || InvestorModel.DOB == null)
+                    {
+                        cmd.Parameters.Add("@DOB", SqlDbType.Date).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@DOB", InvestorModel.DOB);
+                    }
+
+                    cmd.Parameters.AddWithValue("@Address1", string.IsNullOrEmpty(InvestorModel.Address1) ? "" : InvestorModel.Address1);
+                    cmd.Parameters.AddWithValue("@Address2", string.IsNullOrEmpty(InvestorModel.Address2) ? "" : InvestorModel.Address2);
+                    cmd.Parameters.AddWithValue("@City", string.IsNullOrEmpty(InvestorModel.City) ? "" : InvestorModel.City);
+                    cmd.Parameters.AddWithValue("@State", string.IsNullOrEmpty(InvestorModel.State) ? "" : InvestorModel.State);
+                    cmd.Parameters.AddWithValue("@ZipCode", string.IsNullOrEmpty(InvestorModel.ZipCode) ? "" : InvestorModel.ZipCode);
+
+                    if (InvestorModel.sDrivingLicense == null)
+                    {
+                        cmd.Parameters.AddWithValue("@DrivingLicense", string.Empty);
+
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@DrivingLicense", InvestorModel.sDrivingLicense);
+                    }
+                    if (InvestorModel.sSocialSecCard == null)
+                    {
+                        cmd.Parameters.AddWithValue("@SocialSecCard", string.Empty);
+
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@SocialSecCard", InvestorModel.sSocialSecCard);
+                    }
+                    if (InvestorModel.sProofOfCard == null)
+                    {
+                        cmd.Parameters.AddWithValue("@ProofOfCard", string.Empty);
+
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@ProofOfCard", InvestorModel.sProofOfCard);
+                    }
+
+                    cmd.Parameters.AddWithValue("@LastName", InvestorModel.LastName);
+                    cmd.Parameters.AddWithValue("@SSN", encrySSN);
+                    cmd.Parameters.AddWithValue("@CurrentEmail", InvestorModel.CurrentEmail);
+                    cmd.Parameters.AddWithValue("@Status", InvestorModel.Status);
+                    cmd.Parameters.AddWithValue("@CreatedBy", InvestorModel.CreatedBy);
+                    cmd.Parameters.AddWithValue("@CreatedDate", InvestorModel.CreatedDate);
+                    cmd.CommandText = strSql;
+                    res = objUtilities.ExecuteInsertCommand(cmd, true);
+
+                    if (res > 0)
+                    {
+                        strSql = "Update Users" + nl;
+                        strSql += "set EmailAddress=@EmailAddress," + nl;
+                        strSql += "UserRole=@UserRole,Status=@Status,CreatedBy=@CreatedBy,CreatedDate=@CreatedDate where UserRole=@UserRole and AgentClientId=@AgentClientId" + nl;
+                        cmd = new SqlCommand();
+                        cmd.Parameters.AddWithValue("@AgentClientId", InvestorModel.InvestorId);
+                        cmd.Parameters.AddWithValue("@EmailAddress", InvestorModel.CurrentEmail);
+                        cmd.Parameters.AddWithValue("@UserRole", InvestorModel.UserRole);
+                        cmd.Parameters.AddWithValue("@Status", InvestorModel.Status);
+                        cmd.Parameters.AddWithValue("@CreatedBy", InvestorModel.CreatedBy);
+                        cmd.Parameters.AddWithValue("@CreatedDate", InvestorModel.CreatedDate);
+                        cmd.CommandText = strSql;
+                        res = objUtilities.ExecuteInsertCommand(cmd, true);
+                        res = (long)InvestorModel.InvestorId;
+                    }
+                    return res;
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(InvestorModel.DOB))
+                    {
+                        InvestorModel.DOB = null;
+                    }
+
+                    strSql = "Insert into Investor" + nl;
+                    strSql += "(FirstName,MiddleName,LastName,DOB,Address1,Address2,City,State,ZipCode,SSN,CurrentEmail,CurrentPhone,DrivingLicense,SocialSecCard,ProofOfCard,Status,CreatedBy,CreatedDate)" + nl;
+                    strSql += "values(@FirstName,@MiddleName,@LastName,@DOB,@Address1,@Address2,@City,@State,@ZipCode,@SSN,@CurrentEmail,@CurrentPhone,@DrivingLicense,@SocialSecCard,@ProofOfCard,@Status,@CreatedBy,@CreatedDate);SELECT SCOPE_IDENTITY();";
+
+                    SqlCommand cmd = new SqlCommand();
+
+                    cmd.Parameters.AddWithValue("@FirstName", InvestorModel.FirstName);
+
+
+                    if (InvestorModel.MiddleName != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MiddleName", InvestorModel.MiddleName);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MiddleName", string.Empty);
+                    }
+
+                    if (InvestorModel.CurrentPhone != null)
+                    {
+                        cmd.Parameters.AddWithValue("@CurrentPhone", InvestorModel.CurrentPhone);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@CurrentPhone", string.Empty);
+                    }
+
+                    if (InvestorModel.DOB == "01/01/1900" || InvestorModel.DOB == "" || InvestorModel.DOB == null)
+                    {
+                        cmd.Parameters.Add("@DOB", SqlDbType.Date).Value = DBNull.Value;
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@DOB", InvestorModel.DOB);
+                    }
+
+                    cmd.Parameters.AddWithValue("@Address1", string.IsNullOrEmpty(InvestorModel.Address1) ? "" : InvestorModel.Address1);
+                    cmd.Parameters.AddWithValue("@Address2", string.IsNullOrEmpty(InvestorModel.Address2) ? "" : InvestorModel.Address2);
+                    cmd.Parameters.AddWithValue("@City", string.IsNullOrEmpty(InvestorModel.City) ? "" : InvestorModel.City);
+                    cmd.Parameters.AddWithValue("@State", string.IsNullOrEmpty(InvestorModel.State) ? "" : InvestorModel.State);
+                    cmd.Parameters.AddWithValue("@ZipCode", string.IsNullOrEmpty(InvestorModel.ZipCode) ? "" : InvestorModel.ZipCode);
+
+                    if (InvestorModel.sDrivingLicense == null)
+                    {
+                        cmd.Parameters.AddWithValue("@DrivingLicense", string.Empty);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@DrivingLicense", InvestorModel.sDrivingLicense);
+                    }
+                    if (InvestorModel.sSocialSecCard == null)
+                    {
+                        cmd.Parameters.AddWithValue("@SocialSecCard", string.Empty);
+
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@SocialSecCard", InvestorModel.sSocialSecCard);
+                    }
+                    if (InvestorModel.sProofOfCard == null)
+                    {
+                        cmd.Parameters.AddWithValue("@ProofOfCard", string.Empty);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@ProofOfCard", InvestorModel.sProofOfCard);
+                    }
+                    
+                    cmd.Parameters.AddWithValue("@LastName", InvestorModel.LastName);
+                    cmd.Parameters.AddWithValue("@SSN", encrySSN);
+                    cmd.Parameters.AddWithValue("@CurrentEmail", InvestorModel.CurrentEmail);
+                    cmd.Parameters.AddWithValue("@Status", InvestorModel.Status);
+                    cmd.Parameters.AddWithValue("@CreatedBy", InvestorModel.CreatedBy);
+                    cmd.Parameters.AddWithValue("@CreatedDate", InvestorModel.CreatedDate);
+                    cmd.CommandText = strSql;
+                    int modified = Convert.ToInt32(objUtilities.ExecuteScalarCommand(cmd, true));
+                    InvestorModel.InvestorId = Convert.ToInt32(modified);
+                    if (InvestorModel.InvestorId != 0 && InvestorModel.InvestorId != null)
+                    {
+
+                        InvestorModel.sSocialSecCard = InvestorModel.InvestorId + "-" + InvestorModel.sSocialSecCard;
+                        InvestorModel.sDrivingLicense = InvestorModel.InvestorId + "-" + InvestorModel.sDrivingLicense;
+                        InvestorModel.sProofOfCard = InvestorModel.InvestorId + "-" + InvestorModel.sProofOfCard;
+                        strSql = "Update Investor" + nl;
+                        strSql += "set DrivingLicense=@DrivingLicense," + nl; ;
+                        strSql += "SocialSecCard=@SocialSecCard,ProofOfCard=@ProofOfCard where InvestorId=@InvestorId" + nl;
+                        cmd = new SqlCommand();
+                        cmd.Parameters.AddWithValue("@InvestorId", InvestorModel.InvestorId);
+                        cmd.Parameters.AddWithValue("@SocialSecCard", InvestorModel.sSocialSecCard);
+                        cmd.Parameters.AddWithValue("@DrivingLicense", InvestorModel.sDrivingLicense);
+                        cmd.Parameters.AddWithValue("@ProofOfCard", InvestorModel.sProofOfCard);
+                        cmd.CommandText = strSql;
+                        res = objUtilities.ExecuteInsertCommand(cmd, true);
+
+
+                        if (res > 0)
+                        {
+                            strSql = "Insert into Users" + nl;
+                            strSql += "(UserName,EmailAddress,Password,UserRole,Status,CreatedBy,CreatedDate,AgentClientId)" + nl;
+                            strSql += "values(@UserName,@EmailAddress,@Password,@UserRole,@Status,@CreatedBy,@CreatedDate,@AgentClientId)" + nl;
+                            cmd = new SqlCommand();
+                            cmd.Parameters.AddWithValue("@AgentClientId", InvestorModel.InvestorId);
+                            cmd.Parameters.AddWithValue("@UserName", InvestorModel.CurrentEmail);
+                            cmd.Parameters.AddWithValue("@EmailAddress", InvestorModel.CurrentEmail);
+                            cmd.Parameters.AddWithValue("@Password", encryPassw);
+                            cmd.Parameters.AddWithValue("@UserRole", InvestorModel.UserRole);
+                            cmd.Parameters.AddWithValue("@Status", InvestorModel.Status);
+                            cmd.Parameters.AddWithValue("@CreatedBy", InvestorModel.CreatedBy);
+                            cmd.Parameters.AddWithValue("@CreatedDate", InvestorModel.CreatedDate);
+                            cmd.CommandText = strSql;
+                            res = objUtilities.ExecuteInsertCommand(cmd, true);
+                        }
+                        if (res > 0)
+                        {
+                            res = (long)InvestorModel.InvestorId;
+                            SessionData sd = new SessionData();
+                            AgentData agentData = new AgentData();
+                            string AdminEmail= sd.GetEmail();
+                            common.SendMail(InvestorModel.CurrentEmail, "Registration successful.", "REGISTRATION", InvestorModel.CurrentEmail, "", "Investor", InvestorModel.Password, InvestorModel.FirstName);
+                            common.SendMail(AdminEmail, "Registration successful.", "REGISTRATION", AdminEmail, "", "admin", "admin", InvestorModel.FirstName);
+                        }
+                    }
+                    return res;
+                }
+
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return res;
+        }
+
+
+      
     }
 }
