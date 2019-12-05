@@ -338,7 +338,7 @@
                                                         <div class="input-group">
                                                             <input type="file" class="form-control" name="FSocialSecCard" id="FileSocialSecCard" onchange="RemoveValidation(this);" accept=".pdf,.jpeg,.png,.jpg" required />
                                                             <span class="input-group-btn" id="Mpopover">
-                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Social Security Card filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Card" data-content="Usually this is the articles of Social Security Card filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                             </span>
                                                         </div>
                                                         <div class="text-danger" id="Msg_FileSocialSecCard">
@@ -354,14 +354,11 @@
                                                         <div class="input-group">
                                                             <input type="file" class="form-control" name="FSocialSecCard" id="FileSocialSecCard" accept=".pdf,.jpeg,.png,.jpg" />
                                                             <span class="input-group-btn" id="Mpopover">
-                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Social Security Card filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Card" data-content="Usually this is the articles of Social Security Card filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                             </span>
                                                         </div>
                                                         <input type="text" name="sSocialSecCard" value="@Model.sSocialSecCard" hidden />
-
                                                         <span><label>@Model.sSocialSecCard</label></span>
-
-
                                                     </div>
                                                 }
                                             </div>
@@ -379,7 +376,7 @@
                                                             <input type="file" class="form-control" name="FDrivingLicense" id="FileDrivingLicense" onchange="RemoveValidation(this);" accept=".pdf,.jpeg,.png,.jpg" required />
 
                                                             <span class="input-group-btn" id="Mpopover">
-                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Drivers License filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                                <a class="btn btn-default" data-toggle="popover" title="Drivers License" data-content="Usually this is the articles of Drivers License filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                             </span>
                                                         </div>
                                                         <div class="text-danger" id="Msg_FileDrivingLicense">
@@ -396,7 +393,7 @@
                                                             <input type="file" class="form-control" name="FDrivingLicense" id="FileDrivingLicense" accept=".pdf,.jpeg,.png,.jpg" />
 
                                                             <span class="input-group-btn" id="Mpopover">
-                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Drivers License filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                                <a class="btn btn-default" data-toggle="popover" title="Drivers License" data-content="Usually this is the articles of Drivers License filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                             </span>
                                                         </div>
                                                         <input type="text" name="sDrivingLicense" value="@Model.sDrivingLicense" hidden />
@@ -419,7 +416,7 @@
                                                             <input type="file" class="form-control" name="FProofOfCard" id="FileProofOfCard" onchange="RemoveValidation(this)" accept=".pdf,.jpeg,.png,.jpg" required />
 
                                                             <span class="input-group-btn" id="Mpopover">
-                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Proof of Address filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                                <a class="btn btn-default" data-toggle="popover" title="Proof Of Address" data-content="Usually this is the articles of Proof of Address filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                             </span>
                                                         </div>
                                                         <div class="text-danger" id="Msg_FileProofOfCard">
@@ -435,7 +432,7 @@
                                                         <div class="input-group">
                                                             <input type="file" class="form-control" name="FProofOfCard" id="FileProofOfCard" accept=".pdf,.jpeg,.png,.jpg" />
                                                             <span class="input-group-btn" id="Mpopover">
-                                                                <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Usually this is the articles of Proof of Address filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                                <a class="btn btn-default" data-toggle="popover" title="Proof Of Address" data-content="Usually this is the articles of Proof of Address filed. PDF/JPG/PNG only."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                             </span>
                                                         </div>
                                                         <input type="text" name="sProofOfCard" value="@Model.sProofOfCard" hidden />
@@ -453,11 +450,7 @@
                                             </div>
                                         </div>
 
-                                        @*<div class="row">
-                                                    <div class="col-md-2 pull-right">
-                                                        <input type="button" id="bnt_next" class="btn btn-secondary" value="Next" />
-                                                    </div>
-                                            </div>*@
+                                       
 
                                     </div>
                                 </div>
@@ -583,8 +576,7 @@
         $('[data-toggle="popover"]').popover();
 
  var from = getUrlParameter('from');
-        var staffid = @Html.Raw(Json.Encode(staff));
-        //var sessionstaff = Html.Raw(Json.Encode(sessionstaffId));
+        var staffid = @Html.Raw(Json.Encode(staff));       
 
         var sessionId = '@Session["StaffId"]';
 

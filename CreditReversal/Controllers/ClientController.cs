@@ -88,7 +88,7 @@ namespace CreditReversal.Controllers
 
         [HttpGet]        public ActionResult CreditItems(string ClientId, string from = "")        {            string role = sessionData.GetUserRole();            string[] round = null;            try            {                ClientModel clientModel = cfunction.GetClient(ClientId);                if (clientModel != null)                {                    ViewBag.Cname = clientModel.FullName;                }                string fullname = string.Empty;                if (Session["Name"] != null)                {                    fullname = Session["Name"].ToString();                }                var names = fullname.Split(' ');                string name = names[0];                ViewBag.name = name;                ViewBag.ClientName = fullname;                ViewBag.AgentName = cfunction.getAgentName(Convert.ToInt32(ClientId));                string agentid = sessionData.GetAgentId();                string staffid = sessionData.GetStaffId();                round = CData.GetRoundType(ClientId);                List<CreditReportItems> creditReportItems = cfunction.GetCreditReportItems(Convert.ToInt32(ClientId));                if (creditReportItems.Count > 0)                {                    ViewBag.DateReportPulls = round[1];                    ViewBag.CreditReportItems = creditReportItems;
                     //ViewBag.Round = creditReportItems.First().RoundType;
-                    ViewBag.Round = round[0];                    string dateInString = round[1];                    DateTime startDate = DateTime.Parse(dateInString);                    DateTime expiryDate = startDate.AddDays(30);                    DateTime dexpiryDate = Convert.ToDateTime(expiryDate.ToString("MM/dd/yyyy").Replace("-", "/"));                    if (DateTime.Now.Date > dexpiryDate)                    {                        ViewBag.Status = "true";                    }                }                ViewBag.challengeMasters = cfunction.GetChallengeMasters(agentid.StringToInt(0), staffid.StringToInt(0));                ViewBag.Dasboard = sessionData.getDasboard();
+                    ViewBag.Round = round[0];                    string dateInString = round[1];                    DateTime startDate = DateTime.Parse(dateInString);                    DateTime expiryDate = startDate.AddDays(30);                    DateTime dexpiryDate = Convert.ToDateTime(expiryDate.ToString("MM/dd/yyyy").Replace("-", "/"));                    if (DateTime.Now.Date >= dexpiryDate)                    {                        ViewBag.Status = "true";                    }                }                ViewBag.challengeMasters = cfunction.GetChallengeMasters(agentid.StringToInt(0), staffid.StringToInt(0));                ViewBag.Dasboard = sessionData.getDasboard();
                 //List<CreditReportItems> creditReportItemChallenges = cfunction.ReportItemChallenges(Convert.ToInt32(ClientId));
                 //if (creditReportItemChallenges.Count > 0)
                 //{
@@ -182,7 +182,15 @@ namespace CreditReversal.Controllers
                     string PFileName = Path.GetFileName(clientModel.FProofOfCard.FileName);
                     string _path = Server.MapPath("~/documents/" + "Client-" + clientModel.ClientId + "-" + PFileName);
                     clientModel.FProofOfCard.SaveAs(_path);
-                    clientModel.sProofOfCard = PFileName;
+                    //clientModel.sProofOfCard = PFileName;
+                    if (clientModel.ClientId != null)
+                    {
+                        clientModel.sProofOfCard = clientModel.ClientId + "-" + PFileName;
+                    }
+                    else
+                    {
+                        clientModel.sProofOfCard = PFileName;
+                    }
                 }
 
                 if (clientModel.FDrivingLicense != null)
@@ -190,7 +198,16 @@ namespace CreditReversal.Controllers
                     string DFileName = Path.GetFileName(clientModel.FDrivingLicense.FileName);
                     string path = Server.MapPath("~/documents/" + "Client-" + clientModel.ClientId + "-" + DFileName);
                     clientModel.FDrivingLicense.SaveAs(path);
-                    clientModel.sDrivingLicense = DFileName;
+                    //clientModel.sDrivingLicense = DFileName;
+                    if (clientModel.ClientId !=null)
+                    {
+                        clientModel.sDrivingLicense = clientModel.ClientId + "-" + DFileName;
+                    } 
+                    else
+                    {
+                        clientModel.sDrivingLicense = DFileName;
+                    }
+                    
                 }
 
                 if (clientModel.FSocialSecCard != null)
@@ -198,7 +215,15 @@ namespace CreditReversal.Controllers
                     string SFileName = Path.GetFileName(clientModel.FSocialSecCard.FileName);
                     string path = Server.MapPath("~/documents/" + "Client-" + clientModel.ClientId + "-" + SFileName);
                     clientModel.FSocialSecCard.SaveAs(path);
-                    clientModel.sSocialSecCard = SFileName;
+                    //clientModel.sSocialSecCard = SFileName;
+                    if (clientModel.ClientId != null)
+                    {
+                        clientModel.sSocialSecCard = clientModel.ClientId + "-" + SFileName;
+                    }
+                    else
+                    {
+                        clientModel.sSocialSecCard = SFileName;
+                    }
                 }
 
 

@@ -12,6 +12,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Script.Serialization;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using CreditReversal.DAL;
+
 
 namespace CreditReversal.Utilities
 {
@@ -19,6 +23,8 @@ namespace CreditReversal.Utilities
     {
         private string connectionString = ConfigurationManager.ConnectionStrings["connectionString"].ConnectionString;
         private SqlConnection sqlcon;
+
+        public DBUtilities utills = new DBUtilities();
         public string Encrypt(string clearText)
         {
             string EncryptionKey = "M3";
@@ -73,123 +79,376 @@ namespace CreditReversal.Utilities
 
             return url;
         }
-        public int SendMail(string ToAddress, string Subject = "", string type = "", string username = "", string Model = "", string role = "", string Password = "", string client = "")
+        //public int SendMail(string ToAddress, string Subject = "", string type = "", string username = "", string Model = "", string role = "", string Password = "", string client = "")
+        //{
+        //    int retVal = 0;
+        //    try
+        //    {
+        //        MailMessage newmsg = new MailMessage();
+        //        //  string ToAddress = useraccount.EmailAddress;
+        //        newmsg.From = new MailAddress("testm3consulting@gmail.com", "Support");
+        //        newmsg.Subject = Subject;
+        //        newmsg.To.Add(ToAddress);
+        //        newmsg.IsBodyHtml = true;
+        //        newmsg.Body = string.Empty;
+        //        StringBuilder sb = new StringBuilder();
+
+        //        if (type == "REGISTRATION")
+        //        {
+        //            if (client != "")
+        //            {
+        //                sb.Append("<br /> Dear " + client + ", <br /> <br />");
+        //            }
+
+        //            if (role == "user")
+        //            {
+        //                sb.Append("&nbsp; &nbsp; Your registration successfull. <br />");
+        //                sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
+        //                sb.Append("&nbsp; &nbsp;  User Name : " + username + " <br />");
+        //                sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
+        //            }
+        //            else if(role == "Investor")
+        //            {
+        //                sb.Append("&nbsp; &nbsp; Your registration successfull. <br />");
+        //                sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
+        //                sb.Append("&nbsp; &nbsp;  User Name : " + username + " <br />");
+        //                sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
+        //            }
+        //            else
+        //            {
+        //                if (role == "admin")
+        //                {
+        //                    sb.Append("&nbsp; &nbsp; Investor: " + client + " registered successfully. <br />");
+        //                }
+        //                else {
+        //                    sb.Append("&nbsp; &nbsp; Client: " + client + " registered successfully. <br />");                            
+        //                } 
+        //            }
+        //        }
+        //        if (type == "Lost_Password")
+        //        {
+        //            if (username != "")
+        //            {
+        //                sb.Append("<br /> Dear User <br /> <br />");
+        //            }
+        //            if (username != "" && Password != "")
+        //            {
+        //                sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
+        //                sb.Append("&nbsp; &nbsp;  User Name : " + username + " <br />");
+        //                sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
+        //            }
+
+        //        }
+        //        if (type == "Staff-Registration")
+        //        {
+        //            if (username != "")
+        //            {
+        //                sb.Append("<br /> Dear " + username + ", <br /> <br />");
+        //            }
+        //            if (username != "" && Password != "")
+        //            {
+        //                sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
+        //                sb.Append("&nbsp; &nbsp;  User Name : " + ToAddress + " <br />");
+        //                sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
+        //            }
+
+        //        }
+        //        if (type == "AgentRegistration")
+        //        {
+        //            if (username != "")
+        //            {
+        //                sb.Append("<br /> Dear " + username + ", <br /> <br />");
+        //            }
+        //            if (username != "" && Password != "")
+        //            {
+        //                sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
+        //                sb.Append("&nbsp; &nbsp;  User Name : " + ToAddress + " <br />");
+        //                sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
+        //            }
+
+        //        }
+        //        sb.Append("<br /><br /> Thanks, <br /> Support Team.");
+        //        newmsg.Body = sb.ToString();
+        //        SmtpClient smtpClient = new SmtpClient();
+        //        smtpClient.Host = "smtp.gmail.com";
+        //        smtpClient.Port = 587;
+        //        smtpClient.EnableSsl = true;
+        //        smtpClient.UseDefaultCredentials = true;
+        //        smtpClient.Credentials = new System.Net.NetworkCredential(
+        //            "testm3consulting@gmail.com", "whocares@123");
+        //        smtpClient.Send(newmsg);
+        //        retVal = 1;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        string msg = ex.Message;
+        //    }
+        //    return retVal;
+        //}
+
+
+        //  public int SendMail(string Email, string Subject, string Name, string body, string MailType)
+        //public int SendMail(string ToAddress, string Subject = "", string type = "", string username = "", string Model = "", string role = "", string Password = "", string client = "")
+       
+        public int SendMail(string Email, string Subject = "", string type = "", string username = "", string Model = "", string role = "", string Password = "", string clientName = "")
         {
-            int retVal = 0;
+            int retVal = 0;string body = string.Empty;
             try
             {
-                MailMessage newmsg = new MailMessage();
-                //  string ToAddress = useraccount.EmailAddress;
-                newmsg.From = new MailAddress("testm3consulting@gmail.com", "Support");
-                newmsg.Subject = Subject;
-                newmsg.To.Add(ToAddress);
-                newmsg.IsBodyHtml = true;
-                newmsg.Body = string.Empty;
+
+                using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "/EmailTemplates/template1.html"))
+                {
+                    body = reader.ReadToEnd();
+                }
+                int i = 0;
+                string str = null;
+
+                string apiKey = "";
+                string fromemail = "";
+                DataTable dt = getSettings();
+
+                if (dt.Rows.Count > 0)
+                {
+                    apiKey = dt.Rows[0]["SendGridAPIKey"].ToString();
+                    fromemail = dt.Rows[0]["Fromemail"].ToString();
+                }
+
+               var  Body = string.Empty;
+
                 StringBuilder sb = new StringBuilder();
 
+               
+                body = body.Replace("{Year}", DateTime.Now.Year.ToString());
                 if (type == "REGISTRATION")
                 {
-                    if (client != "")
+                    if (clientName != "")
                     {
-                        sb.Append("<br /> Dear " + client + ", <br /> <br />");
+                        body = body.Replace("{Agent}", clientName);
+                       // sb.Append("<br /> Dear " + clientName + ", <br /> <br />");
                     }
 
-                    if (role == "user")
+                    if (role == "user" || role == "Investor")
                     {
-                        sb.Append("&nbsp; &nbsp; Your registration successfull. <br />");
-                        sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
-                        sb.Append("&nbsp; &nbsp;  User Name : " + username + " <br />");
-                        sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
-                    }
-                    else if(role == "Investor")
-                    {
-                        sb.Append("&nbsp; &nbsp; Your registration successfull. <br />");
-                        sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
-                        sb.Append("&nbsp; &nbsp;  User Name : " + username + " <br />");
-                        sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
+                        body = body.Replace("{body1}", "Your registration successfull."); 
+                        body = body.Replace("{body2}", "Your login credentials: "); 
+                        body = body.Replace("{body3}", "User Name : " + username + ""); 
+                        body = body.Replace("{body4}", "Password : " + Password + ""); 
+                        //sb.Append("&nbsp; &nbsp; Your registration successfull. <br />");
+                        //sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
+                        //sb.Append("&nbsp; &nbsp;  User Name : " + username + " <br />");
+                        //sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
                     }
                     else
                     {
                         if (role == "admin")
                         {
-                            sb.Append("&nbsp; &nbsp; Investor: " + client + " registered successfully. <br />");
+                            body = body.Replace("{body1}", "Investor " + clientName + " registered successfully.");
+                            body = body.Replace("{body2}", "");
+                            body = body.Replace("{body3}", "");
+                            body = body.Replace("{body4}", "");
+                            //sb.Append("&nbsp; &nbsp; Investor " + clientName + " registered successfully. <br />");
                         }
-                        else {
-                            sb.Append("&nbsp; &nbsp; Client: " + client + " registered successfully. <br />");                            
-                        } 
+                        else
+                        {
+                            body = body.Replace("{body1}", "Client " + clientName + " registered successfully.");
+                            body = body.Replace("{body2}", "");
+                            body = body.Replace("{body3}", "");
+                            body = body.Replace("{body4}", "");
+                            //  sb.Append("&nbsp; &nbsp; Client " + clientName + " registered successfully. <br />");
+                        }
                     }
                 }
                 if (type == "Lost_Password")
                 {
                     if (username != "")
                     {
-                        sb.Append("<br /> Dear User <br /> <br />");
+                        body = body.Replace("{Agent}", "User");
+                       // sb.Append("<br /> Dear User <br /> <br />");
                     }
                     if (username != "" && Password != "")
                     {
-                        sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
-                        sb.Append("&nbsp; &nbsp;  User Name : " + username + " <br />");
-                        sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
+                        body = body.Replace("{body1}", "");
+                        body = body.Replace("{body2}", "Your login credentials: ");
+                        body = body.Replace("{body3}", "User Name : " + username + "");
+                        body = body.Replace("{body4}", "Password : " + Password + "");
+                        //sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
+                        //sb.Append("&nbsp; &nbsp;  User Name : " + username + " <br />");
+                        //sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
                     }
 
                 }
-                if (type == "Staff-Registration")                {                    if (username != "")                    {                        sb.Append("<br /> Dear " + username + ", <br /> <br />");                    }                    if (username != "" && Password != "")                    {                        sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");                        sb.Append("&nbsp; &nbsp;  User Name : " + ToAddress + " <br />");                        sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");                    }                }
-                if (type == "AgentRegistration")                {                    if (username != "")                    {                        sb.Append("<br /> Dear " + username + ", <br /> <br />");                    }                    if (username != "" && Password != "")                    {                        sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");                        sb.Append("&nbsp; &nbsp;  User Name : " + ToAddress + " <br />");                        sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");                    }                }
-                sb.Append("<br /><br /> Thanks, <br /> Support Team.");
-                newmsg.Body = sb.ToString();
-                SmtpClient smtpClient = new SmtpClient();
-                smtpClient.Host = "smtp.gmail.com";
-                smtpClient.Port = 587;
-                smtpClient.EnableSsl = true;
-                smtpClient.UseDefaultCredentials = true;
-                smtpClient.Credentials = new System.Net.NetworkCredential(
-                    "testm3consulting@gmail.com", "whocares@123");
-                smtpClient.Send(newmsg);
-                retVal = 1;
+                if (type == "Staff-Registration")
+                {
+                    if (username != "")
+                    {
+                        body = body.Replace("{Agent}", username);
+                        //sb.Append("<br /> Dear " + username + ", <br /> <br />");
+                    }
+                    if (username != "" && Password != "")
+                    {
+                        body = body.Replace("{body1}", "");
+                        body = body.Replace("{body2}", "Your login credentials: ");
+                        body = body.Replace("{body3}", "User Name : " + Email + "");
+                        body = body.Replace("{body4}", "Password : " + Password + "");
+                        //sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
+                        //sb.Append("&nbsp; &nbsp;  User Name : " + Email + " <br />");
+                        //sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
+                    }
+
+                }
+                if (type == "AgentRegistration")
+                {
+                    if (username != "")
+                    {
+                        body = body.Replace("{Agent}", username);
+                       // sb.Append("<br /> Dear " + username + ", <br /> <br />");
+                    }
+                    if (username != "" && Password != "")
+                    {
+                        body = body.Replace("{body1}", "");
+                        body = body.Replace("{body2}", "Your login credentials: ");
+                        body = body.Replace("{body3}", "User Name : " + Email + "");
+                        body = body.Replace("{body4}", "Password : " + Password + "");
+                        //sb.Append("&nbsp; &nbsp;  Your login credentials:  <br />");
+                        //sb.Append("&nbsp; &nbsp;  User Name : " + Email + " <br />");
+                        //sb.Append("&nbsp; &nbsp;  Password : " + Password + " <br />");
+                    }
+
+                }
+                //sb.Append("<br /><br /> Thanks, <br /> Support Team.");
+                Body = body; // sb.ToString();
+
+                dynamic client = new SendGridClient(apiKey);
+                var from = new EmailAddress(fromemail, "Support-CreditReversalGuru");
+                var subject = Subject;
+                var to = new EmailAddress(Email, username);
+                var plainTextContent = "";
+                var htmlContent = "";
+                var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, Body);
+                var response = client.SendEmailAsync(msg);
+                if (response.Result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    retVal = 0;
+                      InsertAgentMail(Email, Subject, clientName, Body, fromemail, type,"0", "Unauthorized");
+                }
+                else if (response.Result.StatusCode == System.Net.HttpStatusCode.Accepted)
+                {
+                    retVal = 1;
+                      InsertAgentMail(Email, Subject, clientName, Body, fromemail, type,"1", "");
+                }
+               
             }
             catch (Exception ex)
             {
-                string msg = ex.Message;
+                ex.insertTrace("");
+               // SetMessage("sendmail: " + ex.Message);
+              //  InsertAgentMail(Email, Subject, clientName, Body, fromemail, type, "1", ex.Message);
             }
             return retVal;
         }
-        //This Method is used for sending an email to Agent for complete registration
-        public bool SendMail(string toAddress = "", string link = "", string agentName = "")
-        {
-            bool status = false;
 
+        public bool SendMail(string Email, string link = "", string agentName = "")
+        {
+            bool status = false; string body = string.Empty;
             try
             {
-                MailMessage newmsg = new MailMessage();
-                newmsg.From = new MailAddress("testm3consulting@gmail.com", "Support");
-                newmsg.Subject = "Agent Registration";
-                newmsg.To.Add(toAddress);
-                newmsg.IsBodyHtml = true;
-                newmsg.Body = string.Empty;
-                StringBuilder sb = new StringBuilder();
-                sb.Append("<br /> Dear " + agentName + ", <br /> <br />");
-                sb.Append("&nbsp; &nbsp; Please go through the below link to complete your registration process. <br />");
-                sb.Append(link);
-                sb.Append("<br /><br /> Thanks, <br /> Support Team.");
-                newmsg.Body = sb.ToString();
-                SmtpClient smtpClient = new SmtpClient();
-                smtpClient.Host = "smtp.gmail.com";
-                smtpClient.Port = 587;
-                smtpClient.EnableSsl = true;
-                smtpClient.UseDefaultCredentials = true;
-                smtpClient.Credentials = new System.Net.NetworkCredential(
-                    "testm3consulting@gmail.com", "whocares@123");
-                smtpClient.Send(newmsg);
+                using (StreamReader reader = new StreamReader(AppDomain.CurrentDomain.BaseDirectory + "/EmailTemplates/template1.html"))
+                {
+                    body = reader.ReadToEnd();
+                }
+                string apiKey = "";
+                string fromemail = "";
+                DataTable dt = getSettings();
 
-                status = true;
+                if (dt.Rows.Count > 0)
+                {
+                    apiKey = dt.Rows[0]["SendGridAPIKey"].ToString();
+                    fromemail = dt.Rows[0]["Fromemail"].ToString();
+                }
+
+                dynamic client = new SendGridClient(apiKey);
+                var from = new EmailAddress(fromemail, "Support-CreditReversalGuru");
+                var subject = "Agent Registration";
+                var to = new EmailAddress(Email, agentName);
+
+                StringBuilder sb = new StringBuilder();
+                body = body.Replace("{Agent}", agentName);
+                // sb.Append("<br /> Dear " + agentName + ", <br /> <br />");
+                body = body.Replace("{body1}", "Please go through the below link to complete your registration process.");
+                body = body.Replace("{body2}", link);
+                body = body.Replace("{body3}", "");
+                body = body.Replace("{body4}", "");
+               // sb.Append("&nbsp; &nbsp; Please go through the below link to complete your registration process. <br />");
+               // sb.Append(link);
+              //  sb.Append("<br /><br /> Thanks, <br /> Support Team.");
+                body = sb.ToString();
+
+               // var plainTextContent = "<br /> Dear " + agentName + ", <br /> <br />" ;
+               // var htmlContent = "&nbsp; &nbsp; Please go through the below link to complete your registration process. <br />";
+                var msg = MailHelper.CreateSingleEmail(from, to, subject, "", body);
+                var response = client.SendEmailAsync(msg);
+                if (response.Result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                     status = false;
+                    InsertAgentMail(Email, subject, agentName, body, fromemail, "Agent Registration", "0", "Unauthorized");
+                }
+                else if (response.Result.StatusCode == System.Net.HttpStatusCode.Accepted)
+                {
+                    status = true;
+                    InsertAgentMail(Email, subject, agentName, body, fromemail, "Agent Registration", "1", "");
+                }
+             
             }
             catch (Exception ex)
             {
-                string msg = ex.Message;
+                ex.insertTrace("");
             }
-
             return status;
         }
+
+
+        //This Method is used for sending an email to Agent for complete registration
+        //public bool SendMail(string toAddress = "", string link = "", string agentName = "")
+        //{
+        //    bool status = false;
+
+        //    try
+        //    {
+        //        MailMessage newmsg = new MailMessage();
+        //        newmsg.From = new MailAddress("testm3consulting@gmail.com", "Support");
+        //        newmsg.Subject = "Agent Registration";
+        //        newmsg.To.Add(toAddress);
+        //        newmsg.IsBodyHtml = true;
+        //        newmsg.Body = string.Empty;
+        //        StringBuilder sb = new StringBuilder();
+        //        sb.Append("<br /> Dear " + agentName + ", <br /> <br />");
+        //        sb.Append("&nbsp; &nbsp; Please go through the below link to complete your registration process. <br />");
+        //        sb.Append(link);
+        //        sb.Append("<br /><br /> Thanks, <br /> Support Team.");
+        //        newmsg.Body = sb.ToString();
+        //        SmtpClient smtpClient = new SmtpClient();
+        //        smtpClient.Host = "smtp.gmail.com";
+        //        smtpClient.Port = 587;
+        //        smtpClient.EnableSsl = true;
+        //        smtpClient.UseDefaultCredentials = true;
+        //        smtpClient.Credentials = new System.Net.NetworkCredential(
+        //            "testm3consulting@gmail.com", "whocares@123");
+        //        smtpClient.Send(newmsg);
+
+        //        status = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        string msg = ex.Message;
+        //    }
+
+        //    return status;
+        //}
+
+
+        public void InsertAgentMail(string Email, string Subject, string Name, string body, string FromEmail, string MailType, string MailStatus, string ErrorMsg)        {            try            {                body = Subject;                string sql = "  INSERT  INTO AgentMails(Agent,Subject,Body,FromEmail,ToEmail,MailType,MailStatus,ErrorMsg "                    + "  ) VALUES('" + Name + "','" + Subject + "','" + body + "','" + FromEmail + "',  '" + Email                    + "', '" + MailType + "','" + MailStatus + "', '" + ErrorMsg + "')";                DBUtilities utilities = new DBUtilities();                utilities.ExecuteString(sql, true);            }            catch (Exception ex)            { ex.insertTrace(""); }        }
+
+
         public static string CreateRandomPassword()
         {
             int length = 5;
@@ -532,6 +791,9 @@ namespace CreditReversal.Utilities
                 return "";
             }
         }
+
+
+        public DataTable getSettings()        {            DataTable dt = new DataTable();            try            {                string sql = " SELECT  ConfigId,DBConnection,SendGridAPIKey,Fromemail,AuthApiLoginId,ApiTransactionKey "                + " , SecretKey, AuthEnvironment,[14DaysMailLine1] as days14line1,[14DaysMailLine2] as days14line2, "                + " [7DaysMailLine1] as days7line1,[7DaysMailLine2] as days7line2 "                + " ,PaymentSuccessLine1,PaymentSuccessLine2,PaymentFailureLine1,PaymentFailureLine2,NextAttemptMailLine1 "                + " ,NextAttemptMailLine2,SecondPaymentFailureLine1,SecondPaymentFailureLine2 FROM ServiceSettings ";                dt = utills.GetDataTable(sql);            }            catch (Exception ex)            {               // SetMessage(ex.Message);            }            return dt;        }
 
     }
 }

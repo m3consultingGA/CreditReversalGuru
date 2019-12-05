@@ -2,11 +2,11 @@
 @model CreditReversal.Models.Investor
 
 @{
-  
-     ViewBag.Title = "CreateInvestor";
+
+    ViewBag.Title = "CreateInvestor";
     Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
     string role = null;
-    
+
 
 }
 
@@ -20,7 +20,7 @@
                 {
                     if (Request.QueryString["Mode"] == "Profile")
                     {
-                       
+
                     }
                     else if (Request.QueryString["Mode"] == "View")
                     {
@@ -34,7 +34,7 @@
 
                 <li class="active"><a href="/Client/Index"><i class="fa fa-user"></i>&nbsp;View Investor</a></li>
             }
-            
+
 
         </ol>
     </div>
@@ -72,7 +72,7 @@
         </div> <!-- /.portlet-header -->
         <div class="portlet-body">
             <div class="row" style="padding-bottom:12px;padding-top:15px;">
-              
+
 
                 <form method="post" id="Investorform" action="/Admin/CreateInvestor" enctype="multipart/form-data">
                     <div class="tab-content">
@@ -254,7 +254,7 @@
                                                             <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Must be at least 9 characters long, Format should be 000-00-0000."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                         </span>
                                                     </div>
-                                                  
+
                                                     <div class="text-danger" id="Msg_txtSSN">
                                                     </div>
 
@@ -284,7 +284,7 @@
                                                 else
                                                 {
                                                     <div class="col-md-2">
-                                                        <label>Social Security Card <span style="color:red"></span></label>
+                                                        <label>Social Security Card <span style="color:red">*</span></label>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="input-group">
@@ -325,7 +325,7 @@
                                                 else
                                                 {
                                                     <div class="col-md-2">
-                                                        <label>Drivers License <span style="color:red"></span></label>
+                                                        <label>Drivers License <span style="color:red">*</span></label>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="input-group">
@@ -365,7 +365,7 @@
                                                 else
                                                 {
                                                     <div class="col-md-2">
-                                                        <label>Proof Of Address <span style="color:red"></span></label>
+                                                        <label>Proof Of Address <span style="color:red">*</span></label>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="input-group">
@@ -390,14 +390,14 @@
                                             </div>
                                         </div>
 
-                                       
+
 
                                     </div>
                                 </div>
 
                             </div>
                         </div>
-                        
+
                     </div>
                 </form>
             </div>
@@ -544,7 +544,7 @@
         }
     }
 
-  
+
 
 
 

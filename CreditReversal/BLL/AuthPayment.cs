@@ -7,11 +7,15 @@ using AuthorizeNet.Api.Contracts.V1;
 using AuthorizeNet.Api.Controllers.Bases;
 using System.Dynamic;
 using System.Web.Configuration;
+using CreditReversal.DAL;
+using System.Data;
+using CreditReversal.Utilities;
 
 namespace CreditReversal.BLL
 {
     public class AuthPayment
     {
+       
         public static ANetApiResponse Pay(decimal amount)
         {
 
@@ -117,10 +121,23 @@ namespace CreditReversal.BLL
         {
             try
             {
-                string ApiLoginId = WebConfigurationManager.AppSettings["ApiLoginId"];
-                string ApiTransactionKey = WebConfigurationManager.AppSettings["ApiTransactionKey"];
-                string SecretKey = WebConfigurationManager.AppSettings["SecretKey"];
-                string Environment = WebConfigurationManager.AppSettings["Environment"];
+                string ApiLoginId = "";//WebConfigurationManager.AppSettings["ApiLoginId"];
+                string ApiTransactionKey = "";// WebConfigurationManager.AppSettings["ApiTransactionKey"];
+                string SecretKey = "";// WebConfigurationManager.AppSettings["SecretKey"];
+                string Environment = "";// WebConfigurationManager.AppSettings["Environment"];
+
+               // DBUtilities dBUtilities = new DBUtilities();
+                  Common common = new Common();
+                  DataTable dt = common.getSettings();
+
+                if (dt.Rows.Count > 0)
+                {
+                    ApiLoginId = dt.Rows[0]["AuthApiLoginId"].ToString();
+                    ApiTransactionKey = dt.Rows[0]["ApiTransactionKey"].ToString();
+                    SecretKey = dt.Rows[0]["SecretKey"].ToString();
+                    Environment = dt.Rows[0]["AuthEnvironment"].ToString();
+                }
+
 
                 ApiOperationBase<AuthorizeNet.Api.Contracts.V1.ANetApiRequest, AuthorizeNet.Api.Contracts.V1.ANetApiResponse>.RunEnvironment = Environment.ToUpper() == "SANDBOX" ? AuthorizeNet.Environment.SANDBOX : AuthorizeNet.Environment.PRODUCTION;
                 System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;

@@ -8,87 +8,80 @@
 }
 <ol class="breadcrumb pull-right">
     <li class="breadcrumb-item ml-auto "><a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
-    @if (role == "admin")
-    {
+   
        <li class="breadcrumb-item active">Manage Investor </li>
-    }
-    else
-    {
-         <li class="breadcrumb-item active">View Investor </li>
-    }
+   
 </ol>
 
 
 
 <link href="~/Content/css/loader.css" rel="stylesheet" />
 <div style="padding-top:10px">
-    @if (role == "admin")
-    {
-         <h4 style="padding-top:30px">Manage Investor</h4>
-    }
+  
     
+<div class="row">
+    <div class="col-lg-12">
 
-    <div class="col-md-12">
-        <div class="row">           
-            <div class="pull-right" style="padding-bottom:10px;">
-                @if (role == "admin")
-                {
-                   <a href="/Admin/CreateInvestor" class="btn btn-secondary btn-sm">Add Investor</a>
-                }
+        <div class="portlet portlet-boxed">
+            <div class="portlet-header">
+                <h4 class="portlet-title">
+                    <u>Manage Investor</u>
+                </h4>
+                <span class="pull-right" style="padding-right:15px;">
+                   
+                    <a href="/Admin/CreateInvestor" class="btn btn-secondary">Add Investor</a>
+                </span>
+            </div> <!-- /.portlet-header -->
+            <div class="portlet-body">
+                <div class="table-responsive">
+                    <table id="tblInvestor" class="table table-bordered">
+                        <thead>
+                            <tr class="trTable">
+                                <th style="cursor: pointer;">
+                                    Investor Name
+                                </th>
+                                <th style="cursor: pointer;">
+                                    Email
+                                </th>
+                                <th> Actions</th>
+                            </tr>
+                        </thead>
+                        @if (ViewBag.Investors != null && ViewBag.Investors.Count > 0)
+                        {
+                            <tbody>
+                                @foreach (var item in ViewBag.Investors)
+                                {
+                                    <tr class="trBody">
+                                        <td>
+                                            @if (role != "admin")
+                                            {
+                                                <a href="/Admin/CreateInvestor?InvestorId=@item.InvestorId" title="click to view credit items.">@item.FirstName&nbsp;@item.LastName</a>
+                                            }
+                                            else
+                                            {
+                                                <span>@item.FirstName&nbsp;@item.LastName</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span>@item.CurrentEmail</span>
+                                        </td>
+                                        <td>                                            
+                                                <a class="btn btn-secondary btn-sm" href="/Admin/CreateInvestor?InvestorId=@item.InvestorId&Mode=Edit">Edit</a>
+                                            
+                                                <button type="submit" onclick="btnDelete('@item.InvestorId')" class="btn btn-danger btn-sm mb-1">Delete</button>
+                                           
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        }
+                    </table>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="table-responsive">
-                <table id="tblInvestor" class="table table-bordered">
-                    <thead>
-                        <tr class="trTable">
-                            <th style="cursor: pointer;">
-                                Investor Name
-                            </th>
-                            <th style="cursor: pointer;">
-                                Email
-                            </th>
-                            <th> Actions</th>
-                        </tr>
-                    </thead>
-                    @if (ViewBag.Investors != null && ViewBag.Investors.Count > 0)
-                    {
-                        <tbody>
-                            @foreach (var item in ViewBag.Investors)
-                            {
-                                <tr class="trBody">
-                                    <td>
-                                        @if (role != "admin")
-                                        {                                            
-                                            <a href="/Admin/CreateInvestor?InvestorId=@item.InvestorId" title="click to view credit items.">@item.FirstName&nbsp;@item.LastName</a>
-                                        }
-                                        else
-                                        {
-                                            <span>@item.FirstName&nbsp;@item.LastName</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        <span>@item.CurrentEmail</span>
-                                    </td>
-                                    <td>
-                                        @if (role == "admin")
-                                        {
-                                            <a class="btn btn-secondary btn-sm" href="/Admin/CreateInvestor?InvestorId=@item.InvestorId&Mode=Edit">Edit</a>
-                                        }                                                                            
-                                        @if (role == "admin")
-                                        {
-                                            <button type="submit" onclick="btnDelete('@item.InvestorId')" class="btn btn-danger btn-sm mb-1">Delete</button>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    }
-                </table>
-            </div>
-        </div>
-
     </div>
+</div>
+
 </div>
 
 <script>
