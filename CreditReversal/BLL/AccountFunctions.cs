@@ -88,11 +88,7 @@ namespace CreditReversal.BLL
 					String strPathAndQuery = HttpContext.Current.Request.Url.PathAndQuery;
 					string link = HttpContext.Current.Request.Url.AbsoluteUri.Replace(strPathAndQuery, "/") + "Account/CompleteRegistration?id=" + EncrptID;
 					bool mailstatus = common.SendMail(signUp.EmailAddress, link, signUp.Name);
-					if (mailstatus)
-					{
-						id = Convert.ToInt32(res.ToString());
-					}
-
+					id = Convert.ToInt32(res.ToString());
 				}
 
 			}

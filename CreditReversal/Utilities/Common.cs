@@ -221,14 +221,13 @@ namespace CreditReversal.Utilities
                 body = body.Replace("{Year}", DateTime.Now.Year.ToString());
                 if (type == "REGISTRATION")
                 {
-                    if (clientName != "")
-                    {
-                        body = body.Replace("{Agent}", clientName);
-                       // sb.Append("<br /> Dear " + clientName + ", <br /> <br />");
-                    }
-
                     if (role == "user" || role == "Investor")
                     {
+                        if (clientName != "")
+                        {
+                            body = body.Replace("{Agent}", clientName);
+                            // sb.Append("<br /> Dear " + clientName + ", <br /> <br />");
+                        }
                         body = body.Replace("{body1}", "Your registration successfull."); 
                         body = body.Replace("{body2}", "Your login credentials: "); 
                         body = body.Replace("{body3}", "User Name : " + username + ""); 
@@ -242,6 +241,8 @@ namespace CreditReversal.Utilities
                     {
                         if (role == "admin")
                         {
+                         
+                            body = body.Replace("{Agent}", "Admin");
                             body = body.Replace("{body1}", "Investor " + clientName + " registered successfully.");
                             body = body.Replace("{body2}", "");
                             body = body.Replace("{body3}", "");
@@ -250,6 +251,7 @@ namespace CreditReversal.Utilities
                         }
                         else
                         {
+                            body = body.Replace("{Agent}", "Admin");
                             body = body.Replace("{body1}", "Client " + clientName + " registered successfully.");
                             body = body.Replace("{body2}", "");
                             body = body.Replace("{body3}", "");
@@ -381,7 +383,6 @@ namespace CreditReversal.Utilities
                // sb.Append("&nbsp; &nbsp; Please go through the below link to complete your registration process. <br />");
                // sb.Append(link);
               //  sb.Append("<br /><br /> Thanks, <br /> Support Team.");
-                body = sb.ToString();
 
                // var plainTextContent = "<br /> Dear " + agentName + ", <br /> <br />" ;
                // var htmlContent = "&nbsp; &nbsp; Please go through the below link to complete your registration process. <br />";

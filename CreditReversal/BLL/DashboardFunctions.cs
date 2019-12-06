@@ -8,6 +8,7 @@ using CreditReversal.Models;
 using CreditReversal.Utilities;
 using System.Data.SqlClient;
 using System.Text;
+using System.Globalization;
 
 namespace CreditReversal.BLL
 {
@@ -678,14 +679,19 @@ namespace CreditReversal.BLL
             { string msg = ex.Message; res = ""; }
             return res;
         }
-        public string getINQChallengeTextPrev(int clientid, string merchant, string agency, int sno)
+        public string getINQChallengeTextPrev(int clientid, string merchant, string agency, int sno, string Dateofinquiry)
         {
             string res = "";
             try
             {
+                
+                
+                //DateTime date = DateTime.ParseExact(Dateofinquiry, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                //string x = Dateofinquiry.ToString("yyyy-MM-dd",0);
+
                 sno = sno - 1;
                 string sql = " Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from CreditReportItemChallenges where "
-                    + " MerchantName='" + merchant.Trim() + "' and Agency='" + agency + "' and clientid=" + clientid + " and sno=" + sno
+                    + " MerchantName='" + merchant.Trim() + "' and Agency='" + agency + "' and clientid=" + clientid + " and convert(varchar ,convert( datetime , DateOfInquiry,101 ),101) ='" + Dateofinquiry  + "' and sno=" + sno
                      + " order by CrdRepItemChallengeId desc";
                 res = utilities.ExecuteScalar(sql, true).ToString();
             }
@@ -875,14 +881,14 @@ namespace CreditReversal.BLL
                     sno = utilities.ExecuteScalar(sql, true).ConvertObjectToIntIfNotNull();
                 }
                 catch (Exception)
-                { }                sql = "SELECT (" +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),103)" +                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid ="+ id +" and sno=" + sno                 + " and DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'EQUIFAX' and CR.ClientId = '" + id + "' and us.sno=" + sno                + " FOR XML PATH('')), 1, 1, '')) " +                " as 'EQUIFAX'," +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),103)" +                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and sno=" + sno
-                + " and DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'EXPERIAN' and CR.ClientId = '" + id + "' and us.sno=" + sno +                " FOR XML PATH('')), 1, 1, '')" +                " as 'EXPERIAN'," +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),103)" +                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges  "                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and sno=" + sno
+                { }                sql = "SELECT (" +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),101)" +                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid ="+ id +" and sno=" + sno                 + " and DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'EQUIFAX' and CR.ClientId = '" + id + "' and us.sno=" + sno                + " FOR XML PATH('')), 1, 1, '')) " +                " as 'EQUIFAX'," +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),101)" +                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and sno=" + sno
+                + " and DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'EXPERIAN' and CR.ClientId = '" + id + "' and us.sno=" + sno +                " FOR XML PATH('')), 1, 1, '')" +                " as 'EXPERIAN'," +                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),101)" +                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges  "                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and sno=" + sno
                 + " and DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +                " FROM" +                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +                " where Agency = 'TRANSUNION' and CR.ClientId = '" + id + "' and us.sno=" + sno +                " FOR XML PATH('')), 1, 1, '')" +                " as 'TRANSUNION'";                dt = utilities.GetDataTable(sql);                sql = "";                sql = "select distinct CreditorName from CreditInquiries where  "                + " CreditReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ") and sno=" + sno;                dt1 = utilities.GetDataTable(sql);                for (int r = 0; r < dt.Rows.Count; r++)                {                    string EQUIFAX = dt.Rows[r]["EQUIFAX"].ToString();                    string TRANSUNION = dt.Rows[r]["TRANSUNION"].ToString();                    string EXPERIAN = dt.Rows[r]["EXPERIAN"].ToString();                    string[] strTRANSUNION = TRANSUNION.Split('^');                    string newstrTRANSUNION = strTRANSUNION.ToString();                    string[] strEQUIFAX = EQUIFAX.Split('^');                    string[] strEXPERIAN = EXPERIAN.Split('^');                    List<Inquires> inqquifax = new List<Inquires>();                    List<Inquires> inqexperian = new List<Inquires>();                    List<Inquires> inqtransunion = new List<Inquires>();                    if (TRANSUNION != "")                    {                        for (int k = 0; k < strTRANSUNION.Length; k++)                        {                            string[] strTRANS1 = strTRANSUNION[k].Split('~');                            Inquires inq = new Inquires();
                             inq.CreditorName = strTRANS1[0];                            inq.TypeofBusiness = strTRANS1[1];                            inq.Dateofinquiry = strTRANS1[2];                            inq.ChallengeStatus = strTRANS1[3];                            inq.ChallengeText = strTRANS1[4];                            inq.CreditInqId = strTRANS1[5];                            if (inq.ChallengeText != "NO CHALLENGE")                            {                                inqtransunion.Add(inq);                            }
                             string challengestatus = "";
                             if (strTRANS1[4] == "0" || strTRANS1[4].Trim() == "" || strTRANS1[4] == "-")
                             {
-                                challengestatus = getINQChallengeTextPrev(id, strTRANS1[0], "TRANSUNION", sno);
+                                challengestatus = getINQChallengeTextPrev(id, strTRANS1[0], "TRANSUNION", sno, strTRANS1[2]);
                             }
                             else
                             {
@@ -893,7 +899,7 @@ namespace CreditReversal.BLL
                             string challengestatus = "";
                             if (strEQUIFAX1[4] == "0" || strEQUIFAX1[4].Trim() == "" || strEQUIFAX1[4] == "-")
                             {
-                                challengestatus = getINQChallengeTextPrev(id, strEQUIFAX1[0], "EQUIFAX", sno);
+                                challengestatus = getINQChallengeTextPrev(id, strEQUIFAX1[0], "EQUIFAX", sno, strEQUIFAX1[2]);
                             }
                             else
                             {
@@ -905,7 +911,7 @@ namespace CreditReversal.BLL
                             string challengestatus = "";
                             if (strEXPERIAN1[4] == "0" || strEXPERIAN1[4].Trim() == "" || strEXPERIAN1[4] == "-")
                             {
-                                challengestatus = getINQChallengeTextPrev(id, strEXPERIAN1[0], "EXPERIAN", sno);
+                                challengestatus = getINQChallengeTextPrev(id, strEXPERIAN1[0], "EXPERIAN", sno, strEXPERIAN1[2]);
                             }
                             else
                             {
