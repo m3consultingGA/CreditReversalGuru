@@ -1,0 +1,73 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+@{
+    Layout = null;
+    ViewBag.Title = "Error";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>401 | Access denied</title>
+    <!-- Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="~/Content/css/font-awesome.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/Content/css/bootstrap.min.css">
+    @*<link href="~/Content/css/responsive.bootstrap.min.css" />*@
+    <link rel="stylesheet" href="/Content/css/mvpready-admin.css">
+    <link rel="shortcut icon" href="favicon.ico">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    @*<link href='@Url.Content("~/Content/404Style.css")' rel="stylesheet" type="text/css" media="all" />*@
+</head>
+<body>
+    <div class="content-page">
+        <div class="content">
+            <div class="container">
+                <br class="sm-50 md-100">
+                <div class="error-container">
+                    <div class="error-code">
+                    401
+                    </div> <!-- /.error-code -->
+                    <div class="error-details">
+                        <h4>There was a problem serving the requested page.</h4>
+                        <br>
+                        <p><strong>What should I do:</strong></p>
+                        <ul class="icons-list">
+                            <li>
+                                <i class="icon-li fa fa-check-square-o"></i>
+                                you can try refreshing the page, the problem may be temporary
+                            </li>
+                            <li>
+                                <i class="icon-li fa fa-check-square-o"></i>
+                                if you entered the url by hand, double check that it is correct
+                            </li>
+                            <li>                               
+                                <a href="/Home/Index" class="btn btn-primary">Back To Sign In</a>
+                            </li>
+                        </ul>
+                    </div> <!-- /.error-details -->
+                </div> <!-- /.error -->
+            </div> <!-- /.container -->
+        </div> <!-- .content -->
+    </div>
+    @*<div class="wrap">
+            <div class="header">
+            </div>
+            <div class="content">
+                <p><span><label></label></span>Access denied.</p>
+                <a href="/Home/Index"class="btn btn-primary">Back To Sign In</a>
+            </div>
+
+        </div>*@
+    <div class="footer">
+        <div class="container">
+            <div class="pull-left">Copyright &copy;@DateTime.Now.Year Credit Reversal Guru.</div>
+        </div>
+    </div>
+</body>
+</html>

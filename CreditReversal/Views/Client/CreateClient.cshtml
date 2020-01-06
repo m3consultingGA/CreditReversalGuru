@@ -1,4 +1,4 @@
-﻿@model CreditReversal.Models.ClientModel
+﻿﻿@model CreditReversal.Models.ClientModel
 
 @{
     int staff = 0;
@@ -147,10 +147,10 @@
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-2">
-                                                    <label>First Name <span style="color:red">*</span></label>
+                                                    <label>First Name<span style="color:red">*</span></label>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form-control" name="FirstName" maxlength="50" id="txtFirstName" value="@Model.FirstName" onchange="RemoveValidation(this);" required>
+                                                    <input type="text" class="form-control" name="FirstName" maxlength="50" id="txtFirstName" value="@Model.FirstName" placeholder="First Name" onchange="RemoveValidation(this);" required>
                                                     <div class="text-danger" id="Msg_txtFirstName">
                                                     </div>
                                                 </div>
@@ -161,10 +161,10 @@
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-2">
-                                                    <label>Last Name <span style="color:red">*</span></label>
+                                                    <label>Last Name<span style="color:red">*</span></label>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form-control" name="LastName" maxlength="50" id="txtLastName" onchange="RemoveValidation(this);" value="@Model.LastName" required>
+                                                    <input type="text" class="form-control" name="LastName" maxlength="50" id="txtLastName" onchange="RemoveValidation(this);" placeholder="Last Name" value="@Model.LastName" required>
                                                     <div class="text-danger" id="Msg_txtLastName">
                                                     </div>
                                                 </div>
@@ -177,7 +177,7 @@
                                                     <label>Middle Name</label>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form-control" maxlength="50" name="MiddleName" id="txtMiddleName" value="@Model.MiddleName">
+                                                    <input type="text" class="form-control" maxlength="50" name="MiddleName" id="txtMiddleName" placeholder="Middle Name" value="@Model.MiddleName">
                                                 </div>
                                             </div>
                                         </div>
@@ -201,7 +201,7 @@
                                                     <label>Address 1<span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form-control" name="Address1" id="Address1" onchange="RemoveValidation(this);" value="@Model.Address1" required>
+                                                    <input type="text" class="form-control" name="Address1" id="Address1" placeholder="Address 1" onchange="RemoveValidation(this);" value="@Model.Address1" required>
                                                     <div class="text-danger" id="Msg_Address1">
                                                     </div>
                                                 </div>
@@ -213,7 +213,7 @@
                                                     <label>Address 2</label>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form-control" name="Address2" id="Address2" value="@Model.Address2">
+                                                    <input type="text" class="form-control" name="Address2" id="Address2" placeholder="Address 2" value="@Model.Address2">
                                                     <div class="text-danger" id="Msg_Address2">
                                                     </div>
                                                 </div>
@@ -225,7 +225,7 @@
                                                     <label>City<span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form-control" name="City" id="City" onchange="RemoveValidation(this);" value="@Model.City" required>
+                                                    <input type="text" class="form-control" name="City" id="City" onchange="RemoveValidation(this);" placeholder="City" value="@Model.City" required>
                                                     <div class="text-danger" id="Msg_City">
                                                     </div>
                                                 </div>
@@ -238,7 +238,24 @@
                                                     <label>State<span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form-control" name="State" id="State" onchange="RemoveValidation(this);" value="@Model.State" required>
+                                                    @if (ViewBag.States != null)
+                                                    {
+                                                        <select id="State" name="State" class="form-control" onchange="RemoveValidation(this);" required>
+                                                            <option value="">Select</option>
+                                                            @foreach (var state in ViewBag.States)
+                                                            {
+                                                                if (state.StateName == Model.State)
+                                                                {
+                                                                    <option value="@state.StateName" selected>@state.StateName - @state.StateCode</option>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option value="@state.StateName">@state.StateName - @state.StateCode</option>
+                                                                }
+                                                            }
+                                                        </select>
+                                                    }
+                                                    @*<input type="text" class="form-control" name="State" id="State" onchange="RemoveValidation(this);" value="@Model.State" required>*@
                                                     <div class="text-danger" id="Msg_State">
                                                     </div>
                                                 </div>
@@ -248,24 +265,30 @@
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-2">
-                                                    <label>ZipCode<span class="text-danger">*</span></label>
+                                                    <label>Zip Code<span class="text-danger">*</span></label>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" name="ZipCode" id="ZipCode" onchange="RemoveValidation(this);" value="@Model.ZipCode" required>
+                                                        <input type="text" class="form-control" name="ZipCode" placeholder="Zip Code" maxlength="10" id="ZipCode"  onchange="RemoveValidation(this);" value="@Model.ZipCode" required>
                                                         <span class="input-group-btn" id="Mpopover">
-                                                            <a class="btn btn-default" data-toggle="popover" title="Enter Zipcode" data-content="Must be at least 5 characters long, Format should be 00000."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                            <a class="btn btn-default" data-toggle="popover" title="Zip Code" data-content="Must be at least 5 characters long. Format should be XXXXX or XXXXX-XXXX ."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                         </span>
                                                     </div>
                                                     <div class="text-danger" id="Msg_ZipCode">
                                                     </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label>
+                                                        Must be at least 5 characters long. Format should be XXXXX or XXXXX-XXXX .
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-2">
-                                                    <label>Email Id <span style="color:red">*</span></label>
+                                                    <label>Email <span style="color:red">*</span></label>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <input type="email" class="form-control" name="txtTempEmail" id="txtTempEmail" style="display:none">
@@ -273,9 +296,9 @@
 
                                                     @if (string.IsNullOrEmpty(Model.CurrentEmail))
                                                     {<div class="input-group">
-                                                            <input type="email" class="form-control" name="CurrentEmail" id="txtCurrentEmail" onchange="RemoveValidation(this),checkemail();" value="@Model.CurrentEmail" required>
+                                                            <input type="email" class="form-control" placeholder="Email" name="CurrentEmail" id="txtCurrentEmail" onchange="RemoveValidation(this),checkemail();" value="@Model.CurrentEmail" required>
                                                             <span class="input-group-btn" id="Mpopover">
-                                                                <a class="btn btn-default" data-toggle="popover" title="Enter Email" data-content="Format should be 'john@company.com'."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                                <a class="btn btn-default" data-toggle="popover" title="Email" data-content="Format should be 'john@company.com'."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                             </span>
                                                         </div>
                                                     }
@@ -288,6 +311,12 @@
                                                     <div class="text-danger" id="Msg_txtCurrentEmail">
                                                     </div>
                                                 </div>
+
+                                                <div class="col-md-6">
+                                                    <label id="lblemailPooper">
+                                                        Format should be 'john@company.com'.
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -298,8 +327,12 @@
                                                     <label>Phone</label>
                                                 </div>
                                                 <div class="col-md-4">
-
-                                                    <input type="text" class="form-control" maxlength="20" name="CurrentPhone" id="txtPhone" value="@Model.CurrentPhone">
+                                                    <input type="text" class="form-control" maxlength="20" placeholder="Phone" name="CurrentPhone" id="txtPhone" value="@Model.CurrentPhone">
+                                                    <div class="text-danger" id="Msg_txtPhone">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label>Must be at least 10 characters long, Format should be (XXX) XXX - XXXX or XXX-XXX-XXXX .</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -307,7 +340,7 @@
                                         <div class="form-group">
                                             <div class="row">
                                                 <div class="col-md-2">
-                                                    <label>Social Security Number <span style="color:red">*</span></label>
+                                                    <label>Social Security Number<span style="color:red">*</span></label>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="input-group">
@@ -315,13 +348,19 @@
                                                                id="txtSSN" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                                                                onchange="RemoveValidation(this),checkssn();" value="@Model.SSN" required />
                                                         <span class="input-group-btn" id="Mpopover">
-                                                            <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Must be at least 9 characters long, Format should be 000-00-0000."><i class="glyphicon glyphicon-question-sign"></i></a>
+                                                            <a class="btn btn-default" data-toggle="popover" title="Social Security Number" data-content="Must be at least 9 characters long, Format should be XXXXXXXXX."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                         </span>
                                                     </div>
                                                     @*data-placement="right" data-trigger="popover"*@
                                                     <div class="text-danger" id="Msg_txtSSN">
                                                     </div>
 
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <label>
+                                                        Must be at least 9 characters long, Format should be XXXXXXXXX.
+                                                    </label>
                                                 </div>
 
                                             </div>
@@ -332,7 +371,7 @@
                                                 @if (Model.sSocialSecCard == null)
                                                 {
                                                     <div class="col-md-2">
-                                                        <label>Social Security Card <span style="color:red">*</span></label>
+                                                        <label>Social Security Card<span style="color:red">*</span></label>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="input-group">
@@ -344,11 +383,16 @@
                                                         <div class="text-danger" id="Msg_FileSocialSecCard">
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <label>
+                                                            Usually this is the articles of Social Security Card filed. PDF/JPG/PNG only.
+                                                        </label>
+                                                    </div>
                                                 }
                                                 else
                                                 {
                                                     <div class="col-md-2">
-                                                        <label>Social Security Card <span style="color:red"></span></label>
+                                                        <label>Social Security Card<span style="color:red"></span></label>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="input-group">
@@ -360,6 +404,11 @@
                                                         <input type="text" name="sSocialSecCard" value="@Model.sSocialSecCard" hidden />
                                                         <span><label>@Model.sSocialSecCard</label></span>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <label>
+                                                            Usually this is the articles of Social Security Card filed. PDF/JPG/PNG only.
+                                                        </label>
+                                                    </div>
                                                 }
                                             </div>
                                         </div>
@@ -369,7 +418,7 @@
                                                 @if (Model.sDrivingLicense == null)
                                                 {
                                                     <div class="col-md-2">
-                                                        <label>Drivers License <span style="color:red">*</span></label>
+                                                        <label>Drivers License<span style="color:red">*</span></label>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="input-group">
@@ -382,11 +431,16 @@
                                                         <div class="text-danger" id="Msg_FileDrivingLicense">
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <label>
+                                                            Usually this is the articles of Drivers License filed. PDF/JPG/PNG only.
+                                                        </label>
+                                                    </div>
                                                 }
                                                 else
                                                 {
                                                     <div class="col-md-2">
-                                                        <label>Drivers License <span style="color:red"></span></label>
+                                                        <label>Drivers License<span style="color:red"></span></label>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="input-group">
@@ -399,6 +453,11 @@
                                                         <input type="text" name="sDrivingLicense" value="@Model.sDrivingLicense" hidden />
                                                         <span><label>@Model.sDrivingLicense</label></span>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <label>
+                                                            Usually this is the articles of Drivers License filed. PDF/JPG/PNG only.
+                                                        </label>
+                                                    </div>
 
                                                 }
                                             </div>
@@ -409,7 +468,7 @@
                                                 @if (Model.sProofOfCard == null)
                                                 {
                                                     <div class="col-md-2">
-                                                        <label>Proof Of Address <span style="color:red">*</span></label>
+                                                        <label>Proof Of Address<span style="color:red">*</span></label>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="input-group">
@@ -422,11 +481,16 @@
                                                         <div class="text-danger" id="Msg_FileProofOfCard">
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <label>
+                                                            Usually this is the articles of Proof of Address filed. PDF/JPG/PNG only.
+                                                        </label>
+                                                    </div>
                                                 }
                                                 else
                                                 {
                                                     <div class="col-md-2">
-                                                        <label>Proof Of Address <span style="color:red"></span></label>
+                                                        <label>Proof Of Address<span style="color:red"></span></label>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="input-group">
@@ -438,6 +502,12 @@
                                                         <input type="text" name="sProofOfCard" value="@Model.sProofOfCard" hidden />
                                                         <span><label>@Model.sProofOfCard</label></span>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <label>
+                                                            Usually this is the articles of Proof of Address filed. PDF/JPG/PNG only.
+                                                        </label>
+                                                    </div>
+
                                                 }
                                             </div>
                                         </div>
@@ -450,7 +520,7 @@
                                             </div>
                                         </div>
 
-                                       
+
 
                                     </div>
                                 </div>
@@ -460,28 +530,19 @@
                         <div id="Address" class="tab-pane fade" style="padding-left:15px;">
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="form-group">
+                                    <div class="form-group" hidden>
                                         <div class="row">
                                             <div class="col-md-2">
                                                 <label>Question <span style="color:red"></span></label>
                                             </div>
                                             <div class="col-md-4">
-                                                <input type="text" class="form-control" name="IdQuestion" maxlength="150" id="IdQuestion" value="@Model.IdQuestion">
+                                                <input type="text" class="form-control" placeholder="Question" name="IdQuestion" maxlength="150" id="IdQuestion" value="@Model.IdQuestion">
                                             </div>
 
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-2">
-                                                <label>Answer <span style="color:red"></span></label>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <input type="text" class="form-control" name="IdAnswer" maxlength="150" id="IdAnswer" value="@Model.IdAnswer">
-                                            </div>
-                                        </div>
-                                    </div>
+
 
                                     <div class="form-group">
                                         <div class="row">
@@ -492,7 +553,12 @@
                                                 </label>
                                             </div>
                                             <div class="col-md-4">
-                                                <input type="text" class="form-control" maxlength="50" name="IdUserName" id="IdUserName" value="@Model.IdUserName">
+                                                <input type="text" class="form-control" placeholder="User Name" maxlength="50" name="IdUserName" id="IdUserName" value="@Model.IdUserName">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>
+                                                    This is the User Name for Identitiy IQ Information.
+                                                </label>
                                             </div>
 
                                         </div>
@@ -505,7 +571,12 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <input type="password" class="form-control" maxlength="10" name="tempPassword" id="tempPassword" style="display:none">
-                                                <input type="password" class="form-control" maxlength="10" name="IdPassword" id="IdPassword" value="@Model.IdPassword">
+                                                <input type="password" class="form-control" placeholder="password" maxlength="10" name="IdPassword" id="IdPassword" value="@Model.IdPassword">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>
+                                                    This is the password for Identitiy IQ Information.
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -516,7 +587,28 @@
                                                 <label>Confirm Password</label><span style="color:red"></span>
                                             </div>
                                             <div class="col-md-4">
-                                                <input type="password" class="form-control" maxlength="10" name="CfmPassword" id="CfmPassword" value="@Model.IdPassword">
+                                                <input type="password" class="form-control" placeholder="Confirm password" maxlength="10" name="CfmPassword" id="CfmPassword" value="@Model.IdPassword">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>
+                                                    This is the  Confirm password for Identitiy IQ Information.
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <label>Answer to Security Question <span style="color:red"></span></label>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" placeholder="Security Answer" name="IdAnswer" maxlength="150" id="IdAnswer" value="@Model.IdAnswer">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>
+                                                    This is the  Answer to Security Question for Identitiy IQ Information.
+                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -564,6 +656,23 @@
 
 <script type="text/javascript">
 
+    //regularexpression for zipcode
+    function checkZip(value) {
+        value = value.value;
+    return (/(^\d{5}$)|(^\d{5}-\d{4}$)/).test(value);
+    };
+    //regularexpression for fedral tax no
+    function checkfed(value) {
+        value = value.value;
+        return (/(^\d{2}-\d{7}$)/).test(value);
+    };
+    //regularexpression for phone number
+    function checkphone(value) {
+        value = value;
+        return (/^(1\s?)?((\([0-9]{3}\))|[0-9]{3})[\s\-]?[\0-9]{3}[\s\-]?[0-9]{4}$/).test(value);
+
+    }
+
     $('#clientform').on('keyup keypress', function (e) {
         var keyCode = e.keyCode || e.which;
         if (keyCode === 13) {
@@ -573,10 +682,25 @@
     });
     $(document).ready(function () {
 
+        //Accepting Numbers only
+        $("#ZipCode").keypress(function (e) {
+            var charCode = (e.which) ? e.which : e.keyCode;
+             if (charCode != 46 && charCode != 45 && charCode > 31
+    && (charCode < 48 || charCode > 57))
+     return false;
+
+  return true;
+        });
+
+
+
+
+
+
         $('[data-toggle="popover"]').popover();
 
  var from = getUrlParameter('from');
-        var staffid = @Html.Raw(Json.Encode(staff));       
+        var staffid = @Html.Raw(Json.Encode(staff));
 
         var sessionId = '@Session["StaffId"]';
 
@@ -601,7 +725,6 @@
         }
 
         var year = currentDate.getFullYear() - 18;
-
         var date = month + "/" + day + "/" + year;
         if ($("#txtDOB").val() == "") {
             $('#txtDOB').datepicker({
@@ -625,7 +748,11 @@
         }
     });
 
+
+
     $("#bnt_next").click(function () {
+        debugger;
+        document.getElementById("Msg_txtPhone").innerHTML = "";
         var firstname = document.getElementById("txtFirstName");
         var lastname = document.getElementById("txtLastName");
         var dob = document.getElementById("txtDOB");
@@ -671,6 +798,10 @@
             $("#ZipCode").focus();
             document.getElementById("Msg_ZipCode").innerHTML = zipcode.validationMessage;
             return false;
+        } else if (!checkZip(zipcode)) {
+            $("#ZipCode").focus();
+            document.getElementById("Msg_ZipCode").innerHTML = "Please enter a valid zip code";
+            return false;
         } else if (!email.checkValidity()) {
             $("#txtCurrentEmail").focus();
             document.getElementById("Msg_txtCurrentEmail").innerHTML = email.validationMessage;
@@ -697,11 +828,17 @@
             $("#FileProofOfCard").focus();
             document.getElementById("Msg_FileProofOfCard").innerHTML = "Please select file.";
             return false;
+        } else if (phone.value != "") {
+            if (!checkphone(phone.value)) {
+                $("#txtPhone").focus();
+                 document.getElementById("Msg_txtPhone").innerHTML = "Please enter valid phone no.";
+                  return false;
+            }
         }
         else {
-            $('#guide-tabs li:eq(1) a').tab('show');
+           
         }
-
+         $('#guide-tabs li:eq(1) a').tab('show');
 
     });
 
@@ -718,26 +855,20 @@
         }
     }
 
-    $("#btnsub").click(function () {      
-
-                var question = document.getElementById("IdQuestion").value;
+    $("#btnsub").click(function () {
+        debugger;
                 var answer = document.getElementById("IdAnswer").value;
                 var username = document.getElementById("IdUserName").value;
                 var password = document.getElementById("IdPassword").value;
-                var cfmpassword = document.getElementById("CfmPassword").value;             
+                var cfmpassword = document.getElementById("CfmPassword").value;
 
-                if (question != "" || answer != "" || username != "" || password != "" || cfmpassword != "") {
-                    document.getElementById("IdQuestion").required = "required";
+                if ( answer != "" || username != "" || password != "" || cfmpassword != "") {
                     document.getElementById("IdAnswer").required = "required";
                     document.getElementById("IdUserName").required = "required";
                     document.getElementById("IdPassword").required = "required";
                     document.getElementById("CfmPassword").required = "required";
                     //Identity IQ information validation
-                    if (!document.getElementById("IdQuestion").checkValidity()) {
-                        $("#IdQuestion").focus();
-                        document.getElementById("Msg_IdQuestion").innerHTML = "Please fill out this field.";
-                        return false;
-                    } else if (!document.getElementById("IdAnswer").checkValidity()) {
+                    if (!document.getElementById("IdAnswer").checkValidity()) {
                         $("#IdAnswer").focus();
                         document.getElementById("Msg_IdAnswer").innerHTML = "Please fill out this field.";
                         return false;

@@ -1,0 +1,249 @@
+﻿@model CreditReversal.Models.TradeLine
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Simple Browser</title>
+</head>
+<body class="container">
+    <div>
+        <form method="post" id="form3" action="/Simple/pullcredit" enctype="multipart/form-data">
+            <button type="submit" id="submit">Pull Credit Report</button>
+        </form>
+        @{
+            if (ViewBag.transunion != null)
+            {
+                <h3>TransUnion</h3>
+                <div style="overflow:scroll;height:200px;">
+                    <table id="transunion" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th> Merchant Name</th>
+                                <th>Account Number </th>
+                                <th>Date Opened</th>
+                                <th>High Credit</th>
+                                <th>Balance</th>
+                                <th>Monthly Payment</th>
+                                <th>Last Reported</th>
+                                <th>Payment Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                foreach (var res in ViewBag.transunion)
+                                {
+                                    <tr>
+                                        <td>
+                                            @res.atcreditorName
+                                        </td>
+                                        <td>
+                                            @res.ataccountNumber
+                                        </td>
+                                        <td>
+                                            @res.atdateOpened
+                                        </td>
+                                        <td>
+                                            @res.athighBalance
+                                        </td>
+                                        <td>
+                                            @res.atcurrentBalance
+                                        </td>
+                                        <td>
+                                            @res.GrantedTrade.atmonthlyPayment
+                                        </td>
+                                        <td>
+                                            @res.atdateReported
+                                        </td>
+
+                                        <td>
+                                            @res.PayStatus.atabbreviation
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+
+            }
+            if (ViewBag.equifax != null)
+            {
+                <h3>Equifax</h3>
+                <div style="overflow:scroll;height:200px;">
+                    <table id="transunion" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th> Merchant Name</th>
+                                <th>Account Number </th>
+                                <th>Date Opened</th>
+                                <th>High Credit</th>
+                                <th>Balance</th>
+                                <th>Monthly Payment</th>
+                                <th>Last Reported</th>
+                                <th>Payment Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                foreach (var res in ViewBag.equifax)
+                                {
+                                    <tr>
+                                        <td>
+                                            @res.atcreditorName
+                                        </td>
+                                        <td>
+                                            @res.ataccountNumber
+                                        </td>
+                                        <td>
+                                            @res.atdateOpened
+                                        </td>
+                                        <td>
+                                            @res.athighBalance
+                                        </td>
+                                        <td>
+                                            @res.atcurrentBalance
+                                        </td>
+                                        <td>
+                                            @res.GrantedTrade.atmonthlyPayment
+                                        </td>
+                                        <td>
+                                            @res.atdateReported
+                                        </td>
+
+                                        <td>
+                                            @res.PayStatus.atabbreviation
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+
+            }
+            if (ViewBag.experian != null)
+            {
+                <h3>Experian</h3>
+                <div style="overflow:scroll;height:200px;">
+                    <table id="transunion" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th> Merchant Name</th>
+                                <th>Account Number </th>
+                                <th>Date Opened</th>
+                                <th>High Credit</th>
+                                <th>Balance</th>
+                                <th>Monthly Payment</th>
+                                <th>Last Reported</th>
+                                <th>Payment Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                foreach (var res in ViewBag.experian)
+                                {
+                                    <tr>
+                                        <td>
+                                            @res.atcreditorName
+                                        </td>
+                                        <td>
+                                            @res.ataccountNumber
+                                        </td>
+                                        <td>
+                                            @res.atdateOpened
+                                        </td>
+                                        <td>
+                                            @res.athighBalance
+                                        </td>
+                                        <td>
+                                            @res.atcurrentBalance
+                                        </td>
+                                        <td>
+                                            @res.GrantedTrade.atmonthlyPayment
+                                        </td>
+                                        <td>
+                                            @res.atdateReported
+                                        </td>
+
+                                        <td>
+                                            @res.PayStatus.atabbreviation
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+
+            }
+
+
+            if (ViewBag.InquiryPartition != null)
+            {
+                <h3>Inquiry</h3>
+                <div style="overflow:scroll;height:200px;">
+                    <table id="transunion" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th> Creditor Name</th>
+                                <th>Type of Business </th>
+                                <th>Date of inquiry</th>
+                                <th>Credit Bureau</th>
+                               
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                foreach (var res in ViewBag.InquiryPartition)
+                                {
+                                    <tr>
+                                        <td>
+                                            @res.Inquiry.atsubscriberName
+                                        </td>
+                                        <td>
+                                            @res.Inquiry.IndustryCode.atabbreviation
+                                        </td>
+                                        <td>
+                                            @res.Inquiry.atinquiryDate
+                                        </td>
+                                        <td>
+                                            @res.Inquiry.atbureau
+                                        </td>
+                                       
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+
+                    </table>
+                </div>
+
+
+            }
+        }
+        <br /><br />
+    </div>
+    <div>
+        @Model
+    </div>
+</body>
+</html>

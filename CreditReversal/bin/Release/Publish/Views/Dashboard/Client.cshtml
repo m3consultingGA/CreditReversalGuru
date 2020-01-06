@@ -1,0 +1,260 @@
+﻿@*@model CreditReversalGuru.Models.ClientModel*@
+@{
+    ViewBag.Title = "Client Dashboard";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+
+@*<title>Client Dashboard</title>*@
+<style>
+    #placeholder {
+        width: 550px;
+        height: 300px;
+        text-align: center;
+    }
+</style>
+
+<div class="portlet portlet-boxed">
+    <div class="portlet-header">
+        <h4 class="portlet-title">
+            <u>Client Dashboard</u>
+        </h4>
+
+    </div> <!-- /.portlet-header -->
+    <div class="portlet-body">
+        <div class="row" style="padding-bottom:12px;padding-top:15px;">
+            <div class="col-lg-6">
+                <div class="panel panel-default">
+                    <div class="panel-heading"><label>Personal Info</label></div>
+                    <div class="panel-body" style="height:510px;">
+                        <table>
+
+                            <tr>
+                                <td style="padding-left:10px"><label>Name </label></td>
+                                <td style="padding-left:10px"><label>: </label></td>
+                                @if (ViewBag.ClientModel.FullName != null)
+                                {
+                                    <td style="padding-left:10px"><label>@ViewBag.ClientModel.FullName</label></td>
+
+                                }
+
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px"><label>DOB </label></td>
+                                <td style="padding-left:10px"><label>:</label></td>
+                                @if (ViewBag.ClientModel.DOB != null)
+                                {
+                                    <td style="padding-left:10px"><label>@ViewBag.ClientModel.DOB</label></td>
+                                }
+
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px"><label>SSN</label></td>
+                                <td style="padding-left:10px"><label>: </label></td>
+                                @if (ViewBag.ClientModel.MaskedSSN != null)
+                                {
+                                    <td style="padding-left:10px"><label>@ViewBag.ClientModel.MaskedSSN</label></td>
+                                }
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px"><label>Address</label></td>
+                                <td style="padding-left:10px"><label>:</label></td>
+                                @if (ViewBag.ClientModel.FullAddress != null)
+                                {
+                                    <td style="padding-left:10px">
+                                        <label>@ViewBag.ClientModel.FullAddress</label>
+
+                                    </td>
+                                }
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="padding-left:10px"></td>
+
+                                @if (ViewBag.ClientModel.FullAddress != null)
+                                {
+                                    <td style="padding-left:10px">
+
+                                        <label>@ViewBag.ClientModel.FullAddress2</label>
+                                    </td>
+                                }
+                            </tr>
+
+                            <tr>
+                                <td style="padding-left:10px"><label>Phone </label></td>
+                                <td style="padding-left:10px"><label>:</label></td>
+                                @if (ViewBag.ClientModel.CurrentPhone != null)
+                                {
+                                    <td style="padding-left:10px"><label>@ViewBag.ClientModel.CurrentPhone</label></td>
+                                }
+
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px"><label>Email </label></td>
+                                <td style="padding-left:10px"><label>:</label></td>
+                                @if (ViewBag.ClientModel.CurrentEmail != null)
+                                {
+                                    <td style="padding-left:10px"><label>@ViewBag.ClientModel.CurrentEmail</label></td>
+                                }
+
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px"><label>Member Since </label></td>
+                                <td style="padding-left:10px"><label>:</label></td>
+                                @if (ViewBag.ClientModel.CreatedDate != null)
+                                {
+                                    <td style="padding-left:10px"><label>@ViewBag.ClientModel.CreatedDate</label></td>
+                                }
+
+                            </tr>
+
+                            <tr>
+                                <td style="padding-left:10px"><label>Service Expires</label></td>
+                                <td style="padding-left:10px"><label>:</label></td>
+                                @if (ViewBag.ClientModel.ServiceExperiDate != null)
+                                {
+                                    <td style="padding-left:10px"><label>@ViewBag.ClientModel.ServiceExperiDate</label></td>
+                                }
+                            </tr>
+                            <tr>
+                                <td style="padding-left:10px"><label>Identity IQ</label></td>
+                                <td style="padding-left:10px"><label>:</label></td>
+                                @if (ViewBag.ClientModel.IdQuestion != null)
+                                {
+                                    <td style="padding-left:10px"><label>Yes</label><input type="button" id="btnEdit" class="btn-link text-primary" onclick="window.location.href='/Client/CreateClient?ClientId=@Session["ClientId"]&Mode=frmDashboard&IQ=true'" value="View/Edit"></td>
+
+                                }
+                                else
+                                {
+                                    <td style="padding-left:10px"><label>No</label></td>
+                                }
+                            </tr>
+
+                            <tr>
+                                <td style="padding-left:10px"><label>Drivers License</label></td>
+                                <td style="padding-left:10px"><label>:</label></td>
+                                @if (ViewBag.ClientModel.sDrivingLicense != null)
+                                {
+                                    <td style="padding-left:10px"><label>Yes</label></td>
+                                }
+                                else
+                                {
+                                    <td style="padding-left:10px"><label>No</label></td>
+                                }
+                            </tr>
+
+                            <tr>
+                                <td style="padding-left:10px"><label>SSN Verified</label></td>
+                                <td style="padding-left:10px"><label>:</label></td>
+                                @if (ViewBag.ClientModel.sSocialSecCard != null)
+                                {
+                                    <td style="padding-left:10px"><label>Yes</label></td>
+                                }
+                                else
+                                {
+                                    <td style="padding-left:10px"><label>No</label></td>
+                                }
+                            </tr>
+
+                        </table>
+                    </div>
+
+
+                    <div class="panel-footer">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <input type="submit" id="btnUpdate" class="btn btn-secondary center" onclick="window.location.href='/Client/CreateClient?ClientId=@Session["ClientId"]&Mode=frmDashboard'" value="Edit">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if (ViewBag.CreditReportItems.DatePulls != null)
+            {
+                <div class="col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><label>Credit File</label></div>
+                        <div class="panel-body" style="height:510px;">
+                            <table>
+
+                                <tr>
+                                    <td style="padding-left:10px"><label>Date First Pulled </label></td>
+                                    <td style="padding-left:10px"><label>: </label></td>
+                                    @if (ViewBag.CreditReportItems.FirstDate != null)
+                                    {
+                                        <td style="padding-left:10px"><label>@ViewBag.CreditReportItems.FirstDate</label></td>
+
+                                    }
+
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:10px"><label># of Negative Items </label></td>
+                                    <td style="padding-left:10px"><label>:</label></td>
+                                    @if (ViewBag.CreditReportItems.CredRepItemsId != null)
+                                    {
+                                        <td style="padding-left:10px"><label>@ViewBag.CreditReportItems.NegativeItemsCount</label></td>
+                                    }
+
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:10px"><label>@ViewBag.Round Challenges Sent</label></td>
+                                    <td style="padding-left:10px"><label>: </label></td>
+                                    @if (ViewBag.CreditReportItems.DatePulls != null)
+                                    {
+                                        <td style="padding-left:10px"><label>@ViewBag.CreditReportItems.DatePulls</label></td>
+                                    }
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:10px"><label>Challenges Sent to</label></td>
+                                    <td style="padding-left:10px"><label>:</label></td>
+                                    <td style="padding-left:10px">
+                                        <label>Equifax, Experian, TransUnion</label>
+                                    </td>
+
+                                </tr>
+
+
+                                <tr>
+                                    <td style="padding-left:10px"><label>Current Status </label></td>
+                                    <td style="padding-left:10px"><label>:</label></td>
+                                    @if (ViewBag.CreditReportItems.Status != null)
+                                    {
+                                        <td style="padding-left:10px"><label>@ViewBag.CreditReportItems.Status response from credit bureau(s)</label></td>
+                                    }
+
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:10px"><label>Next Action </label></td>
+                                    <td style="padding-left:10px"><label>:</label></td>
+                                    <td style="padding-left:10px"><label>Credit pull for @ViewBag.Round challenges</label></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-left:10px"><label>Next Action Date </label></td>
+                                    <td style="padding-left:10px"><label>:</label></td>
+                                    @if (ViewBag.CreditReportItems.DateReportPulls != null)
+                                    {
+                                        <td style="padding-left:10px"><label>@ViewBag.CreditReportItems.DateReportPulls <span style="color:red">*</span></label></td>
+                                    }
+
+                                </tr>
+
+
+                            </table>
+                        </div>
+
+
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    @*<input type="submit" id="btnViewCreditReport" class="btn btn-secondary" onclick="window.location.href='/Dashboard/CreditReport'" value="View Credit Report">*@ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    @*<input type="submit" id="btnViewChallengedItems" class="btn btn-secondary center" onclick="window.location.href='/Client/ClientChallenges'" value="View Challenged Items">*@
+                                    <input type="submit" id="btnViewCreditReport" class="btn btn-secondary" onclick="window.location.href='/Client/CreditItems?ClientId=@Session["ClientId"]&from=db&mode=Edit'" value="View Credit Report"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    <input type="submit" id="btnViewChallengedItems" class="btn btn-secondary center" onclick="window.location.href='/Client/ClientChallenges'" value="View Challenged Items">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            }
+
+        </div>
+        </div>
+    </div>

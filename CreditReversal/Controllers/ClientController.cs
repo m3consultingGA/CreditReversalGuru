@@ -24,6 +24,7 @@ namespace CreditReversal.Controllers
         ClientFunction cfunction = new ClientFunction();
         DashboardFunctions functions = new DashboardFunctions();
         ClientData CData = new ClientData();
+        RegistrationFunctions registrationfunc = new RegistrationFunctions();
         public object PageLoadEvent { get; private set; }
 
         [HttpGet]
@@ -145,8 +146,9 @@ namespace CreditReversal.Controllers
             ClientModel clientModel = new ClientModel(); try
             {
                 ViewBag.Dasboard = sessionData.getDasboard();
-                // ClientId = Request.QueryString["ClientId"];
-                Session["ClientId"] = ClientId;
+                ViewBag.States = registrationfunc.GetStates();
+               // ClientId = Request.QueryString["ClientId"];
+               Session["ClientId"] = ClientId;
                 //Mode = Request.QueryString["Mode"];
                 if (ClientId != "0")
                 {

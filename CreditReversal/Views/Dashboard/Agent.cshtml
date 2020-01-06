@@ -95,7 +95,7 @@
                     <u>New Clients</u>
                 </h4>
                 <span class="pull-right" style="padding-right:15px;">
-                    <a href="/Client/CreateClient?from=db" class="btn btn-secondary">Add NewClient</a>
+                    <a href="/Client/CreateClient?from=db" class="btn btn-secondary">Add New Client</a>
                 </span>
             </div> <!-- /.portlet-header -->
             <div class="portlet-body">
@@ -319,7 +319,6 @@ else if (AgentType == "1")
     }
 
     $(document).ready(function () {
-        debugger;
         $(".loader1").hide();
         $("#overlay").hide();
 
@@ -407,40 +406,36 @@ else if (AgentType == "1")
 
 
          $(function () {
-
+             debugger;
 		   var currentTime = new Date()
 		   var year = currentTime.getFullYear();
              var d1 = [], d2 = [], d3 = [], data, chartOptions;
 		   var round1 = @Html.Raw(Json.Encode(ViewBag.ActiveRoundOne));
 		var round2 = @Html.Raw(Json.Encode(ViewBag.ActiveRoundTwo));
 		var round3 = @Html.Raw(Json.Encode(ViewBag.ActiveRoundThree));
-		   console.log(round1);
-		   console.log(round2);
-		   console.log(round3);
+		   
 		var round1len = round1.length;
 		var round2len = round2.length;
 		var round3len = round3.length;
 		//FOR ROUND-1
 
-		   for (var i = 1; i < round1len; i++) {
-			   var arr = [new Date(year, round1[i].Month, 1), round1[i].clients];
+		   for (var i = 0; i <  round1len; i++) {
+			   var arr = [new Date(year,round1[i].Month-1, 1), round1[i].clients];
 			   d1.push(arr);
 		   }
 
 		   //FOR ROUND-2
-		   for (var i = 1; i < round2len; i++) {
-			   var arr = [new Date(year, round2[i].Month, 1), round2[i].clients];
+		   for (var i = 0; i <  round2len; i++) {
+			   var arr = [new Date(year, round2[i].Month-1, 1), round2[i].clients];
 			   d2.push(arr);
 		   }
 
 		   //FOR ROUND-3
-		   for (var i = 1; i < round3len; i++) {
-			   var arr = [new Date(year, round3[i].Month, 1), round3[i].clients];
+		   for (var i = 0; i < round3len; i++) {
+			   var arr = [new Date(year, round3[i].Month-1, 1), round3[i].clients];
 			   d3.push(arr);
 		   }
-		   console.log(d1);
-		   console.log(d2);
-		   console.log(d3);
+		   
 		data = [{
 			label: 'First Round',
 			data: d1,
@@ -463,12 +458,13 @@ else if (AgentType == "1")
 
 		chartOptions = {
 			xaxis: {
-				min: (new Date(year,01, 01)).getTime(),
-				max: (new Date(year, 12, 31)).getTime(),
+				//min: (new Date(2020,01, 01)).getTime(),
+				//max: (new Date(2020, 12, 31)).getTime(),
 				mode: "time",
 				tickSize: [1, "month"],
-				monthNames: ["","Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-				tickLength: 0
+				monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                tickLength: 0
+                
 			},
 
 			grid: {
@@ -540,7 +536,6 @@ else if (AgentType == "1")
                         dataType: "json",
                         data: { clientId: Id },
                         success: function (data) {
-                            debugger;
                             var ReportId = data;
                             if (ReportId == "report") {
 

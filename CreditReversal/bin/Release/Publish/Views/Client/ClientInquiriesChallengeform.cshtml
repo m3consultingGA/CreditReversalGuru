@@ -1,0 +1,117 @@
+﻿@using CreditReversal.Models
+@model dynamic
+
+@{
+    ViewBag.Title = "ClientInquiriesChallengeform";
+    Layout = "";
+    //var Agency = Session["Agency"];
+    dynamic values = Session["values"];
+    //CreditReportItems creditReportItem = Model.clientcredit;
+    //List<CreditReportItems> CreditReportItems = new List<CreditReportItems>();
+    //CreditReportItems.Add(creditReportItem);
+    List<Inquires> Inquires = Model.clientcredit;
+
+
+    @*<div class="row"><h2>Credit Bureau : @values[4] </h2></div>
+    <div class="row"><strong>Client Name : @values[1] </strong></div>
+    <div class="row"><strong>Round : @values[3] </strong></div>*@
+
+    <title> Challenge</title>
+    <html>
+
+    <body>
+        <div class="row" style="padding-top:20px;">
+
+            <table class="table" style="border:1px solid #000;width:300px;">
+                <tr>
+                    <td style="width:100px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;"><strong>First Name </strong></td>
+                    <td style="width:100px;padding:8px;border-bottom:1px solid #000;"><strong>@values[0]</strong></td>
+                </tr>
+                <tr>
+                    <td style="width:100px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;"><strong>Last Name</strong></td>
+                    <td style="width:100px;padding:8px;border-bottom:1px solid #000;"><strong>@values[1]</strong></td>
+                </tr>
+                <tr>
+                    <td style="width:100px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;"><strong>SSN</strong></td>
+                    <td style="width:100px;padding:8px;border-bottom:1px solid #000;"><strong>@values[4]</strong></td>
+                </tr>
+                <tr>
+                    <td style="width:100px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;"><strong>Date</strong></td>
+                    <td style="width:100px;padding:8px;border-bottom:1px solid #000;"><strong>@values[2]</strong></td>
+                </tr>
+                <tr>
+                    <td style="width:100px;padding:8px;border-right:1px solid #000;"><strong>Agency</strong></td>
+                    <td style="width:100px;padding:8px;"><strong>@values[5]</strong></td>
+                </tr>
+
+            </table>
+        </div>
+
+        <div class="row" style="padding-top:20px;">
+            <table class="table" style="border:1px solid #000;width:800px;">
+
+                <tr>
+                    <td>
+                        <p>
+                            <strong>
+                                To whom it may concern; <br />
+                                I have thoroughly reviewed my credit report and I would like to inform you of the following inaccuracies it contains, see
+                                detailed information below. I am requesting, under the provision of the Fair Credit Reporting Act (FCRA), 15 USC
+                                Section 1681, that you investigate the following accounts.
+                            </strong>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+
+        <div class="row" style="padding-top:20px;">
+
+
+
+            <table class="table" style="border-right:1px solid #000;border-left:1px solid #000;border-top:1px solid #000;width:800px;">
+                <thead>
+                    <tr>
+                        <th style="width:20px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;text-align:left"><strong>Creditor Name</strong></th>
+                        <th style="width:20px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;text-align:left"><strong>Type of Business</strong></th>
+                        <th style="width:20px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000; text-align:left"><strong>Type</strong></th>
+                        <th style="width:20px;padding:8px;border-bottom:1px solid #000; text-align:left"><strong>Comments </strong></th>
+                    </tr>
+                </thead>
+
+                @{
+                    for (int i = 0; i < Inquires.Count; i++)
+                    {
+
+                        <tbody>
+                            <tr>
+                                <td style="width:20px; border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">@Inquires[i].CreditorName</td>
+
+                                <td style="border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">@Inquires[i].TypeofBusiness</td>
+                                <td style="border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">Auto </td>
+                                <td style="border-bottom:1px solid #000;padding:8px;">@Inquires[i].ChallengeText</td>
+
+                            </tr>
+                        </tbody>
+
+                        <br />
+                    }
+                }
+
+            </table>
+            <br />
+            <br />  <br />  <br />  <br />
+            <table style="width:800px">
+                <tr>
+                    <td>Date <br />  @{ <div>@DateTime.Now.ToShortDateString()</div> }</td>
+                    <td style="text-align:right">Signature</td>
+                </tr>
+            </table>
+
+        </div>
+    </body>
+
+</html>
+}
+<br />

@@ -1,0 +1,132 @@
+﻿
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+
+<div class="page-header">
+    @*<h3 class="page-title">Letter </h3>*@
+    <ol class="breadcrumb pull-right">
+        <li><a href="/Dashboard/Admin"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+        <li><a href="/Admin/Pricing"><i class="fa fa-rupee"></i>&nbsp;Manage Pricing </a></li>
+        <li class="active">Add Pricing </li>
+    </ol>
+</div>
+
+@*<ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="/Dashboard/Admin"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/Pricing/Index"><i class="fa fa-rupee"></i>&nbsp;Manage Pricing</a></li>
+        <li class="breadcrumb-item active">Add Pricing </li>
+    </ol>*@
+
+<div style="padding-top:20px;">
+    <div class="portlet portlet-boxed">
+        <div class="portlet-header">
+            <h4 class="portlet-title">
+                Add Pricing
+            </h4>
+        </div> <!-- /.portlet-header -->
+        <div class="portlet-body">
+            <div class="row" style="padding:20px 10px 10px 20px;">
+                <div class="col-md-12">
+
+                    <form method="post" action="/Admin/Add" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="Pricingtype">Pricing Type <span style="color:red">*</span></label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" name="PricingType" id="PricingType" onchange="checkpricingtype(this);" class="form-control" placeholder="Pricing Type" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="logo">Upload Logo</label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="file" name="Logo" id="Logo" class="form-control" placeholder="Upload Logo" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="SetupFee">Setup Fee <span style="color:red">*</span></label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" name="SetupFee" step="any" id="SetupFee" class="form-control" placeholder="Setup Fee" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="PricePerMonth">Price PerMonth <span style="color:red">*</span></label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" name="PricePerMonth" step="any" id="PricePerMonth" class="form-control" placeholder="Price PerMonth" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="AdditionalAgent">Additional Agent <span style="color:red">*</span></label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" name="AdditionalAgent" step="any" id="AdditionalAgent" class="form-control" placeholder="Additional Agent" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2">
+
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="submit" id="btnsubmit" class="btn btn-secondary" value="Submit" />
+                                    <a href="/Admin/Pricing" class="btn btn-danger">Cancel</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+
+    function checkpricingtype(pricingtype) {
+        var type = pricingtype.value;
+        if (pricingtype != null) {
+            $.ajax({
+                type: "POST",
+                url: "/Pricing/GetTypeStatus",
+                data: { 'PricingType': type },
+                cache: false,
+                dataType: "json",
+                success: function (data) {
+                    if (data) {
+                        Swal.fire("Warning!", "Pricing type " + type + " already exists", "warning");
+                        $('#PricingType').val("");
+                        return false;
+                    }
+                }
+            })
+        }
+    }
+</script>

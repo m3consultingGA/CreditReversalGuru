@@ -29,27 +29,8 @@ namespace CreditReversal.Controllers
             return View();
         }
         [HttpGet]
-        public ActionResult Agent()
-        {
-            int AgentClientId = sessionData.GetAgentClientId();
-            Session["UserId"] = sessionData.GetAgentClientId();
-            if (AgentClientId == 0)
-            {
-                Response.Redirect("/Account/SignIn");
-            }
-            Agent agent = new Agent();
-
-            agent = accountFunctions.GetAgent(AgentClientId.ToString());
-            agent.Agentstatus = "AgentStatus";
-
-            ViewBag.years = common.GetYears();
-            ViewBag.pricing = functions.GetPricing();
-            ViewBag.companytypes = functions.GetCompanyTypes();
-            ViewBag.Dasboard = sessionData.getDasboard();
-            ViewBag.states = functions.GetStates();
-            ViewBag.Agentstatus = "AgentStatus";
-            return View(agent);
-        }
+        public ActionResult Agent()        {            int AgentClientId = sessionData.GetAgentClientId();            Session["UserId"] = sessionData.GetAgentClientId();            if (AgentClientId == 0)            {                Response.Redirect("/Account/SignIn");            }            Agent agent = new Agent();            agent = accountFunctions.GetAgent(AgentClientId.ToString());            agent.Agentstatus = "AgentStatus";            ViewBag.years = common.GetYears();
+            List<Pricing> pricings = functions.GetPricing();            ViewBag.pricing = pricings;            string str = string.Join(", ", pricings.Select(x => x.PricingType).ToArray());            ViewBag.pricingstring = str;            List<CompanyTypes> companyTypes = functions.GetCompanyTypes();            string comstr = string.Join(", ", companyTypes.Where(y=>y.CompanyType!= "SOLO PROP").Select(x => x.CompanyType).ToArray());            ViewBag.companystring = comstr;            ViewBag.companytypes = companyTypes;            ViewBag.Dasboard = sessionData.getDasboard();            ViewBag.states = functions.GetStates();            ViewBag.Agentstatus = "AgentStatus";            return View(agent);        }
         //[Authorization]
         [HttpPost]
         public ActionResult Agent(Agent agent)

@@ -25,10 +25,10 @@ namespace CreditReversal.DAL
 			{
 				if (!status)
 				{
-					sql = "Insert into IdentityIqInformation(ClientId,Question,Answer,UserName,Password)values(@ClientId,@Question,@Answer,@UserName,@Password)";
+					sql = "Insert into IdentityIqInformation(ClientId,Answer,UserName,Password)values(@ClientId,@Answer,@UserName,@Password)";
 					SqlCommand sqlCmd = new SqlCommand();
 					sqlCmd.Parameters.AddWithValue("@ClientId", IQInfo.ClientId);
-					sqlCmd.Parameters.AddWithValue("@Question", IQInfo.Question);
+					//sqlCmd.Parameters.AddWithValue("@Question", IQInfo.Question);
 					sqlCmd.Parameters.AddWithValue("@Answer", IQInfo.Answer);
 					sqlCmd.Parameters.AddWithValue("@UserName", IQInfo.UserName);
 					sqlCmd.Parameters.AddWithValue("@Password", IQInfo.Password);

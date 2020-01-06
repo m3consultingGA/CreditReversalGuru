@@ -294,7 +294,7 @@ namespace CreditReversal.BLL
             bool res = false;
             try
             {
-                string sql = "select * from IdentityIqInformation where ClientId='" + clientID + "' and Question!='' ";
+                string sql = "select * from IdentityIqInformation where ClientId=" + clientID + "  and isnull(UserName,'') != ''";
                 DataTable dataTable = utilities.GetDataTable(sql, true);
                 if (dataTable.Rows.Count > 0)
                 {

@@ -208,7 +208,7 @@ namespace CreditReversal.DAL
                     {
                         IdentityIQInfo identityIQInfo = new IdentityIQInfo();
                         identityIQInfo.ClientId = ClientModel.ClientId;
-                        identityIQInfo.Question = string.IsNullOrEmpty(ClientModel.IdQuestion) ? "" : ClientModel.IdQuestion;
+                       // identityIQInfo.Question = string.IsNullOrEmpty(ClientModel.IdQuestion) ? "" : ClientModel.IdQuestion;
                         identityIQInfo.Answer = string.IsNullOrEmpty(ClientModel.IdAnswer) ? "" : ClientModel.IdAnswer;
                         identityIQInfo.UserName = string.IsNullOrEmpty(ClientModel.IdUserName) ? "" : ClientModel.IdUserName;
                         identityIQInfo.Password = string.IsNullOrEmpty(ClientModel.IdPassword) ? "" : ClientModel.IdPassword;

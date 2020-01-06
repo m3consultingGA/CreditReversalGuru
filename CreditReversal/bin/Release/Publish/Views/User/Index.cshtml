@@ -1,0 +1,88 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_PublicLayoutPage.cshtml";
+}
+<title> User</title>
+<link href="~/Content/loader.css" rel="stylesheet" />
+@*<link href="~/Content/style.css" rel="stylesheet" />*@
+
+<ol class="breadcrumb">
+    <li class="breadcrumb-item ml-auto"><a href="/Dashboard/Index"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+    <li class="breadcrumb-item active">Users</li>
+</ol>
+
+
+    <div  ng-app="UsersApp" ng-controller="UsersController">
+        <div class="divMain">
+            <div class="col-lg-12">
+                <div class="row m-2">
+                    <div class="col-lg-3"><h5>Users</h5></div>
+
+                </div>
+                <div class="row  m-2 p-2">
+                    <div class="col-md-1" style="padding-top:4px;"><label>Search :</label></div>
+                    <div class="col-md-4">
+                        <input type="text" ng-model="search" class="form-control" placeholder="Type your search keyword..">
+                    </div>
+                    <div class="col-md-7">
+                        <div class="mr-1 my-2">
+                            <div class="pull-right">
+                                <button class="btn btn-secondary btn-sm" ng-hide="btncsv" id="csvdownload" ng-click="DownloadPDF()">PDF</button>
+                                <button class="btn btn-secondary btn-sm" ng-hide="btncsv" id="csvdownload" ng-click="Downloadcsv()">CSV</button>
+                                <button class="btn btn-secondary btn-sm" ng-hide="btnexcel" id="excelDownload" ng-click="DownloadcExcel()">Excel</button>
+                                @*<input type="button" class="btn btn-secondary btn-sm" value="Create User" ng-click="CreateButton()" />*@
+                                <a href="/User/CreateUser" class="btn btn-secondary btn-sm">Create User</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row m-2 p-2">
+                    <div class="table-responsive">
+                        <table id="tblCustomers" class="table table-bordered">
+                            <tr class="trTable">
+                                <th style="cursor: pointer;" ng-click="sort('UserName')">
+                                    User Name
+                                    <span class="fa fa-sort" ng-show="sortKey=='UserName'" ng-class="{'fa fa-sort-up':reverse,'fa fa-sort-down':!reverse}"></span>
+                                </th>
+                                <th style="cursor: pointer;" ng-click="sort('EmailId')">
+                                    Email
+                                    <span class="fa fa-sort" ng-show="sortKey=='EmailId'" ng-class="{'fa fa-sort-up':reverse,'fa fa-sort-down':!reverse}"></span>
+                                </th>
+                                <th> Actions</th>
+                            </tr>
+                            <tbody dir-paginate="m in Users |orderBy:sortKey:reverse |filter:search|itemsPerPage:10">
+                                <tr class="trBody">
+                                    <td style="display:none"> <span>{{m.UserId}}</span></td>
+                                    <td>
+                                        <span> {{m.UserName}}</span>
+                                    </td>
+                                    <td>
+                                        <span>{{m.EmailId}}</span>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-secondary btn-sm mb-1" href="/Users/CreateUser?Id={{m.UserId}}&&mode=Edit">Edit</a>
+                                        <a href="javascript:;" class="btn btn-secondary btn-sm mb-1" ng-click="Delete(m.UserId)">Delete</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row pagination  ml-auto">
+                        <div class="pull-right">
+                            <div class="col-lg-12">
+                                <dir-pagination-controls max-size="5" direction-links="true" boundary-links="true">
+                                </dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+<script src="~/js/Users.js"></script>
+<script src="~/js/jspdf.min.js"></script>
+<script src="~/js/jspdf.plugin.autotable.js"></script>

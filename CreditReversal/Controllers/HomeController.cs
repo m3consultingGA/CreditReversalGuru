@@ -12,6 +12,8 @@ using System.IO;
 using System.Net.Http;
 using CreditReversal.DAL;
 using System.Text;
+using Persits.PDF;
+using System.Text.RegularExpressions;
 
 namespace CreditReversal.Controllers
 {
@@ -251,7 +253,6 @@ namespace CreditReversal.Controllers
         public ActionResult ContactUs()
         {
 
-            ////var response = AuthPayment.Pay(500);
             //AuthorizeDotNetModel parentModel = new AuthorizeDotNetModel();
             //CreditCardDetailsModel creditCardDetails = new CreditCardDetailsModel();
             //creditCardDetails.CardNumber = "4111111111111111";

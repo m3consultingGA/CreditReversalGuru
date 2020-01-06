@@ -1,0 +1,394 @@
+﻿@model CreditReversal.Models.CreditItems
+@{
+    ViewBag.Title = "Credit Report";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+
+
+<div class="page-header">
+    <h4 class="page-title">Credit Report</h4>
+    <div style="padding-bottom:10px;">
+        <ol class="breadcrumb pull-right">
+            <li class="breadcrumb-item"><a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+
+            <li class="breadcrumb-item active">Credit Report </li>
+        </ol>
+    </div>
+</div>
+
+
+
+<style>
+    #placeholder {
+        width: 550px;
+        height: 300px;
+        text-align: center;
+    }
+    .tdClass {
+        font-weight: 600;
+    }
+</style>
+<div class="portlet portlet-boxed">
+    <div class="portlet-header">
+        <h4 class="portlet-title">
+            <u>Credit Report</u>
+        </h4>
+
+    </div> <!-- /.portlet-header -->
+    <div class="portlet-body">
+        <div class="row" style="padding-bottom:10px;padding-left:-10px;">
+            @if (ViewBag.AgentName != null)
+            {<div class="col-md-3"> <label>Agent&nbsp;:&nbsp;</label> @ViewBag.AgentName</div>
+            @*<div class="col-md-3"> <label>Client: </label>@ViewBag.CName</div>*@
+            <div class="col-md-3"><label>Pull Credit Date&nbsp;:&nbsp;</label> @ViewBag.DateReportPulls</div><div class="col-md-3"><label>Round&nbsp;:&nbsp;</label> @ViewBag.Round</div>
+        }
+        </div>
+
+        
+
+
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="20%"></th>
+                            <th width="23%" style="text-align:center;background-color:#CBD06C;color:#fff;">Equifax</th>
+                            <th width="23%" style="text-align:center;background-color:#98BDC5;color:#fff;">Experian</th>
+                            <th width="23%" style="text-align:center;background-color:#DAB96A;color:#fff;">TransUnion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.challenges != null)
+                        {
+                            var i = 0;
+                            var j = 0;
+
+                            foreach (var item in ViewBag.challenges)
+                            {
+                                string lateEQUIFAX = item.EQUIFAX;
+                                string lateEXPERIAN = item.EXPERIAN;
+                                string lateTRANSUNION = item.TRANSUNION;
+                                if (i == 3 || i == 4 || i == 5 && i != 8)
+                                {
+                        <tr>
+                            @if (i != 8)
+                            {
+                                <td class="tdClass">@item.Heading</td>
+                            }
+
+                            @if (lateEQUIFAX.ToUpper().Contains("LATE"))
+                            {
+                                <td style="background-color:red;color:white" align="right">@item.EQUIFAX</td>
+                            }
+                            else
+                            {
+                                <td align="right">@item.EQUIFAX</td>
+                            }
+                            @if (lateEXPERIAN.ToUpper().Contains("LATE"))
+                            {
+                                <td style="background-color:red;color:white" align="right">@item.EXPERIAN</td>
+                            }
+                            else
+                            {
+                                <td align="right">@item.EXPERIAN</td>
+                            }
+                            @if (lateTRANSUNION.ToUpper().Contains("LATE"))
+                            {
+                                <td style="background-color:red;color:white" align="right">@item.TRANSUNION</td>
+                            }
+                            else
+                            {
+                                <td align="right">@item.TRANSUNION</td>
+                            }
+                        </tr>
+                                }
+                                else
+                                {
+                                    if (i != 8)
+                                    {
+                                        <tr>
+                                            @if (i != 9)
+                                            {
+                                                <td class="tdClass">@item.Heading</td>
+                                            }
+
+                                            @if (lateEQUIFAX.ToUpper().Contains("LATE"))
+                                            {
+                                                <td style="background-color:red;color:white">@item.EQUIFAX</td>
+                                            }
+                                            else
+                                            {
+
+                                                if (i == 8)
+                                                {
+
+
+                                                    if (item.EQUIFAX == "0")
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    else if (item.EQUIFAX == "1")
+                                                    {
+                                                        <td>
+                                                            <div class="input-group">
+                                                                @*<span class="input-group-addon">
+                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkEQUI_@j">
+                                                                </span>
+                                                                <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="EQUIChallenge_@j" name="TRChallenge" style="width:200px" />*@
+                                                                @*<datalist id="challenges" class="dropdown">
+                                                                    @if (ViewBag.challengeMasters.Count > 0)
+                                                                    {
+                                                                        foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                        {
+                                                                            <option value="@challengeitem.ChallengeText" />
+                                                                        }
+                                                                    }
+                                                                </datalist>*@
+                                                            </div>
+
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            <div class="input-group">
+                                                                @*<span class="input-group-addon">
+                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkEQUI_@j" checked>
+                                                                </span>
+                                                                <input type="text" list="challenges" class="form-control challengestext" value="@item.EQUIFAX" placeholder="Select challenge" id="EQUIChallenge_@j" name="TRChallenge" style="width:200px" ; />*@
+                                                                @*<datalist id="challenges" class="dropdown">
+                                                                    @if (ViewBag.challengeMasters.Count > 0)
+                                                                    {
+                                                                        foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                        {
+                                                                            <option value="@challengeitem.ChallengeText" />
+                                                                        }
+                                                                    }
+                                                                </datalist>*@
+                                                            </div>
+                                                        </td>
+                                                    }
+
+                                                }
+                                                else if (i == 9)
+                                                {
+
+                                                    <lable id="hdnEQUICreditRepItemId_@j" hidden>@item.EQUIFAX</lable>
+
+
+                                                }
+                                                else
+                                                {
+                                                    if (i == 0)
+                                                    {
+                                                        <td style="font-weight:600">@item.EQUIFAX</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.EQUIFAX</td>
+                                                    }
+
+                                                }
+
+
+                                            }
+                                            @if (lateEXPERIAN.ToUpper().Contains("LATE"))
+                                            {
+                                                <td style="background-color:red;color:white">@item.EXPERIAN</td>
+                                            }
+                                            else
+                                            {
+
+                                                if (i == 8)
+                                                {
+
+                                                    if (item.EXPERIAN == "0")
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    else if (item.EXPERIAN == "1")
+                                                    {
+                                                        <td>
+                                                            <div class="input-group">
+                                                                @*<span class="input-group-addon">
+                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkEXPE_@j">
+                                                                </span>
+                                                                <input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="EXPEChallenge_@j" name="TRChallenge" style="width:200px" ; />*@
+                                                                @*<datalist id="challenges" class="dropdown">
+                                                                    @if (ViewBag.challengeMasters.Count > 0)
+                                                                    {
+                                                                        foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                        {
+                                                                            <option value="@challengeitem.ChallengeText" />
+                                                                        }
+                                                                    }
+                                                                </datalist>*@
+                                                            </div>
+
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            <div class="input-group">
+                                                                @*<span class="input-group-addon">
+                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkEXPE_@j" checked>
+                                                                </span>
+                                                                <input type="text" list="challenges" class="form-control challengestext" value="@item.EXPERIAN" placeholder="Select challenge" id="EXPEChallenge_@j" name="TRChallenge" style="width:200px" ; />
+                                                                <input type="hidden" id="hdnEXPECreditRepItemId_@j" value="@item.EXPERIAN" />*@
+                                                                @*<datalist id="challenges" class="dropdown">
+                                                                    @if (ViewBag.challengeMasters.Count > 0)
+                                                                    {
+
+                                                                        foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                        {
+                                                                            <option value="@challengeitem.ChallengeText" />
+                                                                        }
+                                                                    }
+                                                                </datalist>*@
+                                                            </div>
+                                                        </td>
+                                                    }
+
+                                                }
+                                                else if (i == 9)
+                                                {
+
+                                                    <lable id="hdnEXPECreditRepItemId_@j" hidden>@item.EXPERIAN</lable>
+
+
+                                                }
+                                                else
+                                                {
+                                                    if (i == 0)
+                                                    {
+                                                        <td style="font-weight:600">@item.EXPERIAN</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.EXPERIAN</td>
+                                                    }
+
+
+
+                                                }
+
+
+                                            }
+                                            @if (lateTRANSUNION.ToUpper().Contains("LATE"))
+                                            {
+                                                <td style="background-color:red;color:white">@item.TRANSUNION</td>
+                                            }
+                                            else
+                                            {
+
+                                                if (i == 8)
+                                                {
+                                                    if (item.TRANSUNION == "0")
+                                                    {
+                                                        <td></td>
+                                                    }
+                                                    else if (item.TRANSUNION == "1")
+                                                    {
+                                                        <td>
+                                                            <div class="input-group">
+                                                                @*<span class="input-group-addon">
+                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkTRANS_@j">
+                                                                </span>*@
+                                                                @*<input type="text" list="challenges" class="form-control challengestext" placeholder="Select challenge" id="TRANSChallenge_@j" name="TRChallenge" style="width:200px" ; />*@
+                                                                @*<datalist id="challenges" class="dropdown">
+                                                                    @if (ViewBag.challengeMasters.Count > 0)
+                                                                    {
+                                                                        foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                        {
+                                                                            <option value="@challengeitem.ChallengeText" />
+                                                                        }
+                                                                    }
+                                                                </datalist>*@
+                                                            </div>
+
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            <div class="input-group">
+                                                                @*<span class="input-group-addon">
+                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkTRANS_@j" checked>
+                                                                </span>
+                                                                <input type="text" list="challenges" class="form-control challengestext" value="@item.TRANSUNION" placeholder="Select challenge" id="TRANSChallenge_@j" name="TRChallenge" style="width:200px" />*@
+                                                                @*<datalist id="challenges" class="dropdown">
+                                                                    @if (ViewBag.challengeMasters.Count > 0)
+                                                                    {
+
+                                                                        foreach (var challengeitem in ViewBag.challengeMasters)
+                                                                        {
+                                                                            <option value="@challengeitem.ChallengeText" />
+                                                                        }
+                                                                    }
+                                                                </datalist>*@
+                                                            </div>
+                                                        </td>
+                                                    }
+
+                                                }
+                                                else if (i == 9)
+                                                {
+                                                    <lable id="hdnTRANSCreditRepItemId_@j" hidden>@item.TRANSUNION</lable>
+
+                                                }
+                                                else
+                                                {
+                                                    if (i == 0)
+                                                    {
+                                                        <td style="font-weight:600">@item.TRANSUNION</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@item.TRANSUNION</td>
+                                                    }
+
+
+                                                }
+
+
+                                            }
+                                        </tr>
+                                    }
+
+
+                                }
+                                if (item.Empty == "Empty")
+                                {
+                                    <tr>
+                                        <td> </td>
+                                        <td> </td>
+                                        <td> </td>
+                                        <td> </td>
+                                    </tr>
+                                }
+                                i++;
+                                j++;
+                                if (i == 10)
+                                {
+                                    i = 0;
+                                }
+                            }
+
+
+
+                        }
+
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@*<script language="javascript" type="text/javascript" src="~/Content/bower_components/flot/jquery.flot.js"></script>
+    <script language="javascript" type="text/javascript" src="~/Content/bower_components/flot/jquery.flot.pie.js"></script>*@
+
