@@ -31,6 +31,10 @@
                 {
                     ViewBag.Title = "Edit Client";
                 }
+                else if (Request.QueryString["Mode"] == "frmDashboard")
+                {
+                    ViewBag.Title = "My Profile";
+                }
                 else
                 {
                     ViewBag.Title = "Add Client";
@@ -88,6 +92,10 @@
                     {
                         <li class="active">View Client</li>
                     }
+                    else if (Request.QueryString["Mode"] == "frmDashboard")
+                    {
+                        <li class="active">My Profile</li>
+                    }
                     else
                     {
                         <li class="active">Add Client </li>
@@ -119,6 +127,10 @@
                     else if (Request.QueryString["Mode"] == "View")
                     {
                         <h4 class="portlet-title">View Client</h4>
+                    }
+                    else if (Request.QueryString["Mode"] == "frmDashboard")
+                    {
+                        <h4 class="portlet-title">My Profile</h4>
                     }
                     else
                     {
@@ -269,7 +281,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" name="ZipCode" placeholder="Zip Code" maxlength="10" id="ZipCode"  onchange="RemoveValidation(this);" value="@Model.ZipCode" required>
+                                                        <input type="text" class="form-control" name="ZipCode" placeholder="Zip Code" maxlength="10" id="ZipCode" onchange="RemoveValidation(this);" value="@Model.ZipCode" required>
                                                         <span class="input-group-btn" id="Mpopover">
                                                             <a class="btn btn-default" data-toggle="popover" title="Zip Code" data-content="Must be at least 5 characters long. Format should be XXXXX or XXXXX-XXXX ."><i class="glyphicon glyphicon-question-sign"></i></a>
                                                         </span>
@@ -836,7 +848,7 @@
             }
         }
         else {
-           
+
         }
          $('#guide-tabs li:eq(1) a').tab('show');
 
