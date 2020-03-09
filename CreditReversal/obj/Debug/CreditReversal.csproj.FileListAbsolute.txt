@@ -689,3 +689,6 @@ C:\Users\Pc1\Documents\GitHub\CreditReversalGuru\CreditReversal\obj\Debug\Credit
 C:\Users\Pc1\Documents\GitHub\CreditReversalGuru\CreditReversal\obj\Debug\CreditReversal.csproj.CopyComplete
 C:\Users\Pc1\Documents\GitHub\CreditReversalGuru\CreditReversal\obj\Debug\CreditReversal.dll
 C:\Users\Pc1\Documents\GitHub\CreditReversalGuru\CreditReversal\obj\Debug\CreditReversal.pdb
+C:\Users\Satish\Documents\GitHub\CreditReversalGuru\CreditReversal\obj\Debug\CreditReversal.csprojAssemblyReference.cache
+C:\Users\Satish\Documents\GitHub\CreditReversalGuru\CreditReversal\obj\Debug\CreditReversal.dll
+C:\Users\Satish\Documents\GitHub\CreditReversalGuru\CreditReversal\obj\Debug\CreditReversal.pdb
