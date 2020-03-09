@@ -165,7 +165,8 @@ namespace CreditReversal.DAL
                 if (dt.Rows.Count > 0)                {
                     strSql = "Update ServiceSettings set SendGridAPIKey=@SendGridAPIKey,Fromemail=@Fromemail,AuthApiLoginId=@AuthApiLoginId,ApiTransactionKey=@ApiTransactionKey,SecretKey=@SecretKey,AuthEnvironment=@AuthEnvironment,[14DaysMailLine1]=@Days14MailLine1,[14DaysMailLine2]=@Days14MailLine2, ";
                     strSql += "[7DaysMailLine1]=@Days7MailLine1,[7DaysMailLine2]=@Days7MailLine2,PaymentSuccessLine1=@PaymentSuccessLine1 ,PaymentSuccessLine2=@PaymentSuccessLine2 ,PaymentFailureLine1=@PaymentFailureLine1,PaymentFailureLine2=@PaymentFailureLine2,NextAttemptMailLine1=@NextAttemptMailLine1, ";
-                    strSql += "NextAttemptMailLine2=@NextAttemptMailLine2,SecondPaymentFailureLine1=@SecondPaymentFailureLine1,SecondPaymentFailureLine2=@SecondPaymentFailureLine2 ";
+                    strSql += "NextAttemptMailLine2=@NextAttemptMailLine2,SecondPaymentFailureLine1=@SecondPaymentFailureLine1,SecondPaymentFailureLine2=@SecondPaymentFailureLine2,ChallengesPath=@ChallengesPath, ";
+                    strSql += "ChallengesPathResult=@ChallengesPathResult,MailXStreamURL=@MailXStreamURL,MXUserid=@MXUserid,MXPassword=@MXPassword,MXTemplate=@MXTemplate ";
                     
                     SqlCommand cmd = new SqlCommand();
                     if (servicesettings.SendGridAPIKey != null)
@@ -315,18 +316,72 @@ namespace CreditReversal.DAL
                     {
                         cmd.Parameters.AddWithValue("@SecondPaymentFailureLine2", string.Empty);
                     }
+                   
+                    if (servicesettings.ChallengesPath != null)
+                    {
+                        cmd.Parameters.AddWithValue("@ChallengesPath", servicesettings.ChallengesPath);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@ChallengesPath", string.Empty);
+                    }
 
-                    
+                    if (servicesettings.ChallengesPathResult != null)
+                    {
+                        cmd.Parameters.AddWithValue("@ChallengesPathResult", servicesettings.ChallengesPathResult);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@ChallengesPathResult", string.Empty);
+                    }
+
+
+                    if (servicesettings.MailXStreamURL != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MailXStreamURL", servicesettings.MailXStreamURL);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MailXStreamURL", string.Empty);
+                    }
+
+                    if (servicesettings.MXUserid != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MXUserid", servicesettings.MXUserid);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MXUserid", string.Empty);
+                    }
+
+                    if (servicesettings.MXPassword != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MXPassword", servicesettings.MXPassword);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MXPassword", string.Empty);
+                    }
+
+                    if (servicesettings.MXTemplate != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MXTemplate", servicesettings.MXTemplate);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MXTemplate", string.Empty);
+                    }
+
                     cmd.CommandText = strSql;
                     res = Convert.ToInt32(objUtilities.ExecuteInsertCommand(cmd, true));
                 }
                 else {
                     strSql = "Insert into ServiceSettings(SendGridAPIKey,Fromemail,AuthApiLoginId,ApiTransactionKey,SecretKey,AuthEnvironment,[14DaysMailLine1],[14DaysMailLine2], ";
                     strSql += "[7DaysMailLine1],[7DaysMailLine2],PaymentSuccessLine1 ,PaymentSuccessLine2 ,PaymentFailureLine1,PaymentFailureLine2,NextAttemptMailLine1, ";
-                    strSql += "NextAttemptMailLine2,SecondPaymentFailureLine1,SecondPaymentFailureLine2) ";
+                    strSql += "NextAttemptMailLine2,SecondPaymentFailureLine1,SecondPaymentFailureLine2,ChallengesPath,ChallengesPathResult,MailXStreamURL,MXUserid,MXPassword,MXTemplate) ";
                     strSql += "values(@SendGridAPIKey,@Fromemail,@AuthApiLoginId,@ApiTransactionKey,@SecretKey,@AuthEnvironment,@Days14MailLine1,@Days14MailLine2,";
                     strSql += "@Days7MailLine1,@Days7MailLine2,@PaymentSuccessLine1 ,@PaymentSuccessLine2 ,@PaymentFailureLine1,@PaymentFailureLine2,@NextAttemptMailLine1,";
-                    strSql += "@NextAttemptMailLine2,@SecondPaymentFailureLine1,@SecondPaymentFailureLine2)";
+                    strSql += "@NextAttemptMailLine2,@SecondPaymentFailureLine1,@SecondPaymentFailureLine2,@ChallengesPath,@ChallengesPathResult,@MailXStreamURL,@MXUserid,@MXPassword,@MXTemplate)";
                     SqlCommand cmd = new SqlCommand();
                     if (servicesettings.SendGridAPIKey != null)
                     {
@@ -475,6 +530,63 @@ namespace CreditReversal.DAL
                     {
                         cmd.Parameters.AddWithValue("@SecondPaymentFailureLine2", string.Empty);
                     }
+                                       
+
+                    if (servicesettings.ChallengesPath != null)
+                    {
+                        cmd.Parameters.AddWithValue("@ChallengesPath", servicesettings.ChallengesPath);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@ChallengesPath", string.Empty);
+                    }
+
+                    if (servicesettings.ChallengesPathResult != null)
+                    {
+                        cmd.Parameters.AddWithValue("@ChallengesPathResult", servicesettings.ChallengesPathResult);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@ChallengesPathResult", string.Empty);
+                    }
+
+
+                    if (servicesettings.MailXStreamURL != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MailXStreamURL", servicesettings.MailXStreamURL);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MailXStreamURL", string.Empty);
+                    }
+
+                    if (servicesettings.MXUserid != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MXUserid", servicesettings.MXUserid);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MXUserid", string.Empty);
+                    }
+
+                    if (servicesettings.MXPassword != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MXPassword", servicesettings.MXPassword);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MXPassword", string.Empty);
+                    }
+
+                    if (servicesettings.MXTemplate != null)
+                    {
+                        cmd.Parameters.AddWithValue("@MXTemplate", servicesettings.MXTemplate);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@MXTemplate", string.Empty);
+                    }                      
+                                                                                          
                     cmd.CommandText = strSql;
                     res = Convert.ToInt32(objUtilities.ExecuteInsertCommand(cmd, true));
                 }
@@ -488,7 +600,7 @@ namespace CreditReversal.DAL
 
         public ServiceSettings GetServiceSettings()        {            ServiceSettings ServiceSettings = new ServiceSettings();            try            {                strSql = "select SendGridAPIKey,Fromemail,AuthApiLoginId,ApiTransactionKey,SecretKey,AuthEnvironment,[14DaysMailLine1],[14DaysMailLine2], ";
                 strSql += "[7DaysMailLine1],[7DaysMailLine2],PaymentSuccessLine1 ,PaymentSuccessLine2 ,PaymentFailureLine1,PaymentFailureLine2,NextAttemptMailLine1, ";
-                strSql += "NextAttemptMailLine2,SecondPaymentFailureLine1,SecondPaymentFailureLine2 ";
+                strSql += "NextAttemptMailLine2,SecondPaymentFailureLine1,SecondPaymentFailureLine2,ChallengesPath,ChallengesPathResult,MailXStreamURL,MXUserid,MXPassword,MXTemplate ";
                 strSql += " from ServiceSettings";                               DataTable dt = objUtilities.GetDataTable(strSql);                if (dt.Rows.Count > 0)                {                    foreach (DataRow dr in dt.Rows)                    {                                                ServiceSettings.SendGridAPIKey = dr["SendGridAPIKey"].ToString();                        ServiceSettings.Fromemail = dr["Fromemail"].ToString();                        ServiceSettings.AuthApiLoginId = dr["AuthApiLoginId"].ToString();                        ServiceSettings.ApiTransactionKey = dr["ApiTransactionKey"].ToString();
 
                         ServiceSettings.SecretKey = dr["SecretKey"].ToString();                        ServiceSettings.AuthEnvironment = dr["AuthEnvironment"].ToString();                        ServiceSettings.Days14MailLine1 = dr["14DaysMailLine1"].ToString();                        ServiceSettings.Days14MailLine2 = dr["14DaysMailLine2"].ToString();                        ServiceSettings.Days7MailLine1 = dr["7DaysMailLine1"].ToString();                        ServiceSettings.Days7MailLine2 = dr["7DaysMailLine2"].ToString();                        ServiceSettings.PaymentSuccessLine1 = dr["PaymentSuccessLine1"].ToString();
@@ -499,7 +611,14 @@ namespace CreditReversal.DAL
                         ServiceSettings.NextAttemptMailLine2 = dr["NextAttemptMailLine2"].ToString();
                         ServiceSettings.SecondPaymentFailureLine1 = dr["SecondPaymentFailureLine1"].ToString();
                         ServiceSettings.SecondPaymentFailureLine2 = dr["SecondPaymentFailureLine2"].ToString();
-
+                       
+                        ServiceSettings.ChallengesPath = dr["ChallengesPath"].ToString();
+                        ServiceSettings.ChallengesPathResult = dr["ChallengesPathResult"].ToString();
+                        ServiceSettings.MailXStreamURL = dr["MailXStreamURL"].ToString();
+                        ServiceSettings.MXUserid = dr["MXUserid"].ToString();
+                        ServiceSettings.MXPassword = dr["MXPassword"].ToString();
+                        ServiceSettings.MXTemplate = dr["MXTemplate"].ToString();
+                       
                     }                }            }            catch (Exception ex) { ex.insertTrace(""); }            return ServiceSettings;        }
 
 
@@ -874,6 +993,87 @@ namespace CreditReversal.DAL
         }
 
 
-      
+
+        #region Insert AccountType
+        public int InsertAccountType(AccountTypes objATypes)
+        {
+            try
+            {
+                strSql = "Insert into AccountTypes(AccountType,Status,AccountTypeDetails)values(@AccountType,@Status,@AccountTypeDetails)";
+                SqlCommand cmd = new SqlCommand();
+                cmd.Parameters.AddWithValue("@AccountType", objATypes.AccountType);
+                cmd.Parameters.AddWithValue("@Status", objATypes.Status);
+                cmd.Parameters.AddWithValue("@AccountTypeDetails", objATypes.AccountTypeDetails);
+                cmd.CommandText = strSql;
+                res = Convert.ToInt32(objUtilities.ExecuteInsertCommand(cmd, true));
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return res;
+        }
+        #endregion
+
+        #region Edit Account Type
+        public List<AccountTypes> GetAccountTypeEditById(string ATId)
+        {
+
+            List<AccountTypes> objATypesList = new List<AccountTypes>();
+            try
+            {
+                strSql = "Select AccTypeId,AccountType,AccountTypeDetails,Status from AccountTypes where AccTypeId=" + ATId;
+                DataTable dt = objUtilities.GetDataTable(strSql, true);
+                if (dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        AccountTypes ACTypes = new AccountTypes();
+                        ACTypes.AccountType = row["AccountType"].ToString();
+                        ACTypes.AccTypeId = Convert.ToInt32(row["AccTypeId"]);
+                        ACTypes.AccountTypeDetails = row["AccountTypeDetails"].ToString();
+                        ACTypes.Status = row["Status"].ToString();
+                        objATypesList.Add(ACTypes);
+                    }
+                }
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return objATypesList;
+        }
+        #endregion
+
+        #region Update AccountType
+        public int UpdateAccountType(AccountTypes objATypes)
+        {
+            try
+            {
+                strSql = "Update AccountTypes set AccountType=@AccountType,AccountTypeDetails=@AccountTypeDetails where  AccTypeId=@AccTypeId";
+                SqlCommand cmd = new SqlCommand();
+                cmd.Parameters.AddWithValue("@AccTypeId", objATypes.AccTypeId);
+                cmd.Parameters.AddWithValue("@AccountType", objATypes.AccountType);
+               // cmd.Parameters.AddWithValue("@Status", objATypes.Status);
+                cmd.Parameters.AddWithValue("@AccountTypeDetails", objATypes.AccountTypeDetails);
+                cmd.CommandText = strSql;
+                res = Convert.ToInt32(objUtilities.ExecuteInsertCommand(cmd, true));
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return res;
+        }
+        #endregion
+
+        #region Delete Account Type
+        public int DeleteAccountType(string AccTypeId)
+        {
+            try
+            {
+                strSql = "Delete from AccountTypes where  AccTypeId=" + AccTypeId;
+                SqlCommand cmd = new SqlCommand();
+                cmd.CommandText = strSql;
+                res = Convert.ToInt32(objUtilities.ExecuteInsertCommand(cmd, true));
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return res;
+        }
+
+
+        #endregion
+
     }
 }

@@ -10,6 +10,7 @@
         <li active">Add Challenge </li>
     </ol>
 </div>
+
 <div style="padding-top:20px;">
     <div class="portlet portlet-boxed">
         <div class="portlet-header">
@@ -18,10 +19,29 @@
             </h4>
         </div> <!-- /.portlet-header -->
         <div class="portlet-body">
-            <div class="row" style="padding:20px 10px 10px 20px;">
+            <div class="row" style="padding:10px 10px 10px 20px;">
 
                 <div class="col-md-6">
                     <form>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label for="AccountType">Account Type<span class="errmsg">*</span></label>
+                                </div>
+                                <div class="col-md-8">
+                                    @if (ViewBag.accTypes != null)
+                                    {
+                                        <select class="form-control" id="AccTypeId" name="AccTypeId" required>
+                                            <option value="" selected>--Select AccountType--</option>
+                                            @foreach (var atypes in ViewBag.accTypes)
+                                            {
+                                                <option value="@atypes.AccTypeId">@atypes.AccountType</option>
+                                            }
+                                        </select>
+                                    }
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-md-3">
@@ -41,19 +61,23 @@
                                     <label for="ChallengeText">ChallengeText<span class="errmsg">*</span></label>
                                 </div>
                                 <div class="col-md-8">
-                                    <input type="text" class="form-control" name="ChallengeText" id="ChallengeText" required />
+                                    <textarea type="text" rows="5" cols="5" class="form-control" name="ChallengeText" id="ChallengeText" required></textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-group">
+
+
+
+
+                        <div class="form-group" hidden>
                             <div class="row">
                                 <div class="col-sm-3">
 
                                 </div>
                                 <div class="col-sm-8">
                                     <div class="checkbox-inline">
-                                        <input type="checkbox" name="IsPremium" id="IsPremium" /> <span style="font-weight:600">Is Active</span>
+                                        <input type="checkbox" name="Status" id="Status" checked="checked" /> <span style="font-weight:600">Is Active</span>
                                     </div>
                                 </div>
                             </div>
@@ -70,16 +94,19 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-md-6">
+            </div>
+            <div class="row" style="padding:20px 10px 10px 20px;">
+                <div class="col-md-12">
 
                     <div class="table-responsive">
                         <table id="tblchallange" class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Challenge Level</th>
-                                    <th>Challenge Text</th>
-                                    <th>Is Active</th>
-                                    <th>Actions</th>
+                                    <th  style="width:100px;">Account Type</th>
+                                    <th  style="width:100px;">Challenge Level</th>
+                                    <th style="width:400px;text-align:justify;">Challenge Text</th>
+                                    @*<th>Is Active</th>*@
+                                    <th style="width:100px;">Actions</th>
 
                                 </tr>
                             </thead>
@@ -88,10 +115,10 @@
                                 @foreach (var c in ViewBag.challange)
                                 {
                                     <tr>
+                                        <td>@c.AccountType</td>
                                         <td>@c.ChallengeLevel </td>
                                         <td>@c.ChallengeText</td>
-                                        <td>@c.IsPremium</td>
-
+                                        @*<td>@c.Status</td>*@
                                         <td>
                                             <a href="/Admin/Challenge?Id=@c.ChallengeId" class="btn btn-secondary fa fa-pencil"></a>
 
@@ -101,14 +128,10 @@
                                 }
                             </tbody>
                         </table>
-
                     </div>
-
                 </div>
-
             </div>
         </div>
-    </div>
 </div>
 
 
@@ -159,8 +182,9 @@
                     $("#ChallengeId").val(data.ChallengeId);
                     $("#ChallengeLevel").val(data.ChallengeLevel);
                     $("#ChallengeText").val(data.ChallengeText);
+                     $("#AccTypeId").val(data.AccTypeId);
                     if (data.IsPremium == true) {
-                        $('#IsPremium').prop('checked', true);
+                        $('#Status').prop('checked', true);
                     }
 
                 }
@@ -170,9 +194,9 @@
     });
 
     $("#btnAdd").on("click", function () {
-
+        debugger
         var IsPr;
-        var check = $('#IsPremium:checked').val();
+        var check = $('#Status:checked').val();
 
         if (check != undefined) {
             IsPr = true;
@@ -183,13 +207,15 @@
 
         var ChallengeLevel = $("#ChallengeLevel").val();
         var ChallengeText = $("#ChallengeText").val();
+        var AccTypeId = $("#AccTypeId").val();
         debugger
-        if (ChallengeLevel != "" && ChallengeText != "") {
+        if (ChallengeLevel != "" && ChallengeText != "" && AccTypeId != 0) {
 
             var Cha = {
                 ChallengeLevel: $("#ChallengeLevel").val(),
                 ChallengeText: $("#ChallengeText").val(),
-                IsPremium: IsPr,
+                AccTypeId: $("#AccTypeId").val(),
+                Status: IsPr,
             }
             $.ajax({
                 method: "POST",
@@ -217,7 +243,7 @@
     });
 
     $("#btnUpdate").on("click", function () {
-
+        debugger
         var IsPr;
         var check = $('#IsPremium:checked').val();
 
@@ -229,6 +255,7 @@
 
         var ChallengeLevel = $("#ChallengeLevel").val();
         var ChallengeText = $("#ChallengeText").val();
+         var AccTypeId = $("#AccTypeId").val();
         //var IsPremium = $('#IsPremium:checked').val();
 
         if (ChallengeLevel != "" && ChallengeText != "") {
@@ -236,7 +263,8 @@
             var Cha = {
                 ChallengeLevel: $("#ChallengeLevel").val(),
                 ChallengeText: $("#ChallengeText").val(),
-                IsPremium: IsPr,
+               // Status: IsPr,
+                  AccTypeId: $("#AccTypeId").val(),
                 ChallengeId: $("#ChallengeId").val(),
             }
 

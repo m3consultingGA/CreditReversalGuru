@@ -6,9 +6,12 @@ by editing this MSBuild file. In order to learn more about this please visit htt
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <_PublishTargetUrl>C:\Users\Pc1\Documents\M3\CreditReversal-Nov1720191PM\CreditReversal\CreditReversal\bin\Release\Publish</_PublishTargetUrl>
+    <_PublishTargetUrl>C:\Users\Pc1\Documents\M3\LatestCodes\Credditreversal\CreditReversal\CreditReversal\bin\Release\Publish</_PublishTargetUrl>
   </PropertyGroup>
   <ItemGroup>
+    <File Include=".editorconfig">
+      <publishTime>12/20/2019 12:08:42</publishTime>
+    </File>
     <File Include="bin/Antlr3.Runtime.dll">
       <publishTime>09/10/2013 16:29:20</publishTime>
     </File>
@@ -19,10 +22,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/11/2019 10:48:32</publishTime>
     </File>
     <File Include="bin/CreditReversal.dll">
-      <publishTime>11/18/2019 16:12:23</publishTime>
+      <publishTime>01/06/2020 09:29:58</publishTime>
     </File>
     <File Include="bin/CreditReversal.pdb">
-      <publishTime>11/18/2019 16:12:23</publishTime>
+      <publishTime>01/06/2020 09:29:58</publishTime>
     </File>
     <File Include="bin/Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll">
       <publishTime>05/24/2018 13:38:22</publishTime>
@@ -180,6 +183,12 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="bin/roslyn/VBCSCompiler.exe.config">
       <publishTime>05/24/2018 13:38:24</publishTime>
     </File>
+    <File Include="bin/SendGrid.dll">
+      <publishTime>08/15/2019 18:53:16</publishTime>
+    </File>
+    <File Include="bin/SendGrid.pdb">
+      <publishTime>08/15/2019 18:53:16</publishTime>
+    </File>
     <File Include="bin/SimpleBrowser.dll">
       <publishTime>10/03/2018 19:54:18</publishTime>
     </File>
@@ -191,6 +200,21 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="bin/simplebrowser1.pdb">
       <publishTime>11/13/2019 09:08:22</publishTime>
+    </File>
+    <File Include="bin/System.Net.Http.dll">
+      <publishTime>09/05/2017 14:54:18</publishTime>
+    </File>
+    <File Include="bin/System.Security.Cryptography.Algorithms.dll">
+      <publishTime>11/05/2016 04:57:14</publishTime>
+    </File>
+    <File Include="bin/System.Security.Cryptography.Encoding.dll">
+      <publishTime>11/05/2016 04:57:08</publishTime>
+    </File>
+    <File Include="bin/System.Security.Cryptography.Primitives.dll">
+      <publishTime>11/05/2016 04:57:18</publishTime>
+    </File>
+    <File Include="bin/System.Security.Cryptography.X509Certificates.dll">
+      <publishTime>11/05/2016 04:57:18</publishTime>
     </File>
     <File Include="bin/System.Web.Helpers.dll">
       <publishTime>02/01/2018 12:20:56</publishTime>
@@ -8578,10 +8602,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/11/2019 10:37:34</publishTime>
     </File>
     <File Include="Content/css/loader.css">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>11/29/2019 09:50:12</publishTime>
     </File>
     <File Include="Content/css/mvpready-admin.css">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>11/29/2019 09:50:12</publishTime>
     </File>
     <File Include="Content/css/responsive.bootstrap.min.css">
       <publishTime>11/11/2019 10:37:34</publishTime>
@@ -8959,49 +8983,64 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/11/2019 10:37:34</publishTime>
     </File>
     <File Include="Content/js/bootstrap.min.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
+    </File>
+    <File Include="Content/js/buttons.html5.min.js">
+      <publishTime>12/03/2019 14:19:28</publishTime>
+    </File>
+    <File Include="Content/js/buttons.print.min.js">
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/dataTables.bootstrap.min.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
+    </File>
+    <File Include="Content/js/dataTables.buttons.min.js">
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/jquery-1.11.3.min.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/jquery-1.12.4.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/jquery-3.3.1.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/jquery.dataTables.min.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/jquery.min.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/jquery.slimscroll.min.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/mvpready-account.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/mvpready-admin.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/mvpready-core.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/mvpready-helpers.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
+    </File>
+    <File Include="Content/js/pdfmake.min.js">
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/pie.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/responsive.bootstrap.min.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/js/vertical.js">
-      <publishTime>11/11/2019 10:37:34</publishTime>
+      <publishTime>12/03/2019 14:19:28</publishTime>
+    </File>
+    <File Include="Content/js/vfs_fonts.js">
+      <publishTime>12/03/2019 14:19:28</publishTime>
     </File>
     <File Include="Content/less/mvpready-admin.less">
       <publishTime>11/11/2019 10:37:34</publishTime>
@@ -9065,6 +9104,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="documents/Client--ClientDB.jpg">
       <publishTime>11/11/2019 10:37:36</publishTime>
+    </File>
+    <File Include="EmailTemplates/template1.html">
+      <publishTime>12/05/2019 14:29:34</publishTime>
     </File>
     <File Include="ExtDLL/AuthorizeNet.dll">
       <publishTime>11/11/2019 10:48:32</publishTime>
@@ -9133,100 +9175,115 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/06/2019 15:49:18</publishTime>
     </File>
     <File Include="Views/Account/ChangePassword.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:48:50</publishTime>
     </File>
     <File Include="Views/Account/SignIn.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Account/SignUp.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Admin/Add.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Admin/AddCompanyTypes.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Admin/Billing.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Admin/Challenge.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
+    </File>
+    <File Include="Views/Admin/CreateInvestor.cshtml">
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Admin/Edit.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
+    </File>
+    <File Include="Views/Admin/Investors.cshtml">
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Admin/Letter.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Admin/Pricing.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
+    </File>
+    <File Include="Views/Admin/ServiceSettings.cshtml">
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Agent/AddAgent.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Agent/AddBilling.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/27/2019 16:54:24</publishTime>
     </File>
     <File Include="Views/Agent/AddNewAgent.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Agent/AddStaff.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 16:08:20</publishTime>
     </File>
     <File Include="Views/Agent/AssignStaff.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Agent/BillingList.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 16:05:08</publishTime>
+    </File>
+    <File Include="Views/Agent/Challenges.cshtml">
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Agent/Index.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Client/ClientChallengeform.cshtml">
-      <publishTime>11/18/2019 15:10:15</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Client/ClientChallenges.cshtml">
-      <publishTime>11/13/2019 09:44:54</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
+    </File>
+    <File Include="Views/Client/ClientInquiriesChallengeform.cshtml">
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Client/CreateClient.cshtml">
-      <publishTime>11/15/2019 19:32:32</publishTime>
+      <publishTime>12/26/2019 09:28:28</publishTime>
     </File>
     <File Include="Views/Client/CreditItems.cshtml">
-      <publishTime>11/18/2019 15:10:01</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Client/IdentityIQInfo.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Client/Index.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Client/Loadhtml.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Client/PullDetails.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Dashboard/Admin.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Dashboard/Agent.cshtml">
-      <publishTime>11/14/2019 12:45:44</publishTime>
+      <publishTime>12/27/2019 16:55:00</publishTime>
     </File>
     <File Include="Views/Dashboard/AgentStaff.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Dashboard/Client.cshtml">
-      <publishTime>11/14/2019 16:43:08</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Dashboard/CreditReport.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Error/Index.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Error/NotFound.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Home/About.cshtml">
       <publishTime>11/06/2019 15:49:13</publishTime>
@@ -9235,58 +9292,58 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/06/2019 15:49:13</publishTime>
     </File>
     <File Include="Views/Home/ContactUs.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Home/HowItWorks.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Home/Index.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Home/Indexbkup.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Home/NewPage.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Registration/Agent.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/26/2019 09:35:24</publishTime>
     </File>
     <File Include="Views/Registration/Failure.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Registration/Thankyou.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
-      <publishTime>11/08/2019 15:13:36</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>11/08/2019 15:33:12</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Shared/_publicLayoutPage.cshtml">
-      <publishTime>11/11/2019 10:38:44</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Shared/_secureLayoutPage.cshtml">
-      <publishTime>11/11/2019 10:38:44</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Simple/index.cshtml">
-      <publishTime>11/15/2019 19:32:32</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/User/CreateUser.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/User/Index.cshtml">
-      <publishTime>11/11/2019 10:38:30</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/Web.config">
-      <publishTime>11/15/2019 19:32:34</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Views/_ViewStart.cshtml">
-      <publishTime>11/08/2019 15:13:36</publishTime>
+      <publishTime>12/23/2019 14:44:48</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>11/18/2019 16:12:34</publishTime>
+      <publishTime>01/06/2020 09:33:43</publishTime>
     </File>
   </ItemGroup>
 </Project>

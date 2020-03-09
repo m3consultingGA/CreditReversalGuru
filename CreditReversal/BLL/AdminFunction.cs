@@ -14,7 +14,7 @@ namespace CreditReversal.BLL
     public class AdminFunction
     {
         private DBUtilities dbutilities = new DBUtilities();
-       
+
 
         #region Challenge Functions
 
@@ -24,7 +24,14 @@ namespace CreditReversal.BLL
             List<Challenge> challenge = new List<Challenge>();
             try
             {
-                string query = "Select * from ChallengeMaster";
+                //string query = "Select ChallengeId,ChallengeLevel,ChallengeText,isnull(AccountTypeId,0)as  AccountTypeId,  " +
+                //               "(select top 1 isnull(AccountType, '') from AccountTypes "+
+                //               "where AccountTypeId = cm.AccountTypeId and Status = 1) as AccountType,Status " +
+                //               "from ChallengeMaster cm where cm.Status = 1";
+
+                string query= "Select ChallengeId,ChallengeLevel,ChallengeText, isnull(AccountTypeId, 0) as AccountTypeId,"+
+                    "at.AccountType,cm.Status from ChallengeMaster cm inner join AccountTypes at " +
+                    "on cm.AccountTypeId = at.AccTypeId  and cm.Status = 1";
 
                 DataTable dt = dbutilities.GetDataTable(query, true);
                 if (dt.Rows.Count > 0)
@@ -35,7 +42,9 @@ namespace CreditReversal.BLL
                         cha.ChallengeText = row["ChallengeText"].ToString();
                         cha.ChallengeId = Convert.ToInt32(row["ChallengeId"]);
                         cha.ChallengeLevel = row["ChallengeLevel"].ToString();
-                        cha.IsPremium = Convert.ToBoolean(row["IsPremium"]);
+                        cha.AccTypeId = Convert.ToInt32(row["AccountTypeId"].ToString());
+                        cha.AccountType = row["AccountType"].ToString();                            
+                        cha.Status = row["Status"].ToString();
                         challenge.Add(cha);
                     }
                 }
@@ -55,17 +64,24 @@ namespace CreditReversal.BLL
             {
                 if (Id != 0)
                 {
-                    query = "Update ChallengeMaster Set ChallengeLevel=@ChallengeLevel,ChallengeText=@ChallengeText,IsPremium=@IsPremium where ChallengeId =" + Id;
+                    query = "Update ChallengeMaster Set ChallengeLevel=@ChallengeLevel,ChallengeText=@ChallengeText,AccountTypeId=@AccountTypeId where ChallengeId =" + Id;
                 }
                 else
                 {
-                    query = "Insert Into ChallengeMaster(ChallengeLevel,ChallengeText,IsPremium) values(@ChallengeLevel,@ChallengeText,@IsPremium)";
+                    query = "Insert Into ChallengeMaster(ChallengeLevel,ChallengeText,Status,AccountTypeId) values(@ChallengeLevel,@ChallengeText,@Status,@AccountTypeId)";
                 }
                 SqlCommand cmd = new SqlCommand();
                 cmd.Parameters.AddWithValue("@ChallengeLevel", string.IsNullOrEmpty(challange.ChallengeLevel) ? "" : challange.ChallengeLevel);
                 cmd.Parameters.AddWithValue("@ChallengeText", string.IsNullOrEmpty(challange.ChallengeText) ? "" : challange.ChallengeText);
-
-                cmd.Parameters.AddWithValue("@IsPremium", challange.IsPremium);
+                if (Id != 0)
+                {
+                 
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("@Status", challange.Status);
+                }
+                cmd.Parameters.AddWithValue("@AccountTypeId", challange.AccTypeId);
                 cmd.CommandText = query;
                 res = dbutilities.ExecuteInsertCommand(cmd, true);
                 if (res > 0)
@@ -92,8 +108,9 @@ namespace CreditReversal.BLL
                 row = dbutilities.GetDataRow(query);
                 challenge.ChallengeId = Convert.ToInt32(row[0]);
                 challenge.ChallengeLevel = row[1].ToString();
-                challenge.ChallengeText = row[2].ToString();
-                challenge.IsPremium = Convert.ToBoolean(row[3]);
+                challenge.ChallengeText = row[2].ToString();                
+                challenge.Status = row[3].ToString();
+                challenge.AccTypeId = Convert.ToInt32(row[4]);
 
             }
             catch (Exception ex) { ex.insertTrace(""); }
@@ -332,8 +349,6 @@ namespace CreditReversal.BLL
             catch (Exception ex) { ex.insertTrace(""); }
             return res;
         }
-
-
         #endregion
 
         #region Get Company Type        public List<Agent> GetBilling()        {            List<Agent> objCTypes = new List<Agent>();            try            {                objCTypes = objCTData.GetBilling();            }            catch (Exception ex) { ex.insertTrace(""); }            return objCTypes;        }
@@ -518,13 +533,13 @@ namespace CreditReversal.BLL
         }
         #endregion
 
-        #region Insert Service Settings
+        #region Get Service Settings
         public ServiceSettings GetServiceSettings()
         {
             ServiceSettings res = new ServiceSettings();
             try
             {
-                
+
                 res = objCTData.GetServiceSettings();
             }
             catch (Exception ex) { ex.insertTrace(""); }
@@ -581,5 +596,121 @@ namespace CreditReversal.BLL
             catch (Exception ex) { ex.insertTrace(""); }
             return userstatus;
         }
+
+        #region Insert Account Type
+        public int InsertAccountTypes(AccountTypes objATypes)
+        {
+            int res = 0;
+            try
+            {
+                res = objCTData.InsertAccountType(objATypes);
+            }
+            catch (Exception ex)
+            {
+                ex.insertTrace("");
+            }
+            return res;
+        }
+        #endregion
+
+        #region Get AccountTpes
+        public List<AccountTypes> GetAccountTypes()
+        {
+            List<AccountTypes> accountTypes = new List<AccountTypes>();
+            try
+            {
+                string query = "Select AccTypeId,AccountType,AccountTypeDetails,Status from AccountTypes where Status=1";
+
+                DataTable dt = dbutilities.GetDataTable(query, true);
+                if (dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        AccountTypes ACTypes = new AccountTypes();
+                        ACTypes.AccountType = row["AccountType"].ToString();
+                        ACTypes.AccTypeId = Convert.ToInt32(row["AccTypeId"]);
+                        ACTypes.AccountTypeDetails = row["AccountTypeDetails"].ToString();
+                        ACTypes.Status= row["Status"].ToString();
+                        accountTypes.Add(ACTypes);
+                    }
+                }
+
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return accountTypes;
+        }
+        #endregion
+
+        #region Edit AccountType
+        public List<AccountTypes> GetAccountTypeEditById(string ATId)
+        {
+            List<AccountTypes> objATypes = new List<AccountTypes>();
+            try
+            {
+                objATypes = objCTData.GetAccountTypeEditById(ATId);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return objATypes;
+        }
+
+
+        #endregion
+
+        #region Update Company Type
+        public int UpdateAccountType(AccountTypes objATypes)
+        {
+            int res = 0;
+            try
+            {
+                res = objCTData.UpdateAccountType(objATypes);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return res;
+        }
+        #endregion
+
+        #region Delete Account Type
+        public int DeleteAccountType(string AccTypeId)
+        {
+            int res = 0;
+            try
+            {
+                res = objCTData.DeleteAccountType(AccTypeId);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return res;
+        }
+        #endregion
+
+        #region Get Challenge Order
+        public List<ChallengeOrders> GetChallengeOrders()
+        {
+            List<ChallengeOrders> COrder = new List<ChallengeOrders>();
+            try
+            {
+                string query = "Select RowId,OrderId,OrderName,ChallengeFileName,OrderStatus, " +
+                               "Convert(varchar(15),OrderDate,101)as RDate,Status from ChallengeOrders where Status = 1";
+
+                DataTable dt = dbutilities.GetDataTable(query, true);
+                if (dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        ChallengeOrders COrders = new ChallengeOrders();
+                        COrders.OrderId = row["OrderId"].ToString();
+                        COrders.OrderName =row["OrderName"].ToString();
+                        COrders.ChallengeFileName = row["ChallengeFileName"].ToString();
+                        COrders.OrderStatus = row["OrderStatus"].ToString();
+                        COrders.OrderDate = row["RDate"].ToString();
+                        COrders.Status = row["Status"].ToString();
+                        COrder.Add(COrders);
+                    }
+                }
+            }
+
+            catch (Exception ex) { ex.insertTrace(""); }
+            return COrder;
+        }
+        #endregion
     }
 }

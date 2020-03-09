@@ -4,77 +4,133 @@
 @{
     ViewBag.Title = "ClientChallengeform";
     Layout = "";
-    //var Agency = Session["Agency"];
+
     dynamic values = Session["values"];
-    //CreditReportItems creditReportItem = Model.clientcredit;
-    //List<CreditReportItems> CreditReportItems = new List<CreditReportItems>();
-    //CreditReportItems.Add(creditReportItem);
+    dynamic clientModel = Session["ClientAddress"];
+
     List<CreditReportItems> CreditReportItems = Model.clientcredit;
 
-
-    @*<div class="row"><h2>Credit Bureau : @values[4] </h2></div>
-        <div class="row"><strong>Client Name : @values[1] </strong></div>
-        <div class="row"><strong>Round : @values[3] </strong></div>*@
+    var Toaddress1=string.Empty;
+    var Toaddress2=string.Empty;
+    var Toaddress3=string.Empty;
+    if (values[5] == "EXPERIAN")
+    {
+        Toaddress1= System.Configuration.ConfigurationManager.AppSettings["EXADDRESS1"];
+        Toaddress2= System.Configuration.ConfigurationManager.AppSettings["EXADDRESS2"];
+        Toaddress3=  System.Configuration.ConfigurationManager.AppSettings["EXADDRESS3"];
+    }
+    if (values[5] == "TRANSUNION")
+    {
+        Toaddress1= System.Configuration.ConfigurationManager.AppSettings["TUADDRESS1"];
+        Toaddress2= System.Configuration.ConfigurationManager.AppSettings["TUADDRESS2"];
+        Toaddress3=  System.Configuration.ConfigurationManager.AppSettings["TUADDRESS3"];
+    }
+    if (values[5] == "EQUIFAX")
+    {
+        Toaddress1= System.Configuration.ConfigurationManager.AppSettings["EQADDRESS1"];
+        Toaddress2= System.Configuration.ConfigurationManager.AppSettings["EQADDRESS2"];
+        Toaddress3=  System.Configuration.ConfigurationManager.AppSettings["EQADDRESS3"];
+    }
     <title> Challenge</title>
     <html>
-    <body>
-        <div class="row" style="padding-top:20px; text-align:left">
+    <body style="font-family:Helvetica;font-size:10px;">
 
-            <table class="table" style="border:1px solid #000;width:300px;">
-                <tr>
-                    <td style="width:100px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;text-align:left"><strong>First Name </strong></td>
-                    <td style="width:100px;padding:8px;border-bottom:1px solid #000;"><strong>@values[0]</strong></td>
-                </tr>
-                <tr>
-                    <td style="width:100px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;"><strong>Last Name</strong></td>
-                    <td style="width:100px;padding:8px;border-bottom:1px solid #000;"><strong>@values[1]</strong></td>
-                </tr>
-                <tr>
-                    <td style="width:100px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;"><strong>SSN</strong></td>
-                    <td style="width:100px;padding:8px;border-bottom:1px solid #000;"><strong>@values[4]</strong></td>
-                </tr>
-                <tr>
-                    <td style="width:100px;padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;"><strong>Date</strong></td>
-                    <td style="width:100px;padding:8px;border-bottom:1px solid #000;"><strong>@values[2]</strong></td>
-                </tr>
-                <tr>
-                    <td style="width:100px;padding:8px;border-right:1px solid #000;"><strong>Agency</strong></td>
-                    <td style="width:100px;padding:8px;"><strong>@values[5]</strong></td>
-                </tr>
+        @*Address1*@
+        <table>
+            <tr>
+                <td>
+                    <span style="color:#eee;font-family:Helvetica;font-size:4px;">---F---</span><br />
+                    @*From  Address<br />*@
+                    @*John David<br />
+        7 Argyle Street<br />
+        Land O Lakes, FL 34639<br />*@
 
-            </table>
-        </div>
+                    @values[0] @values[1]<br />
+                    @clientModel.Address1<br />
+                    @clientModel.City, @clientModel.State @clientModel.ZipCode
+                </td>
+            </tr>
+            <tr><td style="padding-top:55px;"></td></tr>
+
+            @*Address2*@
+
+            <tr>
+                <td>
+                    @*To Address<br />
+        Equifax Information Services LLC<br />
+        P.O. Box 740256<br />
+        Atlanta, GA 30348*@
+                    @*To Address<br />*@
+                    @Toaddress1<br />
+                    @Toaddress2<br />
+                    @Toaddress3<br />
+
+
+                </td>
+            </tr>
+        </table><br /><br /><br /><br /><br /><br /><br /><br />
+
+
+
+
+        <table style="border:1px solid #000;width:670px;">
+            <tr>
+                <td style="        width: 20px;
+        text-align: left
+">
+                    Name:
+                </td>
+                <td style="text-align:left">@values[0] @values[1]</td>
+            </tr>
+            <tr>
+                <td style="width:20px;">SSN:</td>
+                <td style="text-align:left">@values[4]</td>
+            </tr>
+            <tr>
+                <td style="width:20px;">Date:</td>
+                <td style="text-align:left">@values[2]</td>
+            </tr>
+            <tr>
+                <td style="width:20px;">Agency:</td>
+                <td style="text-align:left">@values[5]</td>
+            </tr>
+
+        </table>
+
+
+
+
 
         <div class="row" style="padding-top:20px;">
-            <table class="table" style="border:1px solid #000;width:800px;">
-
+            <table style="text-align: justify;
+        line-height: 20px;
+        width: 670px;">
                 <tr>
                     <td>
-                        <p>
-                            <strong>
-                                To whom it may concern; <br />
-                                I have thoroughly reviewed my credit report and I would like to inform you of the following inaccuracies it contains, see
-                                detailed information below. I am requesting, under the provision of the Fair Credit Reporting Act (FCRA), 15 USC
-                                Section 1681, that you investigate the following accounts.
-                            </strong>
+                        <p style="word-wrap:break-word;">
+
+
+                            To whom it may concern; <br />
+                            I have thoroughly reviewed my credit report and I would like to inform you of the following inaccuracies it contains, see
+                            detailed information below. I am requesting, under the provision of the Fair Credit Reporting Act (FCRA), 15 USC
+                            Section 1681, that you investigate the following accounts.
                         </p>
                     </td>
                 </tr>
             </table>
-
         </div>
 
+
+
+
         <div class="row" style="padding-top:20px;">
-
-
-
-            <table class="table" style="border-right:1px solid #000;border-left:1px solid #000;border-top:1px solid #000;width:800px;">
+            <table style="border:1px solid #000;width:670px;">
                 <thead>
                     <tr>
-                        <th style="padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;text-align:left"><strong>Company</strong></th>
-                        <th style="padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;text-align:left"><strong>Account</strong></th>
-                        <th style="padding:8px;border-right:1px solid #000;border-bottom:1px solid #000;text-align:left"><strong>Type</strong></th>
-                        <th style="padding:8px;border-bottom:1px solid #000;text-align:left"><strong>Comments </strong></th>
+                        <th style="text-align:left;width:150px;">Company</th>
+                        <th style="text-align:left;width:150px;">Account</th>
+                        <th style="text-align:left;width:150px;">Type</th>
+                        <th style="text-align:left;width:150px;">Comments</th>
                     </tr>
                 </thead>
 
@@ -84,11 +140,10 @@
 
                         <tbody>
                             <tr>
-                                <td style="border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">@CreditReportItems[i].MerchantName</td>
-
-                                <td style="border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">@CreditReportItems[i].AccountId</td>
-                                <td style="border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">Auto </td>
-                                <td style="border-bottom:1px solid #000;padding:8px;">@CreditReportItems[i].ChallengeText</td>
+                                <td style="width:150px;">@CreditReportItems[i].MerchantName</td>
+                                <td style="width:150px;">@CreditReportItems[i].AccountId</td>
+                                <td style="width:150px;">Auto </td>
+                                <td style="width:150px;">@CreditReportItems[i].ChallengeText</td>
 
                             </tr>
                         </tbody>
@@ -99,7 +154,10 @@
 
             </table>
             <br /><br />  <br />  <br />  <br />
-            <table style="width:800px">
+            <br /><br />  <br />  <br />  <br />
+
+
+            <table style="width:670px;position:fixed;">
                 <tr>
                     <td>Date <br />  @{ <div>@DateTime.Now.ToShortDateString()</div> }</td>
                     <td style="text-align:right">Signature</td>

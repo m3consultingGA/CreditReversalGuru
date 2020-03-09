@@ -30,5 +30,12 @@ namespace CreditReversal.Models
         public string SecondPaymentFailureLine1 { get; set; }
         public string SecondPaymentFailureLine2 { get; set; }
 
+        public string ChallengesPath { get; set; }
+        public string ChallengesPathResult { get; set; }
+        public string MailXStreamURL { get; set; }
+        public string MXUserid { get; set; }
+        public string MXPassword { get; set; }
+        public string MXTemplate { get; set; }
+
     }
 }

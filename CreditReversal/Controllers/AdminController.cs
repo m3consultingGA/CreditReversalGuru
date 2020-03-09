@@ -311,12 +311,15 @@ namespace CreditReversal.Controllers
         public ActionResult Challenge()
         {
             List<Challenge> challange = new List<Challenge>();
+            List<AccountTypes> accountType = new List<AccountTypes>();
 
             try
             {
 
                 challange = objAdminfunction.Getchallange();
+                accountType = objAdminfunction.GetAccountTypes();
                 ViewBag.challange = challange;
+                ViewBag.accTypes = accountType;
                 ViewBag.Dasboard = objSData.getDasboard();
 
             }
@@ -420,7 +423,7 @@ namespace CreditReversal.Controllers
                     string PFileName = Path.GetFileName(InvestorModel.FProofOfCard.FileName);
                     string _path = Server.MapPath("~/documents/" + "Investor-" + InvestorModel.InvestorId + "-" + PFileName);
                     InvestorModel.FProofOfCard.SaveAs(_path);
-                    
+
                     if (InvestorModel.InvestorId != null)
                     {
                         InvestorModel.sProofOfCard = InvestorModel.InvestorId + "-" + PFileName;
@@ -436,7 +439,7 @@ namespace CreditReversal.Controllers
                     string DFileName = Path.GetFileName(InvestorModel.FDrivingLicense.FileName);
                     string path = Server.MapPath("~/documents/" + "Investor-" + InvestorModel.InvestorId + "-" + DFileName);
                     InvestorModel.FDrivingLicense.SaveAs(path);
-                    
+
                     if (InvestorModel.InvestorId != null)
                     {
                         InvestorModel.sDrivingLicense = InvestorModel.InvestorId + "-" + DFileName;
@@ -456,15 +459,16 @@ namespace CreditReversal.Controllers
                     {
                         InvestorModel.sSocialSecCard = InvestorModel.InvestorId + "-" + SFileName;
                     }
-                    else {
+                    else
+                    {
                         InvestorModel.sSocialSecCard = SFileName;
                     }
 
-                    
+
                 }
 
 
-                
+
                 InvestorModel.Status = "1";
                 InvestorModel.CreatedBy = sessionData.GetUserID().StringToInt(0);
                 InvestorModel.UserRole = "investor";
@@ -475,7 +479,7 @@ namespace CreditReversal.Controllers
                     if (role == "admin")
                     {
                         return RedirectToAction("Investors", "Admin");
-                    }                                     
+                    }
                 }
 
 
@@ -491,7 +495,92 @@ namespace CreditReversal.Controllers
         public ActionResult Investors()        {            try            {
                 ViewBag.Dasboard = objSData.getDasboard();
                 ViewBag.Investors = objAdminfunction.GetInvestors();            }            catch (Exception ex) { ex.insertTrace(""); }            return View();        }
+
         [HttpPost]        public JsonResult DeleteInvestor(string InvestorId)        {            long res = 0;            try            {
                 res = objAdminfunction.DeleteInvestor(InvestorId);            }            catch (Exception ex)            {            }            return Json(res);        }
+        /// <summary>
+        /// Account Type
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult AccountType()
+        {
+            List<AccountTypes> acctTypes = new List<AccountTypes>();
+            try
+            {
+                acctTypes = objAdminfunction.GetAccountTypes();
+                ViewBag.acctTypes = acctTypes;
+                ViewBag.Dashboard = objSData.getDasboard();
+
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+
+            return View();
+        }
+
+        [HttpPost]
+        public JsonResult AddAccountType(AccountTypes ACTypes)
+        {            try            {
+                res = objAdminfunction.InsertAccountTypes(ACTypes);            }            catch (Exception ex) { ex.insertTrace(""); }            return Json(res);
+
+
+        }
+
+        #region Account Edit
+        public JsonResult AccountTypeEditById(string ATId)
+        {
+            List<AccountTypes> objATypes = new List<AccountTypes>();
+            try
+            {
+                objATypes = objAdminfunction.GetAccountTypeEditById(ATId);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return Json(objATypes);
+        }
+        #endregion
+
+        #region Update Account Type
+        [HttpPost]
+        public JsonResult UpdateAccountTypes(AccountTypes objATypes)
+        {
+            try
+            {
+                res = objAdminfunction.UpdateAccountType(objATypes);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return Json(res);
+
+        }
+        #endregion
+
+        #region Delete Account Type
+        [HttpPost]
+        public JsonResult DeleteAccountTypesById(string AccTypeId)
+        {
+            try
+            {
+                res = objAdminfunction.DeleteAccountType(AccTypeId);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return Json(res);
+
+        }
+        #endregion
+
+        #region Challenge Orders
+        public ActionResult ChallengeOrders()
+        {
+            List<ChallengeOrders> corders = new List<ChallengeOrders>();
+            try
+            {
+                corders = objAdminfunction.GetChallengeOrders();
+                ViewBag.COrders = corders;
+                ViewBag.Dashboard = objSData.getDasboard();
+
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+
+            return View();
+        }
+        #endregion
     }
 }

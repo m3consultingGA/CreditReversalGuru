@@ -521,5 +521,28 @@ namespace CreditReversal.BLL
                 sql = "select DISTINCT CI.CreditReportId,CI.CreditorName,CI.TypeOfBusiness,CRC.RoundType,CI.Agency"                + " from CreditReport CR INNER JOIN CreditInquiries CI  ON CR.CreditReportId = CI.CreditReportId "                + " LEFT JOIN CreditReportItemChallenges CRC  ON CI.CreditorName = CRC.MerchantName "                + " where CRC.CreditInqId is Not null and CR.ClientId='"+id+"' ORDER BY CI.CreditorName ";                if (!string.IsNullOrEmpty(agency))                {                    sql += " and AgencyName='" + agency.ToUpper() + "'";                }                dataTable = utilities.GetDataTable(sql, true);                if (dataTable.Rows.Count > 0)                {                    foreach (DataRow row in dataTable.Rows)                    {                        Inquires.Add(new Inquires                        {                            CreditorName = row["CreditorName"].ToString(),                            TypeofBusiness = row["TypeofBusiness"].ToString(),                            RoundType = row["RoundType"].ToString(),                            CreditBureau = row["Agency"].ToString(),                            
                             //ChallengeText = row["ChallengeText"].ToString(),
                         });                    }                }            }            catch (Exception ex) { ex.insertTrace(""); }            return Inquires;        }
+        public Agent GetAgentAddressById(string AgentId)
+        {
+            string AgentName = string.Empty;
+            Agent agent = new Agent();
+            DataRow row = null;
+            try
+            {
+                string query = "select PrimaryBusinessAdd1,PrimaryBusinessAdd2,PrimaryBusinessCity,PrimaryBusinessState,PrimaryBusinessZip from Agent where AgentId='" + AgentId + "'";
+                SqlCommand cmd = new SqlCommand();
+                row = utilities.GetDataRow(query);
+                if (row != null)
+                {
+                    agent.PrimaryBusinessAdd1 = row[0].ToString();
+                    agent.PrimaryBusinessAdd2 = row[1].ToString();
+                    agent.PrimaryBusinessCity = row[2].ToString();
+                    agent.PrimaryBusinessState = row[3].ToString();
+                    agent.PrimaryBusinessZip = row[4].ToString();
+                }
+
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return agent;
+        }
     }
 }

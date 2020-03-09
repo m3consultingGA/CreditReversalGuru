@@ -508,14 +508,24 @@ stringWriter
             // return the HTML code
             return stringWriter.ToString();
         }
-        public JsonResult ClientChallengeform(List<CreditReportItems> credit, int Id, string[] values)        {            string date = string.Empty; bool status = false;
+        public JsonResult ClientChallengeform(List<CreditReportItems> credit, int Id, string[] values)
+        {
+            string date = string.Empty; bool status = false;
 
             try
             {
+                //
+                if (!string.IsNullOrEmpty(Session["AgentId"].ToString()))
+                {
+                    string agentid = Session["AgentId"].ToString();
+                    Agent agentAdddress = cfunction.GetAgentAddressById(agentid);
+                    Session["AgentAddress"] = agentAdddress;
+                }
 
+                //
 
                 date = DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Year.ToString()
-                    + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
+                + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
                 List<CreditReportItems> crediteTRANSUNION = new List<CreditReportItems>();
                 List<CreditReportItems> crediteEXPERIAN = new List<CreditReportItems>();
                 List<CreditReportItems> crediteEQUIFAX = new List<CreditReportItems>();
@@ -567,7 +577,7 @@ stringWriter
                     string client = Id.ToString();
 
                     ClientModel clientModel = cfunction.GetClient(client);
-
+                    Session["ClientAddress"] = clientModel;
                     List<string> StringList = new List<string>();
                     StringList.Add(clientModel.FirstName);
                     StringList.Add(clientModel.LastName);
@@ -632,6 +642,10 @@ stringWriter
                     }
                     PdfManager objPdf = new PdfManager();
                     PdfDocument objDocTRANSUNION = objPdf.CreateDocument();
+                    objDocTRANSUNION.Title = "CreditReversalGuru";
+                    objDocTRANSUNION.Creator = "CreditReversalGuru";
+                    PdfFont objFont = objDocTRANSUNION.Fonts["Helvetica"];
+
                     PdfDocument objDocEXPERIAN = objPdf.CreateDocument();
                     PdfDocument objDocEQUIFAX = objPdf.CreateDocument();
                     MemoryStream pdfStream = new MemoryStream();
@@ -645,7 +659,8 @@ stringWriter
                         int trcount = crediteTRANSUNION.Count - 1;
                         model.clientcredit = crediteTRANSUNION;
                         string htmlToConvert = RenderViewAsString("ClientChallengeform", model);
-                        objDocTRANSUNION.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");
+                        //objDocTRANSUNION.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=34;TopMargin=34;BottomMargin=34; hyperlinks=true; drawbackground=true");
+                        objDocTRANSUNION.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=54;TopMargin=54;BottomMargin=54; hyperlinks=true; drawbackground=true");
                         filename = "Challenge-Account-TRANSUNION" + "-" + values[0] + "-" + values[1] + "-" + crediteTRANSUNION[trcount].RoundType + "-" + date + ".pdf";
                         filename = filename.Replace(" ", "");
                         filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-TRANSUNION" + "-" + values[0] + "-" + values[1] + "-" + crediteTRANSUNION[trcount].RoundType + "-" + date + ".pdf");
@@ -681,7 +696,8 @@ stringWriter
                         int excount = crediteEXPERIAN.Count - 1;
                         model.clientcredit = crediteEXPERIAN;
                         string htmlToConvert = RenderViewAsString("ClientChallengeform", model);
-                        objDocEXPERIAN.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");
+                        //objDocEXPERIAN.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=34;TopMargin=34;BottomMargin=34; hyperlinks=true; drawbackground=true");
+                        objDocEXPERIAN.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=54;TopMargin=54;BottomMargin=54; hyperlinks=true; drawbackground=true");
                         filename = "Challenge-Account-EXPERIAN" + "-" + values[0] + "-" + values[1] + "-" + crediteEXPERIAN[excount].RoundType + "-" + date + ".pdf";
                         filename = filename.Replace(" ", "");
                         filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-EXPERIAN" + "-" + values[0] + "-" + values[1] + "-" + crediteEXPERIAN[excount].RoundType + "-" + date + ".pdf");
@@ -717,7 +733,9 @@ stringWriter
                         model.clientcredit = crediteEQUIFAX;
                         string htmlToConvert = RenderViewAsString("ClientChallengeform", model);
 
-                        objDocEQUIFAX.ImportFromUrl(htmlToConvert, "scale=0.8; hyperlinks=true; drawbackground=true");
+                        //objDocEQUIFAX.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=34;TopMargin=34;BottomMargin=34; hyperlinks=true; drawbackground=true");
+                        objDocEQUIFAX.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=54;TopMargin=54;BottomMargin=54; hyperlinks=true; drawbackground=true");
+
                         filename = "Challenge-Account-EQUIFAX" + "-" + values[0] + "-" + values[1] + "-" + crediteEQUIFAX[eqcount].RoundType + "-" + date + ".pdf";
                         filename = filename.Replace(" ", "");
                         filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-EQUIFAX" + "-" + values[0] + "-" + values[1] + "-" + crediteEQUIFAX[eqcount].RoundType + "-" + date + ".pdf");
@@ -748,7 +766,10 @@ stringWriter
                 }
             }
             catch (Exception ex)
-            { string msg = ex.Message; }            return Json(status);        }
+            { string msg = ex.Message; }
+            return Json(status);
+
+        }
         public ActionResult ClientChallenges(string agency = null)        {            string ClientId = string.Empty;            string Agentname = string.Empty;            string AgentnameNew = string.Empty;            try            {                ClientId = sessionData.GetClientId();                Agentname = cfunction.GetAgentName(ClientId);                AgentnameNew = cfunction.getAgentName(Convert.ToInt32(ClientId));                ViewBag.name = Agentname;                ViewBag.Agentname = AgentnameNew;                ViewBag.Dasboard = sessionData.getDasboard();                ViewBag.CreditReportItems = cfunction.ReportItemChallenges(ClientId.StringToInt(0), agency);                ViewBag.CreditReportInquiresItems = cfunction.ReportItemInquiresChallenges(ClientId.StringToInt(0), agency);            }            catch (Exception ex)            {                System.Diagnostics.Debug.WriteLine(ex.Message);            }            return View();        }
         public JsonResult AddCreditReport(string clientId, string mode = "", string round = "")        {            string ReportId = "";            try            {                List<AccountHistory> accountHistories = new List<AccountHistory>();                List<Inquires> inquires = new List<Inquires>();                IdentityIQInfo IdentityIQInfo = new IdentityIQInfo();                IdentityIQInfo = IQfunction.CheckIdentityIQInfo(clientId);                CreditReportData tuple = GetCreditReportItemsbyReading(IdentityIQInfo);
                 if (tuple.AccHistory.Count > 0 && tuple.inquiryDetails.Count > 0)
@@ -969,7 +990,8 @@ stringWriter
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         ah.Agency = ach.atbureau;
-
+                        ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
+                        ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
                         //Date formating
                         date = ach.atdateOpened;
                         strr = date.Split('-');
@@ -1025,7 +1047,8 @@ stringWriter
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         ah.Agency = ach.atbureau;
-
+                        ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
+                        ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
                         //Date formating
                         date = ach.atdateOpened;
                         strr = date.Split('-');
@@ -1081,7 +1104,8 @@ stringWriter
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         ah.Agency = ach.atbureau;
-
+                        ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
+                        ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
                         //Date formating
                         date = ach.atdateOpened;
                         strr = date.Split('-');

@@ -876,6 +876,7 @@ fieldset[disabled] .btn-transparent.focus {
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus {
   background-color: #ededed;
+  color:#d74b4b;
 }
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
@@ -4607,4 +4608,7 @@ label {
     #Mpopover {
         display: none;
     }
+}
+.errmsg{
+    color:red;
 }
