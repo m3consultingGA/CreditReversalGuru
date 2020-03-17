@@ -6,20 +6,74 @@
     Layout = "";
     //var Agency = Session["Agency"];
     dynamic values = Session["values"];
-    //CreditReportItems creditReportItem = Model.clientcredit;
-    //List<CreditReportItems> CreditReportItems = new List<CreditReportItems>();
-    //CreditReportItems.Add(creditReportItem);
-    List<Inquires> Inquires = Model.clientcredit;
+     dynamic clientModel = Session["ClientAddress"];
+    Inquires Inquires = Model.clientcredit;
 
 
-    @*<div class="row"><h2>Credit Bureau : @values[4] </h2></div>
-    <div class="row"><strong>Client Name : @values[1] </strong></div>
-    <div class="row"><strong>Round : @values[3] </strong></div>*@
 
+
+    var Toaddress1=string.Empty;
+    var Toaddress2=string.Empty;
+    var Toaddress3=string.Empty;
+    if (values[5] == "Experian")
+    {
+        Toaddress1= System.Configuration.ConfigurationManager.AppSettings["EXADDRESS1"];
+        Toaddress2= System.Configuration.ConfigurationManager.AppSettings["EXADDRESS2"];
+        Toaddress3=  System.Configuration.ConfigurationManager.AppSettings["EXADDRESS3"];
+    }
+    if (values[5] == "TransUnion")
+    {
+        Toaddress1= System.Configuration.ConfigurationManager.AppSettings["TUADDRESS1"];
+        Toaddress2= System.Configuration.ConfigurationManager.AppSettings["TUADDRESS2"];
+        Toaddress3=  System.Configuration.ConfigurationManager.AppSettings["TUADDRESS3"];
+    }
+    if (values[5] == "Equifax")
+    {
+        Toaddress1= System.Configuration.ConfigurationManager.AppSettings["EQADDRESS1"];
+        Toaddress2= System.Configuration.ConfigurationManager.AppSettings["EQADDRESS2"];
+        Toaddress3=  System.Configuration.ConfigurationManager.AppSettings["EQADDRESS3"];
+    }
     <title> Challenge</title>
     <html>
 
+   
+    
+
+
     <body>
+        <table>
+            <tr>
+                <td>
+                    <span style="color:#eee;font-family:Helvetica;font-size:4px;">---F---</span><br />
+
+                    @values[0] @values[1]<br />
+                    @clientModel.Address1<br />
+                    @clientModel.City, @clientModel.State @clientModel.ZipCode
+                </td>
+            </tr>
+            <tr><td style="padding-top:55px;"></td></tr>
+
+            @*Address2*@
+
+            <tr>
+                <td>
+                    @*To Address<br />
+                    Equifax Information Services LLC<br />
+                    P.O. Box 740256<br />
+                    Atlanta, GA 30348*@
+                    @*To Address<br />*@
+                    @Toaddress1<br />
+                    @Toaddress2<br />
+                    @Toaddress3<br />
+
+
+                </td>
+            </tr>
+        </table><br /><br /><br /><br /><br /><br /><br /><br />
+
+
+
+
         <div class="row" style="padding-top:20px;">
 
             <table class="table" style="border:1px solid #000;width:300px;">
@@ -67,9 +121,6 @@
         </div>
 
         <div class="row" style="padding-top:20px;">
-
-
-
             <table class="table" style="border-right:1px solid #000;border-left:1px solid #000;border-top:1px solid #000;width:800px;">
                 <thead>
                     <tr>
@@ -81,22 +132,15 @@
                 </thead>
 
                 @{
-                    for (int i = 0; i < Inquires.Count; i++)
-                    {
-
-                        <tbody>
-                            <tr>
-                                <td style="width:20px; border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">@Inquires[i].CreditorName</td>
-
-                                <td style="border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">@Inquires[i].TypeofBusiness</td>
-                                <td style="border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">Auto </td>
-                                <td style="border-bottom:1px solid #000;padding:8px;">@Inquires[i].ChallengeText</td>
-
-                            </tr>
-                        </tbody>
-
-                        <br />
-                    }
+                    <tbody>
+                        <tr>
+                            <td style="width:20px; border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">@Inquires.CreditorName</td>
+                            <td style="border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">@Inquires.TypeofBusiness</td>
+                            <td style="border-bottom:1px solid #000;border-right:1px solid #000;padding:8px;">@Inquires.AccountType </td>
+                            <td style="border-bottom:1px solid #000;padding:8px;">@Inquires.ChallengeText</td>
+                        </tr>
+                    </tbody>
+                    <br />
                 }
 
             </table>
@@ -112,6 +156,6 @@
         </div>
     </body>
 
-</html>
+    </html>
 }
 <br />

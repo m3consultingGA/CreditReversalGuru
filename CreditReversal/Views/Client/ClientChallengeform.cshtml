@@ -8,7 +8,7 @@
     dynamic values = Session["values"];
     dynamic clientModel = Session["ClientAddress"];
 
-    List<CreditReportItems> CreditReportItems = Model.clientcredit;
+    CreditReportItems CreditReportItems = Model.clientcredit;
 
     var Toaddress1=string.Empty;
     var Toaddress2=string.Empty;
@@ -42,8 +42,8 @@
                     <span style="color:#eee;font-family:Helvetica;font-size:4px;">---F---</span><br />
                     @*From  Address<br />*@
                     @*John David<br />
-        7 Argyle Street<br />
-        Land O Lakes, FL 34639<br />*@
+                    7 Argyle Street<br />
+                    Land O Lakes, FL 34639<br />*@
 
                     @values[0] @values[1]<br />
                     @clientModel.Address1<br />
@@ -57,9 +57,9 @@
             <tr>
                 <td>
                     @*To Address<br />
-        Equifax Information Services LLC<br />
-        P.O. Box 740256<br />
-        Atlanta, GA 30348*@
+                    Equifax Information Services LLC<br />
+                    P.O. Box 740256<br />
+                    Atlanta, GA 30348*@
                     @*To Address<br />*@
                     @Toaddress1<br />
                     @Toaddress2<br />
@@ -129,27 +129,27 @@
                     <tr>
                         <th style="text-align:left;width:150px;">Company</th>
                         <th style="text-align:left;width:150px;">Account</th>
-                        <th style="text-align:left;width:150px;">Type</th>
-                        <th style="text-align:left;width:150px;">Comments</th>
+                        <th style="text-align:left;width:50px;">Type</th>
+                        <th style="text-align:left;width:200px;">Comments</th>
                     </tr>
                 </thead>
 
                 @{
-                    for (int i = 0; i < CreditReportItems.Count; i++)
-                    {
+//for (int i = 0; i < CreditReportItems.Count; i++)
+//{
 
                         <tbody>
                             <tr>
-                                <td style="width:150px;">@CreditReportItems[i].MerchantName</td>
-                                <td style="width:150px;">@CreditReportItems[i].AccountId</td>
-                                <td style="width:150px;">Auto </td>
-                                <td style="width:150px;">@CreditReportItems[i].ChallengeText</td>
+                                <td style="width:150px;">@CreditReportItems.MerchantName</td>
+                                <td style="width:150px;">@CreditReportItems.AccountId</td>
+                                <td style="width:50px;">@CreditReportItems.AccountType </td>
+                                <td style="width:200px;text-align:justify;">@CreditReportItems.ChallengeText</td>
 
                             </tr>
                         </tbody>
 
                         <br />
-                    }
+                    @*}*@
                 }
 
             </table>

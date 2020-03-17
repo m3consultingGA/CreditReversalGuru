@@ -186,7 +186,7 @@ namespace CreditReversal.BLL
                 // sql = "select CRI.* from CreditReport CR INNER JOIN CreditReportItems CRI ON CR.CreditReportId = CRI.CredReportId where CR.ClientId='"+id + "'INNER JOIN CreditReportItemChallenges CRC ON CRC.CredRepItemsId = CRI.CredRepItemsId";
                 sql = "select CRC.ChallengeText,CRI.Status as CRCstatus,CR.DateReportPulls ,crc.createddate,cr.ClientId,cr.AgencyName,crc.RoundType,CRC.MerchantName,CRC.AccountId  "
                     + " from CreditReport CR INNER JOIN CreditReportItems CRI ON CR.CreditReportId = CRI.CredReportId "
-                    + " LEFT JOIN CreditReportItemChallenges CRC ON CRI.AccountId = CRC.AccountId and CRI.Agency=CRC.Agency "
+                    + " LEFT JOIN CreditReportItemChallenges CRC ON CRI.AccountId = CRC.AccountId and CRI.Agency=CRC.Agency and CRC.clientid='" + +id + "' "
                     + " where CRC.CredRepItemsId is Not null and CR.ClientId=" + id;
                 if (!string.IsNullOrEmpty(agency))
                 {
@@ -465,6 +465,27 @@ namespace CreditReversal.BLL
         {
             try
             {
+                //
+                object ChallengeText = "";                
+                string sql2 = "Select AccTypeId from AccountTypes where AccountType = '" + credit.AccountType + "'";
+                
+                object AccountTypeId = utilities.ExecuteScalar(sql2, true);                if (AccountTypeId != null && sno != 0)
+                {
+                    sql2 = "";
+                    sql2 = "Select ChallengeText from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' and ChallengeLevel='" + sno + "'";
+                    ChallengeText = utilities.ExecuteScalar(sql2, true);
+
+                    if (ChallengeText==null) {                       
+                        sql2 = "";
+                        sql2 = "Select max(ChallengeLevel) from ChallengeMaster where AccountTypeId = '"+ AccountTypeId + "' ";
+                        var  Challengelevelid = utilities.ExecuteScalar(sql2, true);
+                        sql2 = "";
+                        sql2 = "Select ChallengeText from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' and ChallengeLevel='" + Challengelevelid + "'";
+                        ChallengeText = utilities.ExecuteScalar(sql2, true);
+                    }
+                }
+                //
+
 
                 CreditReportItems creditReportItems = cd.GetCreditReportItems(credit.CredRepItemsId.ToString())[0];
                 string sql = string.Empty;
@@ -473,26 +494,52 @@ namespace CreditReversal.BLL
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@CredRepItemsId", credit.CredRepItemsId);
-                if (credit.Challenge.Contains("Round"))
+                
+                credit.Challenge = ChallengeText.ToString();
+                if (sno == 1)
                 {
-                    string[] str = credit.Challenge.Split('-');
-                    credit.Challenge = str[1];
-                    creditReportItems.RoundType = str[0];
+                    creditReportItems.RoundType = "Round-"+ sno;
                 }
+                else if (sno > 1) { creditReportItems.RoundType = "Round-"+ sno; }
+               
                 cmd.Parameters.AddWithValue("@ChallengeText", credit.Challenge);
                 cmd.Parameters.AddWithValue("@Status", creditReportItems.Status);
                 cmd.Parameters.AddWithValue("@MerchantName", creditReportItems.MerchantName);
                 cmd.Parameters.AddWithValue("@AccountId", creditReportItems.AccountId);
                 cmd.Parameters.AddWithValue("@Agency", creditReportItems.Agency);
                 cmd.Parameters.AddWithValue("@RoundType", creditReportItems.RoundType);
-                
+
                 utilities.ExecuteInsertCommand(cmd, true);
             }
             catch (Exception ex) { ex.insertTrace(""); }
 
             return true;
         }
-        public bool AddReportItemInquiriesChallenges(Inquires Inquires, string round, int sno, int clientid)        {            try            {
+        public bool AddReportItemInquiriesChallenges(Inquires Inquires, string round, int sno, int clientid)        {
+            object ChallengeText = "";
+            try            {
+
+                //
+                     
+                string sql2 = "Select AccTypeId from AccountTypes where AccountType = '" + Inquires.AccountType + "'";               
+                object AccountTypeId = utilities.ExecuteScalar(sql2, true);                if (AccountTypeId != null && sno != 0)
+                {
+                    sql2 = "";
+                    sql2 = "Select ChallengeText from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' and ChallengeLevel='" + sno + "'";
+                    ChallengeText = utilities.ExecuteScalar(sql2, true);
+
+                    if (ChallengeText == null)
+                    {
+                        sql2 = "";
+                        sql2 = "Select max(ChallengeLevel) from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' ";
+                        var Challengelevelid = utilities.ExecuteScalar(sql2, true);
+                        sql2 = "";
+                        sql2 = "Select ChallengeText from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' and ChallengeLevel='" + Challengelevelid + "'";
+                        ChallengeText = utilities.ExecuteScalar(sql2, true);
+                    }
+                }
+                //
+
                 Inquires cinquires = cd.GetInquires(Inquires.CreditInqId)[0];
 
                 string sql = string.Empty;
@@ -500,12 +547,15 @@ namespace CreditReversal.BLL
                     + " values(@CreditInqId,@ChallengeText,@Status,@MerchantName,@Agency,@RoundType," + sno + "," + clientid + ",@DateOfInquiry)";
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandText = sql;
-                if (Inquires.ChallengeText.Contains("Round"))
+               
+                    Inquires.ChallengeText = ChallengeText.ToString();
+                if (sno == 1)
                 {
-                    string[] str = Inquires.ChallengeText.Split('-');
-                    Inquires.ChallengeText = str[1];
-                    Inquires.RoundType = str[0];
+                    Inquires.RoundType = "Round-" + sno;
                 }
+                else if (sno > 1) { Inquires.RoundType = "Round-" + sno; }
+                
+               
                 cmd.Parameters.AddWithValue("@CreditInqId", Inquires.CreditInqId);
                 cmd.Parameters.AddWithValue("@ChallengeText", Inquires.ChallengeText);
                 cmd.Parameters.AddWithValue("@Status", "");
@@ -518,7 +568,15 @@ namespace CreditReversal.BLL
         public List<CreditReportFiles> GetCreditReportsFilesByround(string id, string Round = "")        {            List<CreditReportFiles> CreditReportFiles = new List<CreditReportFiles>();            string sql = "";            try            {                sql = "select* from CreditReportFiles where ClientId = '" + id + "' and RoundType = '" + Round + "'";                dataTable = utilities.GetDataTable(sql, true);                if (dataTable.Rows.Count > 0)                {                    foreach (DataRow row in dataTable.Rows)                    {                        CreditReportFiles.Add(new CreditReportFiles                        {                            CreditRepFileId = row["CreditRepFileId"].ToString(),                            RoundType = row["RoundType"].ToString(),                            ClientId = Convert.ToInt32(row["ClientId"].ToString()),                            CRFilename = row["CRFilename"].ToString()
                         });                    }                }            }            catch (Exception ex) { ex.insertTrace(""); }            return CreditReportFiles;        }
         public List<Inquires> ReportItemInquiresChallenges(int id, string agency = null)        {            List<Inquires> Inquires = new List<Inquires>();            string sql = "";            try            {
-                sql = "select DISTINCT CI.CreditReportId,CI.CreditorName,CI.TypeOfBusiness,CRC.RoundType,CI.Agency"                + " from CreditReport CR INNER JOIN CreditInquiries CI  ON CR.CreditReportId = CI.CreditReportId "                + " LEFT JOIN CreditReportItemChallenges CRC  ON CI.CreditorName = CRC.MerchantName "                + " where CRC.CreditInqId is Not null and CR.ClientId='"+id+"' ORDER BY CI.CreditorName ";                if (!string.IsNullOrEmpty(agency))                {                    sql += " and AgencyName='" + agency.ToUpper() + "'";                }                dataTable = utilities.GetDataTable(sql, true);                if (dataTable.Rows.Count > 0)                {                    foreach (DataRow row in dataTable.Rows)                    {                        Inquires.Add(new Inquires                        {                            CreditorName = row["CreditorName"].ToString(),                            TypeofBusiness = row["TypeofBusiness"].ToString(),                            RoundType = row["RoundType"].ToString(),                            CreditBureau = row["Agency"].ToString(),                            
+                //sql = "select DISTINCT CI.CreditReportId,CI.CreditorName,CI.TypeOfBusiness,CRC.RoundType,CI.Agency"
+                //+ " from CreditReport CR INNER JOIN CreditInquiries CI  ON CR.CreditReportId = CI.CreditReportId "
+                //+ " LEFT JOIN CreditReportItemChallenges CRC  ON CI.CreditorName = CRC.MerchantName "
+                //+ " where CRC.CreditInqId is Not null and CR.ClientId='"+id+"' ORDER BY CI.CreditorName ";
+
+                sql = "select DISTINCT CI.CreditReportId,CI.CreditorName,CI.TypeOfBusiness,CRC.RoundType,CI.Agency"
+                + " from CreditReportItemChallenges CRC INNER JOIN CreditInquiries CI  ON CRC.CreditInqId = CI.CreditInqId "
+                + " where CRC.CreditInqId is Not null and CRC.ClientId = '"+id+"' ORDER BY CI.CreditorName ";
+                if (!string.IsNullOrEmpty(agency))                {                    sql += " and AgencyName='" + agency.ToUpper() + "'";                }                dataTable = utilities.GetDataTable(sql, true);                if (dataTable.Rows.Count > 0)                {                    foreach (DataRow row in dataTable.Rows)                    {                        Inquires.Add(new Inquires                        {                            CreditorName = row["CreditorName"].ToString(),                            TypeofBusiness = row["TypeofBusiness"].ToString(),                            RoundType = row["RoundType"].ToString(),                            CreditBureau = row["Agency"].ToString(),                            
                             //ChallengeText = row["ChallengeText"].ToString(),
                         });                    }                }            }            catch (Exception ex) { ex.insertTrace(""); }            return Inquires;        }
         public Agent GetAgentAddressById(string AgentId)

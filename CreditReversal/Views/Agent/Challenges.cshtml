@@ -50,7 +50,7 @@
                             }
                             @if (ViewBag.creditreportfile != null && ViewBag.creditreportfile.Count > 0)
                             {
-                        <tbody>
+                               <tbody>
                             @{
                                 int i = 0;
                                 int j = 0;
@@ -58,11 +58,11 @@
                             }
                                
                                @foreach (var item in ViewBag.creditreportfile)
-                                {
-                                    if (item.RoundType == "First Round")
-                                    {
+                               {
+                                   //if (item.RoundType == "First Round")
+                                   //{
                                         <tr>
-                                            @*<td>@item.ClientName</td>*@
+                                           
                                             <td>@item.RoundType</td>
                                             <td>@item.CAgency - @item.RoundType-1.@i.ToString()</td>
                                             
@@ -78,12 +78,12 @@
 
                                         </tr>
                                         i++;
-                                    }
+                                    @*}*@
 
-                                    if (item.RoundType == "Second Round")
+                                    @*if (item.RoundType == "Second Round")
                                     {
                                         <tr>
-                                            @*<td>@item.ClientName</td>*@
+                                            
                                             <td>@item.RoundType</td>
                                             <td>@item.CAgency - @item.RoundType-1.@j.ToString()</td>
                                             @{
@@ -98,12 +98,12 @@
 
                                         </tr>
                                         j++;
-                                    }
+                                    }*@
 
-                                    if (item.RoundType == "Third Round")
+                                    @*if (item.RoundType == "Third Round")
                                     {
                                         <tr>
-                                            @*<td>@item.ClientName</td>*@
+                                           
                                             <td>@item.RoundType</td>
                                             <td>@item.CAgency - @item.RoundType-1.@k.ToString()</td>
                                             @{
@@ -118,7 +118,7 @@
 
                                         </tr>
                                         k++;
-                                    }
+                                    }*@
 
 
                                 }

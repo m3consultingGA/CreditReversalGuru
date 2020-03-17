@@ -626,7 +626,10 @@ namespace CreditReversal.DAL
                 {
                     sno = 1;
                 }
-
+                else if (sno > 0)
+                {
+                    sno++;
+                }
             }
             catch (Exception)
             { }

@@ -5,18 +5,20 @@ using System.Web;
 
 namespace CreditReversal.Models
 {
-	public class CreditReportItems
-	{
+    public class CreditReportItems
+    {
         public string ChallengeText { get; set; }
         public int? CredRepItemsId { get; set; }
-		public int? CredReportId { get; set; }
-		public string MerchantName { get; set; }
-		public string AccountId { get; set; }
-		public DateTime OpenDateTime { get; set; }
-		public string OpenDate { get; set; }
-		public string CurrentBalance { get; set; }
-		public string HighestBalance { get; set; }
-		public string Status { get; set; }
+        public int? CredReportId { get; set; }
+        public string MerchantName { get; set; }
+        public string AccountId { get; set; }
+        public string AccountType { get; set; }
+        public string AccountTypeDetail { get; set; }
+        public DateTime OpenDateTime { get; set; }
+        public string OpenDate { get; set; }
+        public string CurrentBalance { get; set; }
+        public string HighestBalance { get; set; }
+        public string Status { get; set; }
         public string Challenge { get; set; }
         public string DateReportPulls { get; set; }        public string DatePulls { get; set; }
         public string Agent { get; set; }
