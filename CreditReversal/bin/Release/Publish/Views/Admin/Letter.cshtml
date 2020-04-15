@@ -1,0 +1,353 @@
+﻿
+@{
+    ViewBag.Title = "Letter Templates";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+
+<div class="page-header">
+    @*<h3 class="page-title">Letter </h3>*@
+    <ol class="breadcrumb pull-right">
+        <li><a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+        <li active">@ViewBag.Title </li>
+    </ol>
+</div> <!-- /.page-header -->
+
+
+<div style="padding-top:20px;">
+    <div class="portlet portlet-boxed">
+        <div class="portlet-header">
+            <h4 class="portlet-title">
+                Letter Templates
+            </h4>
+        </div> <!-- /.portlet-header -->
+        <div class="portlet-body">
+            <div class="row" style="padding-top:10px;">
+                <div class="col-md-7">
+                    <form>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label for="letterName">Letter Name<span class="">*</span></label>
+                                </div>
+                                <div class="col-md-10">
+                                    <input type="text" class="form-control" name="letterName" id="letterName" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label for="letterName">Letter Text<span class="">*</span></label>
+                                </div>
+                                <div class="col-md-10">
+                                    <textarea rows="18" id="lettertext" class="form-control" name="lettertext"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="chckprimary" name="isPrimary" required onchange="" /><span style="font-weight:600">Is Primary</span>
+                                    </label>
+                                </div>
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-secondary" id="btnAddletter" type="submit">Submit</button>
+                                    <button class="btn btn-secondary" id="btnUpdateletter" type="submit">Update</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="col-md-5">
+
+                    <div class="table-responsive" style="height:350px;overflow-y:auto">
+
+                        <table id="tblletter" class="table table-bordered">
+                            <thead>
+                                <tr>
+
+                                    <th>LetterName</th>
+                                    @*<th>LetterText</th>*@
+                                    <th>IsPrimary</th>
+                                    <th>Action</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int primary;
+                                }
+                                @if (ViewBag.letter.Count > 0)
+                                {
+                                    foreach (var item in ViewBag.letter)
+                                    {
+                                        <tr>
+                                            @*<td hidden>@item.LetterId</td>*@
+
+                                            <td>@item.LetterName</td>
+                                            @*<td>@item.LetterName</td>*@
+                                            <td>@item.isPrimary</td>
+                                            @if (item.isPrimary == true)
+                                            {
+                                                primary = 1;
+                                            }
+                                            else
+                                            {
+                                                primary = 0;
+                                            }
+                                            <td>
+                                                <a href="/Admin/Letter?Id=@item.LetterId" class="btn btn-secondary"><i class="fa fa-pencil"></i></a>
+                                                <button type="submit" onclick="btnDelete('@item.LetterId','@primary')" class="btn btn-danger"><i class="fa fa-close"></i></button>
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote.js"></script>
+
+<!-- include plugin -->
+@*<script src="[folder where script is located]/[plugin script].js"></script>*@
+<script>
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+    };
+
+    var Id = getUrlParameter('Id');
+
+    $(document).ready(function () {
+
+
+        $("#lettertext").summernote({
+
+            minHeight: 200,
+            maxHeight: 200,
+            placeholder: 'Write here ...',
+
+            //toolbar: [
+            //    // [groupName, [list of button]]
+            //    ['style', ['bold', 'italic', 'underline', 'clear']],
+            //    ['font', ['strikethrough', 'superscript', 'subscript']],
+            //    ['fontsize', ['fontsize']],
+            //    ['color', ['color']],
+            //    ['para', ['ul', 'ol', 'paragraph']],
+            //    ['height', []]
+            //]
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'clear']],
+                ['fontname', ['fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'hr']],
+                ['view', ['fullscreen', 'codeview']],
+                ['help', ['help']]
+            ],
+
+        });
+        $("#btnUpdateletter").hide();
+
+        var Id = getUrlParameter('Id');
+        if (Id != undefined) {
+
+
+            $.ajax({
+                method: "POST",
+                url: "/Admin/EditLetter",
+                dataType: "JSON",
+                data: { letterId: Id },
+                success: function (data) {
+                    //data.letterId;
+
+                    $("#btnUpdateletter").show();
+                    $("#btnAddletter").hide();
+                    $("#letterName").attr("disabled", "disabled");
+
+                    $("#letterName").val(data.LetterName);
+                    $("#lettertext").val(data.LetterText);
+                    var text = data.LetterText;
+                    $('#lettertext').summernote('code', text);
+                    if (data.isPrimary == true) {
+                        $('#chckprimary').prop('checked', true);
+                        $('#chckprimary').attr("disabled", "disabled");
+                    }
+                    //$("#chckprimary").val(data.isPrimary);
+                }
+            });
+        }
+
+        $("#btnAddletter").on("click", function (e) {
+
+            var check = $('#chckprimary:checked').val();
+            var text = $("#lettertext").val();
+            if (check != undefined) {
+                IsPr = true;
+            } else {
+                IsPr = false;
+            }
+            var comment = $.trim($("#lettertext").val());
+            var messageData = $('#lettertext').summernote('code');
+
+            //var messageData = $('#lettertext').summernote('code').replace(/<\/?[^>]+(>|$)/g, "");
+
+            var let = {
+                LetterName: $("#letterName").val(),
+                LetterText: comment,
+                isPrimary: IsPr,
+            }
+            if (let.letterName != "" && let.LetterText != "") {
+                e.preventDefault();
+                $.ajax({
+
+                    method: "POST",
+                    url: "/Admin/AddLetter",
+                    data: { letter: let },
+                    dataType: "json",
+                    success: function (data) {
+
+                        if (data == true) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: "Inserted successfully",
+                                type: 'success',
+
+                            }).then(function () {
+                                window.location.href = "/Admin/Letter";
+                            })
+                        }
+                        else {
+                            swal.fire("Warning", "LetterName already exits", "warning")
+                        }
+                    }
+
+                });
+            }
+
+        });
+
+        $("#btnUpdateletter").on("click", function (e) {
+
+            var Id = getUrlParameter('Id');
+
+            var check = $('#chckprimary:checked').val();
+
+            if (check != undefined) {
+                IsPr = true;
+            } else {
+                IsPr = false;
+            }
+
+            var letter = {
+                LetterName: $("#letterName").val(),
+                LetterText: $("#lettertext").val(),
+                isPrimary: IsPr,
+                LetterId: Id,
+            }
+
+            if (letter.letterName != "" && letter.lettertext != "") {
+                e.preventDefault();
+                $.ajax({
+
+                    method: "POST",
+                    url: "/Admin/AddLetter",
+                    data: { letter: letter },
+                    dataType: "json",
+                    success: function (data) {
+
+                        if (data == true) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: "Updated successfully",
+                                type: 'success',
+
+                            }).then(function () {
+                                window.location.href = "/Admin/Letter";
+                            })
+                        }
+                    }
+
+                });
+            }
+
+        });
+    });
+
+    function btnDelete(LetterId, isPrimary) {
+
+
+        var Id = LetterId;
+
+        var primary = isPrimary;
+        if (primary != 1) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want delete this staff !",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(function (isConfirm) {
+
+                if (isConfirm.value == true) {
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Admin/DeleteLetter",
+                        data: { letterId: Id },
+                        cache: false,
+                        dataType: "json",
+                        success: function (data) {
+
+                            if (data == true) {
+                                Swal.fire({
+                                    title: "Success!",
+                                    text: "Deleted successfully",
+                                    type: 'success',
+
+                                }).then(function () {
+                                    window.location.href = "/Admin/Letter";
+                                })
+                            }
+                        }
+                    });
+                }
+            })
+        }
+        else {
+
+            swal.fire("Warning", "Primary record can't be deleted  ", "warning")
+        }
+    }
+
+</script>

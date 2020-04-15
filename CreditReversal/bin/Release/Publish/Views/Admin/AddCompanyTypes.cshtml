@@ -1,0 +1,294 @@
+﻿
+@{
+    ViewBag.Title = "AddCompanyTypes";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+
+<div class="page-header">
+    @*<h3 class="page-title">Letter </h3>*@
+    <ol class="breadcrumb pull-right">
+        <li><a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+        <li active">Add Company Types </li>
+    </ol>
+</div>
+
+
+
+<div style="padding-top:20px;">
+    <div class="portlet portlet-boxed">
+        <div class="portlet-header">
+            <h4 class="portlet-title">
+                Add Company Types
+            </h4>
+        </div> <!-- /.portlet-header -->
+        <div class="portlet-body">
+            <div class="row" style="padding-top:20px;">
+                <form>
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label for="ChallengeLevel">Company Type<span class="errmsg">*</span></label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" name="CompanyType" id="txtCompanyType" maxlength="50" required>
+                                    <input type="hidden" name="CompanyTypeId" id="CompanyTypeId" />
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <label for="Status">Status</label>
+                                </div>
+                                <div class="col-sm-8" style="padding-top:7px;">
+                                    <div class="checkbox-inline">
+                                        <input type="checkbox" name="Status" id="Status" checked="checked" /><span style="font-weight:600">Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-8">
+                                <button class="btn btn-secondary" id="btnAdd" type="submit">Submit</button>
+                                <button class="btn btn-secondary" id="btnUpdate" type="submit">Update</button>
+                                <a href="/Dashboard/Admin" class="btn btn-danger"> Cancel</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+                <div class="col-md-6">
+                    <div class="table-responsive">
+                        <table id="tblchallange" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Company Type</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.CTList != null)
+                                {
+                                    foreach (var ct in ViewBag.CTList)
+                                    {
+                                        <tr>
+                                            <td>@ct.CompanyType </td>
+                                            <td>@ct.Status</td>
+
+                                            <td>
+                                                @if (ct.IsIndividual)
+                                                {
+                                                    <button class="btn btn-secondary" onclick="Edit(@ct.CompanyTypeId)" disabled title="Could not be modified"><i class="fa fa-pencil"></i></button>
+                                                    @*<a href="/Admin/AddCompanyTypes?Id=@ct.CompanyTypeId" class="btn btn-secondary" disabled title="Could not be modified">Edit</a>*@
+                                                    <button class="btn btn-danger" onclick="btndelete(@ct.CompanyTypeId)" disabled title="Could not be deleted"><i class="fa fa-close"></i></button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-secondary" onclick="Edit(@ct.CompanyTypeId)"><i class="fa fa-pencil"></i></button>
+                                                    @*<a href="/Admin/AddCompanyTypes?Id=@ct.CompanyTypeId" class="btn btn-secondary">Edit</a>*@
+                                                    <button class="btn btn-danger" onclick="btndelete(@ct.CompanyTypeId)"><i class="fa fa-close"></i></button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $("#btnUpdate").hide();
+
+        var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = window.location.search.substring(1),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
+            }
+        };
+
+        var Id = getUrlParameter('Id');
+        if (Id != undefined) {
+            $.ajax({
+                url: "/Admin/CompanyTypeEditById",
+                method: "POST",
+                dataType: "json",
+                data: { CTId: Id },
+                success: function (data) {
+                    $("#btnAdd").hide();
+                    $("#btnUpdate").show();
+                    $("#CompanyTypeId").val(data[0].CompanyTypeId);
+                    $("#txtCompanyType").val(data[0].CompanyType);
+                    if (data[0].Status == "True") {
+                        $('#Status').prop('checked', true);
+
+                    }
+                    else {
+                        $('#Status').prop('checked', false);
+                    }
+                }
+            });
+        }
+    });
+
+    $("#txtCompanyType").on("change", function () {
+        var CType = $("#txtCompanyType").val();
+        if (CType != "" || CType != null) {
+            $.ajax({
+                method: "POST",
+                url: "/Admin/CheckCompanyType",
+                dataType: "json",
+                data: { CompanyType: CType },
+                success: function (data) {
+                    if (data == true) {
+                        $("#txtCompanyType").focus();
+                        Swal.fire("Warning", "Company Type already exists.", "warning");
+                        $("#txtCompanyType").val('');
+                        return false;
+
+                    }
+                }
+            });
+        }
+    });
+
+    $("#btnAdd").click(function () {
+        var IsStatus;
+        var check = $('#Status:checked').val();
+
+        if (check != undefined) {
+            IsStatus = true;
+        } else {
+            IsStatus = false;
+        }
+        var CompT = {
+            CompanyType: $("#txtCompanyType").val(),
+            Status: IsStatus
+        }
+
+
+        $.ajax({
+            method: "POST",
+            url: "/Admin/AddCompanyTypes",
+            data: { objCompTypes: CompT },
+            dataType: "json",
+            success: function (data) {
+                if (data == 1) {
+                    //  alert(data);
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Company Type added successfully!",
+                        type: 'success',
+
+                    }).then(function () {
+                        window.location.href = "/Challenge/Index";
+                    })
+                }
+            }
+        });
+    });
+
+    $("#btnUpdate").click(function () {
+
+        var IsStatus;
+        var check = $('#Status:checked').val();
+
+        if (check != undefined) {
+            IsStatus = true;
+        } else {
+            IsStatus = false;
+        }
+        var CompT = {
+            CompanyTypeId: $("#CompanyTypeId").val(),
+            CompanyType: $("#txtCompanyType").val(),
+            Status: IsStatus
+        }
+
+        $.ajax({
+            method: "POST",
+            url: "/Admin/UpdateCompanyTypes",
+            data: { objCompTypes: CompT },
+            dataType: "json",
+            success: function (data) {
+                if (data == 1) {
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Company Type updated successfully!",
+                        type: 'success',
+
+                    }).then(function () {
+                        window.location.href = "/Admin/Index";
+                    })
+                }
+            }
+        });
+    });
+
+    function btndelete(CompanyTypeId) {
+        var CTId = CompanyTypeId;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to delete this company type!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(function (isConfirm) {
+
+            if (isConfirm.value == true) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/DeleteCompanyTypeById",
+                    data: { 'CompanyTypeId': CTId },
+                    cache: false,
+                    dataType: "json",
+                    success: function (data) {
+                        if (data == 1) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: "Company Type deleted successfully!",
+                                type: 'success',
+
+                            }).then(function () {
+                                window.location.href = "/Admin/AddCompanyTypes";
+                            })
+                        }
+                    }
+                });
+            }
+        })
+    }
+    function Edit(CompanyTypeID) {
+        window.location.href = "/Admin/AddCompanyTypes?Id=" + CompanyTypeID;
+    }
+</script>
+

@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using CreditReversal.Utilities;
+using CreditReversal.DAL;
 
 namespace CreditReversal.BLL
 {
     public class sbrowser
     {
-        public CreditReport pullcredit(string Username, string Password, string SecurityAnswer)
+        public CreditReport pullcredit(string Username, string Password, string SecurityAnswer,string clientid)
         {
             CreditReport cr = new CreditReport();
             try
@@ -63,6 +64,20 @@ namespace CreditReversal.BLL
                 html2 = html2.Replace(", \"", " , ");
                 var data = JsonConvert.DeserializeObject<dynamic>(html2);
                 browser.Close();
+                DBUtilities utilities = new DBUtilities();
+                SessionData sessionData = new SessionData();
+                try
+                {
+                    string jsondata = html2;
+                    jsondata = jsondata.Replace("'", "\"");
+                    string sql = "Insert into CreditReportData(ClientId,AgentId,JsonData) "
+                    + " Values( " + clientid + ", " + sessionData.GetUserID() + ",'" + jsondata + "')";
+                    utilities.ExecuteString(sql, true);
+                }
+                catch (Exception)
+                {}
+                
+
                 RootObject rootObj = JsonConvert.DeserializeObject<RootObject>(html2);
                 //TU  EQ  EXP
                 List<TradeLinePartition> tdl = new List<TradeLinePartition>();

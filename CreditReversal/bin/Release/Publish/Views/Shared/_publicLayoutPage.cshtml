@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en" class="no-js">
+<!--<![endif]-->
+<head>
+    <title>@ViewBag.Title &middot; Credit Reversal Guru</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,600,600italic,800,800italic">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oswald:400,300,700">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="~/Content/css/font-awesome.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/Content/css/bootstrap.min.css">
+
+    @*<link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">*@
+    <!-- Bootstrap Datatable CSS -->
+    <link href="~/Content/css/responsive.bootstrap.min.css" />
+    <link rel="stylesheet" href="/Content/css/mvpready-admin.css">
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <link rel="stylesheet" href="/Content/bower_components/bootstrap-datepicker/css/bootstrap-datepicker.min.css">
+    <link rel="stylesheet" href="/Content/bower_components/bootstrap-daterangepicker/daterangepicker.css">
+    <script src="/Content/bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="/Content/bower_components/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+</head>
+<body class="account-bg">
+
+    <header class="navbar" role="banner">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <i class="fa fa-align-justify"></i>
+                </button>
+                <a href="/" class="navbar-brand navbar-brand-img">
+                    <img src="/Content/img/crg-logo.png" alt="CRG Ready">
+                </a>
+            </div> <!-- /.navbar-header -->
+            <nav class="collapse navbar-collapse" role="navigation">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/Home/Index">Home</a>
+                    </li>
+                    <li>
+                        <a href="/Home/HowItWorks">How it works</a>
+                    </li>
+                    <li>
+                        <a href="/Home/ContactUs">Contact Us</a>
+                    </li>
+                    @*<li>
+                        <a href="@Url.RouteUrl("account-signin")">Sign In</a>
+                    </li>*@
+                </ul>
+            </nav>
+        </div> <!-- /.container -->
+
+    </header>
+
+
+    <div style="border-top:3px solid #C70039;">
+        @RenderBody()
+
+
+    </div> <!-- /.account-wrapper -->
+    <div style="padding-top:170px;">
+
+    </div>
+    <div class="footer" >
+        <div class="container">
+            <p class="pull-left">Copyright &copy;@DateTime.Now.Year Credit Reversal Guru.</p>
+        </div>
+    </div>
+    @*<script src="~/Content/js/jquery-1.11.3.min.js"></script>*@
+    <script src="~/Content/js/bootstrap.min.js"></script>
+    <script src="~/Content/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/Content/js/jquery.slimscroll.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+</body>
+</html>

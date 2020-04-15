@@ -91,4 +91,3 @@ E:\M3\Office\CreditReversal\CreditReversal\CreditReversal\bin\Microsoft.CodeDom.
 E:\M3\Office\CreditReversal\CreditReversal\CreditReversal\obj\Release\CreditReversal.csproj.CopyComplete
 E:\M3\Office\CreditReversal\CreditReversal\CreditReversal\obj\Release\CreditReversal.dll
 E:\M3\Office\CreditReversal\CreditReversal\CreditReversal\obj\Release\CreditReversal.pdb
-E:\M3\Office\CreditReversal\CreditReversal\CreditReversal\obj\Release\CreditReversal.csprojAssemblyReference.cache

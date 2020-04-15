@@ -1,0 +1,55 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+@{
+    Layout = null;
+    ViewBag.Title = "Error";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>404 | Page Not Found</title>
+    <link href='@Url.Content("~/Content/404Style.css")' rel="stylesheet" type="text/css" media="all" />
+</head>
+<body>
+    <!--start-wrap--->
+    <div class="wrap">
+        <!---start-header---->
+        <div class="header">
+
+           
+            @if (Request["msg"] != null)
+            {
+
+            }
+            else
+            {
+                <div class="logo">
+                    <h1><a href="#">404</a></h1>
+                </div>
+            }
+
+        </div>
+        <!---End-header---->
+        <!--start-content------>
+        <div class="content">
+            @*<img src="~/Images/error-img.png" title="error" />*@
+            @if (Request["msg"] != null)
+            {
+                <p><span><label>O</label>hh.....</span>You already registered.</p>
+            }
+            else
+            {
+                <p><span><label>O</label>hh.....</span>You requested the page that is no longer there.</p>
+            }
+
+            <a href="/Home/Index">Back To Sign In</a> 
+            @*//TODO Changed Home page*@
+            <div class="copy-right">
+                <strong>©Copyright 2019 CreditRevesalGuru.</strong> All rights
+                reserved.
+            </div>
+        </div>
+        <!--End-Cotent------>
+    </div>
+    <!--End-wrap--->
+</body>
+</html>

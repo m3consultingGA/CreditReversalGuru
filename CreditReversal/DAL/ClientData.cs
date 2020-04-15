@@ -811,7 +811,7 @@ namespace CreditReversal.DAL
             return status;
         }        public bool AddCreditReportItems(List<AccountHistory> credit, int Id, string agency,string round,int sno)        {
             string AgentId = HttpContext.Current.Session["UserId"].ToString();            bool status = false;            try            {                int count = credit.Count();                for (int i = 0; i < count; i++)                {                    string sql = "Insert Into CreditReportItems(CredReportId,MerchantName,AccountId,OpenDate,"                        + " CurrentBalance,HighestBalance,Status,MonthlyPayment,LastReported,Agency,CreatedBy, "                        + " CreatedDate,negativeitems,RoundType,sno,AccountType,AccountTypeDetails) values(@CredReportId,@MerchantName,@AccountId,"                        + " @OpenDate,@CurrentBalance,@HighestBalance,@Status,@MonthlyPayment,@LastReported,@Agency, "                        + " @CreatedBy,getdate(),@negativeitems,@RoundType,"+ sno + ",@AccountType,@AccountTypeDetails)";                    SqlCommand cmd = new SqlCommand();                    cmd.CommandText = sql;                    cmd.Parameters.AddWithValue("@CredReportId", Id);                    cmd.Parameters.AddWithValue("@Agency", agency);                    cmd.Parameters.AddWithValue("@MerchantName", credit[i].Bank);                    cmd.Parameters.AddWithValue("@AccountId", credit[i].Account);                    cmd.Parameters.AddWithValue("@OpenDate", credit[i].DateOpened);                    cmd.Parameters.AddWithValue("@CurrentBalance", credit[i].Balance);                    cmd.Parameters.AddWithValue("@HighestBalance", credit[i].HighCredit);                    cmd.Parameters.AddWithValue("@MonthlyPayment", credit[i].MonthlyPayment);                    cmd.Parameters.AddWithValue("@LastReported", credit[i].LastReported);                    cmd.Parameters.AddWithValue("@CreatedBy", AgentId);
-                    cmd.Parameters.AddWithValue("@negativeitems", credit[i].negativeitems);
+                    cmd.Parameters.AddWithValue("@negativeitems", (credit[i].PaymentStatus == "Coll/Chargeoff" ? 1 : credit[i].negativeitems));
                     cmd.Parameters.AddWithValue("@RoundType", round);
                     cmd.Parameters.AddWithValue("@AccountType", credit[i].AccountType);
                     cmd.Parameters.AddWithValue("@AccountTypeDetails", credit[i].AccountTypeDetail);
@@ -821,8 +821,9 @@ namespace CreditReversal.DAL
                     //}
                     //else
                     //{
-                    cmd.Parameters.AddWithValue("@Status", credit[i].PaymentStatus);                  //  }
-
+                    cmd.Parameters.AddWithValue("@Status", credit[i].PaymentStatus);
+                    //  }
+                    //
 
                     utils.ExecuteInsertCommand(cmd, true);                    status = true;                }
             }            catch (Exception ex) {                 ex.insertTrace("");             }            return status;        }

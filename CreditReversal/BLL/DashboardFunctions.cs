@@ -809,7 +809,7 @@ namespace CreditReversal.BLL
                             ah.PaymentStatus = strTRANS1[9] + "~" + strTRANS1[12] + "~" + strTRANS1[13];
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strTRANS1[10] : challengestatus;                            
                             ah.PastDue = strTRANS1[11];
-                            ah.negativeitems = strTRANS1[12].StringToInt(0);
+                            ah.negativeitems = strTRANS1[9] == "Coll/Chargeoff" ? 1  : strTRANS1[12].StringToInt(0);
                             achtransunion.Add(ah);
 
                         }
@@ -841,7 +841,7 @@ namespace CreditReversal.BLL
                             ah.PaymentStatus = strEQUIFAX1[9] + "~" + strEQUIFAX1[12] + "~" + strEQUIFAX1[13];
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEQUIFAX1[10] : challengestatus;
                             ah.PastDue = strEQUIFAX1[11];
-                            ah.negativeitems = strEQUIFAX1[12].StringToInt(0);
+                            ah.negativeitems = strEQUIFAX1[9] == "Coll/Chargeoff" ? 1 : strEQUIFAX1[12].StringToInt(0);
                             achquifax.Add(ah);
 
                         }
@@ -875,7 +875,7 @@ namespace CreditReversal.BLL
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEXPERIAN1[10] : challengestatus;
                             ah.PaymentStatus = strEXPERIAN1[9] + "~" + strEXPERIAN1[12] + "~" + strEXPERIAN1[13];
                             ah.PastDue = strEXPERIAN1[11];
-                            ah.negativeitems = strEXPERIAN1[12].StringToInt(0);
+                            ah.negativeitems = strEXPERIAN1[9] == "Coll/Chargeoff" ? 1 : strEXPERIAN1[12].StringToInt(0);
                             achexperian.Add(ah);
                         }
                     }                    for (int x = 0; x < dt1.Rows.Count; x++)                    {                        string accountid = dt1.Rows[x]["accountId"].ToString();

@@ -50,6 +50,7 @@ namespace CreditReversal.Controllers
         // GET: Home
         public ActionResult Index()
         {
+            //string str = common.Encrypt("rH8s~B-^}@jHp+4<");
             return View();
         }
         [HttpPost]

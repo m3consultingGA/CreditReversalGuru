@@ -1130,7 +1130,7 @@ stringWriter
                 //string username = "georgecole622@msn.com";
                 //string Password = "211665gc";
                 //string SecurityAnswer = "4344";
-                string username = IdentityIQInfo.UserName;                string Password = IdentityIQInfo.Password;                string SecurityAnswer = IdentityIQInfo.Answer;                CreditReport cr = sb.pullcredit(username, Password, SecurityAnswer);
+                string username = IdentityIQInfo.UserName;                string Password = IdentityIQInfo.Password;                string SecurityAnswer = IdentityIQInfo.Answer;                CreditReport cr = sb.pullcredit(username, Password, SecurityAnswer,IdentityIQInfo.ClientId.ToString());
 
 
                 List<MonthlyPayStatus> monthlyPayStatusEQ = new List<MonthlyPayStatus>();
@@ -1158,8 +1158,17 @@ stringWriter
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         ah.Agency = ach.atbureau;
-                        ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
-                        ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+                        try
+                        {
+                            ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
+                            ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+                        }
+                        catch (Exception)
+                        {
+                            ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
+                            ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
+                        }
+                        
                         //Date formating
                         date = ach.atdateOpened;
                         strr = date.Split('-');
@@ -1215,8 +1224,16 @@ stringWriter
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         ah.Agency = ach.atbureau;
-                        ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
-                        ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+                        try
+                        {
+                            ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
+                            ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+                        }
+                        catch (Exception)
+                        {
+                            ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
+                            ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
+                        }
                         //Date formating
                         date = ach.atdateOpened;
                         strr = date.Split('-');
@@ -1272,8 +1289,16 @@ stringWriter
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         ah.Agency = ach.atbureau;
-                        ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
-                        ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+                        try
+                        {
+                            ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
+                            ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+                        }
+                        catch (Exception)
+                        {
+                            ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
+                            ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
+                        }
                         //Date formating
                         date = ach.atdateOpened;
                         strr = date.Split('-');

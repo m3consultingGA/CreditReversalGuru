@@ -1,0 +1,156 @@
+﻿
+@{
+
+    ViewBag.Title = "Manage Agent";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+
+<link href="~/Content/css/loader.css" rel="stylesheet" />
+<div class="page-header">
+    @*<h3 class="page-title">Letter </h3>*@
+    <ol class="breadcrumb pull-right">
+        <li><a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+        <li class="breadcrumb-item active">Create Agent </li>
+    </ol>
+</div>
+
+
+
+@*<ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+        <li class="breadcrumb-item active">Create Agent </li>
+    </ol>
+    <title>Manage Agent</title>*@
+
+<div style="padding-top:20px;">
+    <div class="portlet portlet-boxed">
+        <div class="portlet-header">
+            <h4 class="portlet-title">
+                Manage Agent
+            </h4>
+
+          
+        </div> <!-- /.portlet-header -->
+        <div class="portlet-body">
+            <div class="row" style="padding:20px 10px 10px 20px;">
+                <div class="row">
+
+                    <div class="pull-right">
+                        <a href="/Agent/AddNewAgent" class="btn btn-secondary btn-sm">Create Agent</a>
+                    </div>
+                </div>
+                <div class="row m-2 p-2">
+                    <div class="table-responsive">
+                        <table id="tblCustomers" class="table table-bordered">
+                            <thead>
+                                <tr class="trTable">
+                                    <th>BusinessName</th>
+                                    <th>Agent Name</th>
+                                    <th>FedTaxIdentityNo</th>
+                                    <th>TypeOfComp</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var i in ViewBag.agent)
+                                {
+                                    <tr>
+
+                                        <td>@i.BusinessName</td>
+                                        <td>@i.UserName</td>
+                                        <td>@i.FedTaxIdentityNo</td>
+                                        <td>@i.CompanyType</td>
+                                        <td>
+                                            <a class="btn btn-secondary" href="/Agent/AddNewAgent?Id=@i.AgentId&Mode=Edit"><i class="fa fa-pencil"></i></a>
+                                            @if (i.checkStaffExists == true)
+                                            {
+                                                <button class="btn btn-danger" disabled title="Staff exits" style="cursor:pointer"><i class="fa fa-close"></i></button>
+                                            }
+                                            else if (i.checkClientExists == true)
+                                            {
+                                                <button class="btn btn-danger" disabled title="Client  exits" style="cursor:pointer"><i class="fa fa-close"></i></button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-danger" onclick="btnDelete('@i.AgentId')"><i class="fa fa-close"></i></button>
+                                            }
+
+                                            @if (i.TypeOfComp == "SOLO PROP")
+                                            {
+                                                <a class="btn btn-secondary" href="/Client/Index?Id=@i.AgentId">Client</a>
+                                            }
+
+
+                                        </td>
+                                    </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <script>
+
+        $(document).ready(function () {
+            $('#tblCustomers').DataTable({
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+            });
+
+        });
+        function btnDelete(AgentId) {
+            debugger;
+
+            var agentId = AgentId;
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want Delete this Staff !",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(function (isConfirm) {
+
+                if (isConfirm.value == true) {
+                    debugger;
+                    $.ajax({
+                        type: "POST",
+                        url: "/Agent/DeleteAgent",
+                        data: { 'agentId': agentId },
+                        cache: false,
+                        dataType: "json",
+                        success: function (data) {
+                            debugger;
+                            if (data == true) {
+
+                                Swal.fire({
+                                    title: "Success!",
+                                    text: "successfully Deleted!",
+                                    type: 'success',
+
+                                }).then(function () {
+                                    window.location.href = "/Agent/Index";
+                                })
+                            }
+                        }
+                    });
+
+
+                }
+            })
+        }
+    </script>
+
+
+
+
