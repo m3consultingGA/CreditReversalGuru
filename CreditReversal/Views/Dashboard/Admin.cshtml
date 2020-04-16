@@ -87,7 +87,7 @@ else if (role == "investor")
                                         foreach (var items in ViewBag.GetBillingDates)
                                         {
                                             <tr>
-                                                <td>@items.BusinessName</td>
+                                                <td><a href="/Dashboard/AgentClients?agent=@items.AgentId&name=@items.PrimaryUser">@items.BusinessName</a> </td>
                                                 <td>@items.TypeOfComp</td>
                                                 <td>@items.NumberofStaff</td>
                                                 <td>@items.SCreatedDate</td>

@@ -3232,6 +3232,7 @@
     <Content Include="Views\Admin\Investors.cshtml" />
     <Content Include="Views\Admin\AccountType.cshtml" />
     <Content Include="Views\Admin\ChallengeOrders.cshtml" />
+    <Content Include="Views\Dashboard\AgentClients.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
