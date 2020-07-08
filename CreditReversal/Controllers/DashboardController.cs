@@ -76,6 +76,19 @@ namespace CreditReversal.Controllers
             ViewBag.GetBillingDates = functions.GetAgentBillings();
             return View();
         }
+
+        public ActionResult AgentClients()
+        {
+            ViewBag.Dasboard = sessionData.getDasboard();
+            string agent = string.Empty;
+            ClientData clientData = new ClientData();
+            if(Request["agent"] != null)
+            {
+                agent = Request["agent"].ToString();
+            }
+            ViewBag.GetClients= clientData.GetClientsByAgent(agent);
+            return View();
+        }
         [Route("staff")]
         public ActionResult AgentStaff()
         {

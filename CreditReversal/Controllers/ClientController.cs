@@ -1154,7 +1154,7 @@ stringWriter
                     {
                         DateTime aDate = DateTime.Now;
                         AccountHistory ah = new AccountHistory();
-                        ah.Bank = ach.atcreditorName;
+                        ah.Bank = ach.atcreditorName.Replace("&", " And ");
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         ah.Agency = ach.atbureau;
@@ -1220,7 +1220,7 @@ stringWriter
                     {
                         DateTime aDate = DateTime.Now;
                         AccountHistory ah = new AccountHistory();
-                        ah.Bank = ach.atcreditorName;
+                        ah.Bank = ach.atcreditorName.Replace("&", " And ");
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         ah.Agency = ach.atbureau;
@@ -1285,7 +1285,7 @@ stringWriter
                     {
                         DateTime aDate = DateTime.Now;
                         AccountHistory ah = new AccountHistory();
-                        ah.Bank = ach.atcreditorName;
+                        ah.Bank = ach.atcreditorName.Replace("&", " And ");
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         ah.Agency = ach.atbureau;
