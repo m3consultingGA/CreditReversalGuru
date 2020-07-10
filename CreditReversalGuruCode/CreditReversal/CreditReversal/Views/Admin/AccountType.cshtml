@@ -1,0 +1,298 @@
+﻿
+@{
+    ViewBag.Title = "Account Type";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+
+
+<div class="page-header">  
+    <ol class="breadcrumb pull-right">
+        <li><a href="@ViewBag.Dashboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+        <li active">Add AccountType </li>
+    </ol>
+</div>
+
+<div style="padding-top:20px;">
+    <div class="portlet portlet-boxed">
+        <div class="portlet-header">
+            <h4 class="portlet-title">
+                Add AccountType
+            </h4>
+        </div> <!-- /.portlet-header -->
+        <div class="portlet-body">
+            <div class="row" style="padding:20px 10px 10px 20px;">
+
+                <div class="col-md-6">
+                    <form>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label for="AccountType">Account Type<span class="text-danger">*</span></label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" name="AccountType" id="AccountType" required>
+                                    <input type="hidden" name="AccTypeId" id="AccTypeId" />
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label for="AccountType">Account Details<span class="text-danger">*</span></label>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" name="AccountTypeDetails" id="AccountTypeDetails" required>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group" hidden>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="checkbox-inline">
+                                        <input type="checkbox" name="Status" id="Status" checked="checked" /> <span style="font-weight:600">Is Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" style="padding-bottom:20px;">
+                            <div class="col-md-3"></div>
+                            <div class="col-md-8">
+                                <button class="btn btn-secondary" id="btnAdd" type="submit">Submit</button>
+                                <button class="btn btn-secondary" id="btnUpdate" type="submit">Update</button>
+                                <a href="/Dashboard/Admin" class="btn btn-danger"> Cancel</a>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6">
+
+                    <div class="table-responsive">
+                        <table id="tblACtypes" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Account Type</th>
+                                    <th>AccountType Details</th>
+                                    @*<th>Is Active</th>*@
+                                    <th>Actions</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var atypes in ViewBag.acctTypes)
+                                {
+                                    <tr>
+                                        <td>@atypes.AccountType </td>
+                                        <td>@atypes.AccountTypeDetails</td>
+                                        @*<td>@atypes.Status</td>*@
+
+                                        <td>
+                                            @*<button class="btn btn-secondary" onclick="Edit(@atypes.AccTypeId)"><i class="fa fa-pencil"></i></button>*@
+                                            <a href="/Admin/AccountType?Id=@atypes.AccTypeId" class="btn btn-secondary fa fa-pencil"></a>
+                                            <button class="btn btn-danger" onclick="btndelete(@atypes.AccTypeId)"><i class="fa fa-close"></i></button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(document).ready(function () {
+
+        $("#tblACtypes").DataTable({
+            "pagingType": "simple",
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+        });
+        $("#btnUpdate").hide();
+
+        //Edit
+        var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = window.location.search.substring(1),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
+            }
+        };
+
+        var Id = getUrlParameter('Id');
+
+        if (Id != undefined) {
+            $.ajax({
+                url: "/Admin/AccountTypeEditById",
+                method: "POST",
+                dataType: "json",
+                data: { ATId: Id },
+                success: function (data) {
+                    $("#btnAdd").hide();
+                    $("#btnUpdate").show();
+
+                    $("#AccTypeId").val(data[0].AccTypeId);
+                    $("#AccountType").val(data[0].AccountType);
+                    $("#AccountTypeDetails").val(data[0].AccountTypeDetails);
+
+                    if (data[0].Status == "True") {
+                        $('#Status').prop('checked', true);
+                    }
+                    else {
+                        $('#Status').prop('checked', false);
+                    }
+                }
+            });
+        }
+
+        //end
+
+
+
+
+
+        $("#btnAdd").click(function () {
+
+            var IsPr;
+            var check = $('#Status:checked').val();
+
+            if (check != undefined) {
+                IsPr = true;
+            } else {
+                IsPr = false;
+            }
+
+
+
+            var AccountType = $("#AccountType").val();
+            var AccountTypeDetails = $("#AccountTypeDetails").val();
+
+            if (AccountType != "" && AccountTypeDetails != "") {
+                var Cha = {
+                    AccountType: $("#AccountType").val(),
+                    AccountTypeDetails: $("#AccountTypeDetails").val(),
+                    Status: IsPr,
+                }
+                $.ajax({
+                    method: "POST",
+                    url: "/Admin/AddAccountType",
+                    data: { ACTypes: Cha },
+                    dataType: "json",
+                    success: function (data) {
+
+                        if (data == true) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: "AccountType added successfully!",
+                                type: 'success',
+
+                            }).then(function () {
+                                window.location.href = "/Admin/AccountType";
+                            })
+
+                        }
+
+                    }
+
+                });
+            }
+        });
+
+        $("#btnUpdate").click(function () {
+
+            var IsStatus;
+            var check = $('#Status:checked').val();
+
+            if (check != undefined) {
+                IsStatus = true;
+            } else {
+                IsStatus = false;
+            }
+            var AccountType = $("#AccountType").val();
+            var AccountTypeDetails = $("#AccountTypeDetails").val();
+
+            if (AccountType != "" && AccountTypeDetails != "") {
+                var Cha = {
+                    AccountType: $("#AccountType").val(),
+                    AccountTypeDetails: $("#AccountTypeDetails").val(),
+                    AccTypeId: $("#AccTypeId").val(),
+                }
+
+                $.ajax({
+                    method: "POST",
+                    url: "/Admin/UpdateAccountTypes",
+                    data: { objATypes: Cha },
+                    dataType: "json",
+                    success: function (data) {
+                        if (data == 1) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: "Account Type updated successfully!",
+                                type: 'success',
+
+                            }).then(function () {
+                                window.location.href = "/Admin/AccountType";
+                            })
+                        }
+                    }
+                });
+            }
+        });
+
+        //Delete
+
+        function btndelete(AccTypeId) {
+            debugger
+            var ATId = AccTypeId;
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You want to delete this AccountType!",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(function (isConfirm) {
+
+                if (isConfirm.value == true) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Admin/DeleteAccountTypesById",
+                        data: { 'AccTypeId': ATId },
+                        cache: false,
+                        dataType: "json",
+                        success: function (data) {
+                            if (data == 1) {
+                                Swal.fire({
+                                    title: "Success!",
+                                    text: "Account Type deleted successfully!",
+                                    type: 'success',
+
+                                }).then(function () {
+                                    window.location.href = "/Admin/AccountType";
+                                })
+                            }
+                        }
+                    });
+                }
+            })
+        }
+    });
+</script>

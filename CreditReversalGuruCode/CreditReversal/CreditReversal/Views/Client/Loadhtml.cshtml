@@ -1,0 +1,225 @@
+﻿@model IEnumerable<CreditReversal.Models.AccountHistory>
+
+@{
+    ViewBag.Title = "Loadhtml";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+
+@*<h2>Loadhtml</h2>*@
+
+
+
+<div class="container">
+    <div class="panel panel-primary">
+        <div class="panel-heading ">
+            <h4 style="color:white">Account History</h4>
+        </div>
+        <div class="panel-body" style="overflow-x:scroll;max-height:500px;">
+            <div class="table-responsive">
+                <table id="tblAccHistory"  class="table table-bordered" >
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Agency)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Bank)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Account)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.AccountType)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.AccountTypeDetail)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.BureauCode)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.AccountStatus)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.MonthlyPayment)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.DateOpened)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Balance)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.NoofMonths_terms)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.HighCredit)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.CreditLimit)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.PastDue)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.PaymentStatus)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.LastReported)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Comments)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Accounttransferredorsold)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.DateLastActive)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.DateofLastPayment)
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Agency)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Bank)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Account)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AccountType)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AccountTypeDetail)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.BureauCode)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.AccountStatus)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.MonthlyPayment)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DateOpened)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Balance)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.NoofMonths_terms)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.HighCredit)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CreditLimit)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PastDue)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PaymentStatus)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.LastReported)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Comments)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Accounttransferredorsold)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DateLastActive)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DateofLastPayment)
+                                </td>
+
+
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="panel panel-primary">
+        <div class="panel-heading ">
+            <h4 style="color:white">Inquiries</h4>
+        </div>
+        <div class="panel-body" style="overflow-x:scroll;">
+            <div class="table-responsive">
+                <table id="tblInquires" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="tbheader" width="15%">
+                                Credit Bureau
+                            </th>
+                            <th class="tbheader" width="30%">
+                                Creditor Name
+                            </th>
+                            <th class="tbheader" width="30%">
+                                Type of Business
+                            </th>
+                            <th class="tbheader" width="15%">
+                                Date of inquiry
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.inquires != null)
+                        {
+                            foreach (var item in ViewBag.inquires)
+                            {
+                        <tr>
+                            <td>
+                                @item.CreditBureau
+                            </td>
+                            <td>
+                                @item.CreditorName
+                            </td>
+                            <td>
+                                @item.TypeofBusiness
+                            </td>
+                            <td>
+                                @item.Dateofinquiry
+                            </td>
+                        </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    $(document).ready(function () {
+        $('#tblAccHistory').DataTable({
+            "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+        });
+        $('#tblInquires').DataTable({
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+        });
+    });   
+
+    
+</script>
