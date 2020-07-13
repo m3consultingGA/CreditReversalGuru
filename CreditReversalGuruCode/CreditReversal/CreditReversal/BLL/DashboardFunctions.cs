@@ -414,20 +414,22 @@ namespace CreditReversal.BLL
         public List<string> getHeadings()
         {
             List<string> Headings = new List<string>();
-            Headings.Add("Merchant Name/Account");
-            Headings.Add("Account #");
-            Headings.Add("Account Type");
-            Headings.Add("Account Type Details");
-            Headings.Add("Date Opened");
-            Headings.Add("High Credit");
-            Headings.Add("Balance");
-            Headings.Add("Monthly Payment");
-            Headings.Add("Last Reported");
-            Headings.Add("Payment Status");
-            Headings.Add("Challenge");
-            Headings.Add("CreditreportId");
-            Headings.Add("Negativeitems");
-            Headings.Add("Negativeitems");
+            Headings.Add("Merchant Name/Account");  //0
+            Headings.Add("Account #"); //1
+            Headings.Add("Account Type"); //2
+            Headings.Add("Account Type Details"); //3
+            Headings.Add("Date Opened"); //4
+            Headings.Add("High Credit"); //5
+            Headings.Add("Balance"); //6
+            Headings.Add("Monthly Payment"); //6
+            Headings.Add("Last Reported"); //7
+            Headings.Add("LoanStatus"); //8
+            Headings.Add("PastDueDays"); //9
+            Headings.Add("Payment Status"); //10
+            Headings.Add("Challenge"); //11
+            Headings.Add("CreditreportId"); //12
+            Headings.Add("Negativeitems"); //13
+            //Headings.Add("Negativeitems");
             return Headings;
         }
 
@@ -1059,7 +1061,7 @@ namespace CreditReversal.BLL
             { string msg = ex.Message; res = ""; }
             return res;
         }
-        public List<CreditItems> GetCreditReportChallengesAgent(int id, string agency = null, string role = "")
+        public List<CreditItems> GetCreditReportChallengesAgentByRAJU(int id, string agency = null, string role = "")
         {
 
             List<CreditItems> CreditItems = new List<CreditItems>();
@@ -1104,9 +1106,11 @@ namespace CreditReversal.BLL
 
 
                 sql = "SELECT ( STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ "
-                    + " CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
+                    + " CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+'~'+'~'+Status +'~'+  "
+                    + " Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
+                    +" +'~'+ ISNULL(LoanStatus,'')+'~'+Convert(varchar(10),ISNULL(PastDueDays,'')) "
                     + " from CreditReportItemChallenges where  AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) "
-                    + "+'~'+ Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Equifax' "
+                    + "+'~'+ Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) + '~'+ " + payhistory + " and a.Agency='Equifax' "
                     + " group by PayHistoryId, PHStatus order by PayHistoryId asc),''))" +
                       " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EQUIFAX' and us.sno=" + sno
                       + " and CR.ClientId='" + id + "'" + addnagitiveitems +
@@ -1119,8 +1123,10 @@ namespace CreditReversal.BLL
                       " FOR XML PATH('')), 1, 1, '')) " +
                       " as 'EQUIFAX' ," +
                       " STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
-                      + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
-                      + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                      + " MonthlyPayment +'~'+ LastReported +'~'+ Status +'~'+ "
+                      +" Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
+                      + " +'~'+ ISNULL(LoanStatus,'')+'~'+Convert(varchar(10),ISNULL(PastDueDays,'')) "
+                      + " from CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
                       + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by  "
                       + " PayHistoryId, PHStatus order by PayHistoryId asc),''))" +
                       " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EXPERIAN' and us.sno=" + sno
@@ -1135,8 +1141,10 @@ namespace CreditReversal.BLL
                       " FOR XML PATH('')), 1, 1, '')" +
                       " as 'EXPERIAN'," +
                       " (SELECT STUFF((SELECT '^ ' + (MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
-                      + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
-                      + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                      + " MonthlyPayment +'~'+ LastReported+'~'+ Status +'~'+   "
+                      +" Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText)  "
+                      + " +'~'+ ISNULL(LoanStatus,'')+'~'+Convert(varchar(10),ISNULL(PastDueDays,'')) "
+                      + "  from CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
                       + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='TransUnion' group by "
                       + " PayHistoryId, PHStatus order by PayHistoryId asc),''))" +
                       " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='TRANSUNION' and us.sno=" + sno
@@ -1187,19 +1195,23 @@ namespace CreditReversal.BLL
                             ah.Balance = strTRANS1[6];
                             ah.MonthlyPayment = strTRANS1[7];
                             ah.LastReported = strTRANS1[8];
+                            ah.LoanStatus = strTRANS1[9];
+                            ah.PastDueDays = strTRANS1[10].StringToInt(0) ==0 ? "" : strTRANS1[10];
                             string challengestatus = "";
-                            if (strTRANS1[10] == "0" || strTRANS1[10].Trim() == "")
+                            if (strTRANS1[12] == "0" || strTRANS1[12].Trim() == "")
                             {
                                 challengestatus = getChallengeTextPrev(id, strTRANS1[1], "TRANSUNION", sno);
                             }
                             else
                             {
-                                challengestatus = strTRANS1[10];
+                                challengestatus = strTRANS1[12];
                             }
-                            ah.PaymentStatus = strTRANS1[9] + "~" + strTRANS1[12] + "~" + strTRANS1[13];
-                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strTRANS1[10] : challengestatus;                            
-                            ah.PastDue = strTRANS1[11];
-                            ah.negativeitems = strTRANS1[9] == "Coll/Chargeoff" ? 1  : strTRANS1[12].StringToInt(0);
+                            ah.PaymentStatus = strTRANS1[11] + "~" + strTRANS1[14] + "~" + strTRANS1[15];
+                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strTRANS1[12] : challengestatus;                            
+                            ah.PastDue = strTRANS1[13];
+                            
+                            ah.negativeitems = strTRANS1[11] == "Coll/Chargeoff" ? 1  : strTRANS1[14].StringToInt(0);
+                           
                             achtransunion.Add(ah);
 
                         }
@@ -1219,19 +1231,22 @@ namespace CreditReversal.BLL
                             ah.Balance = strEQUIFAX1[6];
                             ah.MonthlyPayment = strEQUIFAX1[7];
                             ah.LastReported = strEQUIFAX1[8];
+                            ah.LoanStatus = strEQUIFAX1[9];
+                            ah.PastDueDays = strEQUIFAX1[10].StringToInt(0) == 0 ? "" : strEQUIFAX1[10];
                             string challengestatus = "";
-                            if (strEQUIFAX1[10] == "0" || strEQUIFAX1[10].Trim() == "")
+                            if (strEQUIFAX1[12] == "0" || strEQUIFAX1[12].Trim() == "")
                             {
                                 challengestatus = getChallengeTextPrev(id, strEQUIFAX1[1], "EQUIFAX", sno);
                             }
                             else
                             {
-                                challengestatus = strEQUIFAX1[10];
+                                challengestatus = strEQUIFAX1[12];
                             }
-                            ah.PaymentStatus = strEQUIFAX1[9] + "~" + strEQUIFAX1[12] + "~" + strEQUIFAX1[13];
-                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEQUIFAX1[10] : challengestatus;
-                            ah.PastDue = strEQUIFAX1[11];
-                            ah.negativeitems = strEQUIFAX1[9] == "Coll/Chargeoff" ? 1 : strEQUIFAX1[12].StringToInt(0);
+                            ah.PaymentStatus = strEQUIFAX1[11] + "~" + strEQUIFAX1[14] + "~" + strEQUIFAX1[15];
+                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEQUIFAX1[12] : challengestatus;
+                            ah.PastDue = strEQUIFAX1[13];
+                            ah.negativeitems = strEQUIFAX1[11] == "Coll/Chargeoff" ? 1 : strEQUIFAX1[14].StringToInt(0);
+                           
                             achquifax.Add(ah);
 
                         }
@@ -1253,19 +1268,22 @@ namespace CreditReversal.BLL
                             ah.Balance = strEXPERIAN1[6];
                             ah.MonthlyPayment = strEXPERIAN1[7];
                             ah.LastReported = strEXPERIAN1[8];
+                            ah.LoanStatus = strEXPERIAN1[9];
+                            ah.PastDueDays = strEXPERIAN1[10].StringToInt(0) == 0 ? "" : strEXPERIAN1[10];
                             string challengestatus = "";
-                            if (strEXPERIAN1[10] == "0" || strEXPERIAN1[10].Trim() == "")
+                            if (strEXPERIAN1[12] == "0" || strEXPERIAN1[12].Trim() == "")
                             {
                                 challengestatus = getChallengeTextPrev(id, strEXPERIAN1[1], "EXPERIAN", sno);
                             }
                             else
                             {
-                                challengestatus = strEXPERIAN1[10];
+                                challengestatus = strEXPERIAN1[12];
                             }
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEXPERIAN1[10] : challengestatus;
-                            ah.PaymentStatus = strEXPERIAN1[9] + "~" + strEXPERIAN1[12] + "~" + strEXPERIAN1[13];
-                            ah.PastDue = strEXPERIAN1[11];
-                            ah.negativeitems = strEXPERIAN1[9] == "Coll/Chargeoff" ? 1 : strEXPERIAN1[12].StringToInt(0);
+                            ah.PaymentStatus = strEXPERIAN1[11] + "~" + strEXPERIAN1[14] + "~" + strEXPERIAN1[15];
+                            ah.PastDue = strEXPERIAN1[13];
+                            ah.negativeitems = strEXPERIAN1[11] == "Coll/Chargeoff" ? 1 : strEXPERIAN1[14].StringToInt(0);
+                          
                             achexperian.Add(ah);
                         }
                     }
@@ -1273,7 +1291,7 @@ namespace CreditReversal.BLL
                     for (int x = 0; x < dt1.Rows.Count; x++)
                     {
                         string accountid = dt1.Rows[x]["accountId"].ToString();
-                        for (int i = 0; i < 12; i++)
+                        for (int i = 0; i < 13; i++)
                         {
                             CreditItems CreditItem = new CreditItems();
                             CreditItem.Heading = getHeadings()[i];
@@ -1378,7 +1396,6 @@ namespace CreditReversal.BLL
                                     CreditItem.EXPERIAN = "-";
                                 }
                             }
-
                             if (CreditItem.Heading == "Account Type Details")
                             {
 
@@ -1412,9 +1429,772 @@ namespace CreditReversal.BLL
                                     CreditItem.EXPERIAN = "-";
                                 }
                             }
-                            //
+                            if (CreditItem.Heading == "Date Opened")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.DateOpened;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.DateOpened;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.DateOpened;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "High Credit")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.HighCredit;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.HighCredit;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.HighCredit;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "Balance")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.Balance;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.Balance;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.Balance;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "Monthly Payment")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.MonthlyPayment;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.MonthlyPayment;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.MonthlyPayment;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "Last Reported")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.LastReported;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.LastReported;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.LastReported;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "LoanStatus")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.LoanStatus;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.LoanStatus;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.LoanStatus;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "PastDueDays")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.PastDueDays.ToString();
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.PastDueDays.ToString();
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.PastDueDays.ToString();
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "Payment Status")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.PaymentStatus;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.PaymentStatus;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.PaymentStatus;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "Challenge")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.Comments;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.Comments;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = "0";
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "CreditreportId")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.PastDue;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.PastDue;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.PastDue;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "Negativeitems")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.PastDue;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.PastDue;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.PastDue;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.EXPERIAN == "-" && CreditItem.TRANSUNION == "-" && CreditItem.EQUIFAX == "-")
+                            {
+
+                            }
+                            else
+                            {
+                                CreditItems.Add(CreditItem);
+                            }
+
+                        }
+                    }
+                }
+            }
+            catch (Exception ex) { 
+                ex.insertTrace("");
+            }
+
+            return CreditItems;
+        }
+        public string SetStatusForMedical(string AccountType,string AccountTypeDetails,string status="", string comments = "")
+        {
+            string res = string.Empty;
+            try
+            {
+                if(AccountType.ToUpper().Contains("MEDICAL") || AccountTypeDetails.ToUpper().Contains("MEDICAL")
+                    || AccountType.ToUpper().Contains("HEALTH") || AccountTypeDetails.ToUpper().Contains("HEALTH") 
+                    || comments.ToUpper().Contains("HEALTH") || comments.ToUpper().Contains("HEALTH")
+                    || comments.ToUpper().Contains("MEDICAL") || comments.ToUpper().Contains("MEDICAL"))
+                {
+                    res = "Outdated 2+ years.";
+                }
+                else
+                {
+                    res = status;
+                }
+            }
+            catch (Exception ex)
+            {}
+            return res;
+        }
+        public List<CreditItems> GetCreditReportChallengesAgent(int id, string agency = null, string role = "")
+        {
+
+            List<CreditItems> CreditItems = new List<CreditItems>();
+            string sql = "";
+            DataTable dt;
+            DataTable dt1;
 
 
+
+            try
+            {
+                int sno = 0;
+                sql = "select top 1 sno from CreditReportItems where AccountId !='-' and "
+               + " CredReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ")  order by CredRepItemsId desc";
+                try
+                {
+                    sno = utilities.ExecuteScalar(sql, true).ConvertObjectToIntIfNotNull();
+                }
+                catch (Exception)
+                { }
+
+
+                string addnagitiveitems = "", payhistory = "";
+                //payhistory = " isnull((SELECT ' 30 Days Late in ' + convert(varchar,max(convert(datetime,a.phdate)),101)   as pdate FROM PaymentHistory a, "
+                //    + " CreditReportItems b, CreditReport c where a.AccountNo = b.AccountId and a.Agency = b.Agency and a.Merchant = b.MerchantName "
+                //    + " and b.CredReportId = c.CreditReportId and a.ClientId = c.ClientId and a.RoundType = c.RoundType and a.Agency = c.AgencyName "
+                //    + " and(PHStatus != 'C' AND PHStatus != 'U' AND PHStatus != ' ' and PHStatus != 7) and a.AccountNo = US.AccountId  "; 
+
+                payhistory = " isnull((SELECT top 1 convert(varchar,(PHStatus*30)) +' Days late in ' + "
+                    + " convert(varchar,FORMAT(max(convert(datetime,a.phdate)), 'MMM-yyyy'),101)   as pdate "
+                    + " FROM PaymentHistory a, CreditReportItems b, CreditReport c where a.AccountNo = b.AccountId and b.sno=" + sno
+                    + " and a.Agency = b.Agency and a.Merchant = b.MerchantName "
+                   + " and b.CredReportId = c.CreditReportId and a.ClientId = c.ClientId and a.RoundType = c.RoundType and a.Agency = c.AgencyName "
+                   + " and(PHStatus != 'C' AND PHStatus != 'U' AND PHStatus != ' ' and PHStatus != 7 and PHStatus != 9) and a.AccountNo = US.AccountId  ";
+                if (role != "client")
+                {
+                    addnagitiveitems = "and isnull(US.negativeitems,0) > 0 ";
+                }
+                else
+                {
+                    addnagitiveitems = "";
+                }
+
+
+                sql = "SELECT ( STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ "
+                    + " CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
+                    + " from CreditReportItemChallenges where  AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) "
+                    + "+'~'+ Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Equifax' "
+                    + " group by PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
+                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EQUIFAX' and us.sno=" + sno
+                      + " and CR.ClientId='" + id + "'" + addnagitiveitems +
+
+                //if (role== "agentadmin") {
+                //  sql += "  and US.negativeitems > 0 "+
+                //}
+
+                " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  from CreditReport where ClientId = '" + id + "')" +
+                      " FOR XML PATH('')), 1, 1, '')) " +
+                      " as 'EQUIFAX' ," +
+                      " STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
+                      + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
+                      + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                      + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by  "
+                      + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
+                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EXPERIAN' and us.sno=" + sno
+                      + " and CR.ClientId='" + id + "'" + addnagitiveitems +
+                      //if (role== "agentadmin") {
+                      //  sql += "  and US.negativeitems > 0 "+
+                      //}
+
+
+                      " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  "
+                      + " from CreditReport where ClientId = '" + id + "')" +
+                      " FOR XML PATH('')), 1, 1, '')" +
+                      " as 'EXPERIAN'," +
+                      " (SELECT STUFF((SELECT '^ ' + (MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
+                      + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
+                      + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                      + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='TransUnion' group by "
+                      + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
+                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='TRANSUNION' and us.sno=" + sno
+                      + " and CR.ClientId='" + id + "'" + addnagitiveitems +
+                      //"  and US.negativeitems > 0 " +
+                      " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  "
+                      + " from CreditReport where ClientId = '" + id + "')" +
+                      " FOR XML PATH('')), 1, 1, ''))" +
+                      " as 'TRANSUNION'";
+
+                dt = utilities.GetDataTable(sql);
+                sql = "";
+                sql = "select distinct accountId from CreditReportItems where AccountId !='-' and "
+                + " CredReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ") and sno=" + sno;
+                dt1 = utilities.GetDataTable(sql);
+
+
+                string value = "";
+                for (int r = 0; r < dt.Rows.Count; r++)
+                {
+
+                    string EQUIFAX = dt.Rows[r]["EQUIFAX"].ToString();
+                    string TRANSUNION = dt.Rows[r]["TRANSUNION"].ToString();
+                    string EXPERIAN = dt.Rows[r]["EXPERIAN"].ToString();
+                    string[] strTRANSUNION = TRANSUNION.Split('^');
+                    string newstrTRANSUNION = strTRANSUNION.ToString();
+
+                    string[] strEQUIFAX = EQUIFAX.Split('^');
+                    string[] strEXPERIAN = EXPERIAN.Split('^');
+
+                    List<AccountHistory> achquifax = new List<AccountHistory>();
+                    List<AccountHistory> achexperian = new List<AccountHistory>();
+                    List<AccountHistory> achtransunion = new List<AccountHistory>();
+
+                    if (TRANSUNION != "")
+                    {
+
+                        for (int k = 0; k < strTRANSUNION.Length; k++)
+                        {
+                            string[] strTRANS1 = strTRANSUNION[k].Split('~');
+                            AccountHistory ah = new AccountHistory();
+                            ah.Bank = strTRANS1[0];
+                            ah.Account = strTRANS1[1];
+                            ah.AccountType = strTRANS1[2];
+                            ah.AccountTypeDetail = strTRANS1[3];
+                            ah.DateOpened = strTRANS1[4];
+                            ah.HighCredit = strTRANS1[5];
+                            ah.Balance = strTRANS1[6];
+                            ah.MonthlyPayment = strTRANS1[7];
+                            ah.LastReported = strTRANS1[8];
+                            string challengestatus = "";
+                            if (strTRANS1[10] == "0" || strTRANS1[10].Trim() == "")
+                            {
+                                challengestatus = getChallengeTextPrev(id, strTRANS1[1], "TRANSUNION", sno);
+                            }
+                            else
+                            {
+                                challengestatus = strTRANS1[10];
+                            }
+                            string pstatus = strTRANS1[9] + "~" + strTRANS1[12] + "~" + strTRANS1[13];
+                            ah.PaymentStatus = SetStatusForMedical(strTRANS1[2], strTRANS1[3], pstatus);
+                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strTRANS1[10] : challengestatus;
+                            ah.PastDue = strTRANS1[11];
+                            ah.negativeitems = strTRANS1[9] == "Coll/Chargeoff" ? 1 : strTRANS1[12].StringToInt(0);
+                            ah.LoanStatus = "";
+                            ah.PastDueDays = "";
+                            achtransunion.Add(ah);
+
+                        }
+                    }
+                    if (EQUIFAX != "")
+                    {
+                        for (int k = 0; k < strEQUIFAX.Length; k++)
+                        {
+                            string[] strEQUIFAX1 = strEQUIFAX[k].Split('~');
+                            AccountHistory ah = new AccountHistory();
+                            ah.Bank = strEQUIFAX1[0];
+                            ah.Account = strEQUIFAX1[1];
+                            ah.AccountType = strEQUIFAX1[2];
+                            ah.AccountTypeDetail = strEQUIFAX1[3];
+                            ah.DateOpened = strEQUIFAX1[4];
+                            ah.HighCredit = strEQUIFAX1[5];
+                            ah.Balance = strEQUIFAX1[6];
+                            ah.MonthlyPayment = strEQUIFAX1[7];
+                            ah.LastReported = strEQUIFAX1[8];
+                            string challengestatus = "";
+                            if (strEQUIFAX1[10] == "0" || strEQUIFAX1[10].Trim() == "")
+                            {
+                                challengestatus = getChallengeTextPrev(id, strEQUIFAX1[1], "EQUIFAX", sno);
+                            }
+                            else
+                            {
+                                challengestatus = strEQUIFAX1[10];
+                            }
+                            string pstatus = strEQUIFAX1[9] + "~" + strEQUIFAX1[12] + "~" + strEQUIFAX1[13];
+                            ah.PaymentStatus = SetStatusForMedical(strEQUIFAX1[2], strEQUIFAX1[3], pstatus);
+                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEQUIFAX1[10] : challengestatus;
+                            ah.PastDue = strEQUIFAX1[11];
+                            ah.negativeitems = strEQUIFAX1[9] == "Coll/Chargeoff" ? 1 : strEQUIFAX1[12].StringToInt(0);
+                            ah.LoanStatus = "";
+                            ah.PastDueDays = "";
+                            achquifax.Add(ah);
+
+                        }
+                    }
+                    if (EXPERIAN != "")
+                    {
+                        for (int l = 0; l < strEXPERIAN.Length; l++)
+                        {
+
+                            string[] strEXPERIAN1 = strEXPERIAN[l].Split('~');
+                            AccountHistory ah = new AccountHistory();
+                            ah.Bank = strEXPERIAN1[0];
+                            ah.Account = strEXPERIAN1[1];
+                            ah.AccountType = strEXPERIAN1[2];
+                            ah.AccountTypeDetail = strEXPERIAN1[3];
+                            ah.DateOpened = strEXPERIAN1[4];
+                            ah.HighCredit = strEXPERIAN1[5];
+                            ah.Balance = strEXPERIAN1[6];
+                            ah.MonthlyPayment = strEXPERIAN1[7];
+                            ah.LastReported = strEXPERIAN1[8];
+                            string challengestatus = "";
+                            if (strEXPERIAN1[10] == "0" || strEXPERIAN1[10].Trim() == "")
+                            {
+                                challengestatus = getChallengeTextPrev(id, strEXPERIAN1[1], "EXPERIAN", sno);
+                            }
+                            else
+                            {
+                                challengestatus = strEXPERIAN1[10];
+                            }
+                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEXPERIAN1[10] : challengestatus;
+
+                            string pstatus = strEXPERIAN1[9] + "~" + strEXPERIAN1[12] + "~" + strEXPERIAN1[13];
+                            ah.PaymentStatus = SetStatusForMedical(strEXPERIAN1[2], strEXPERIAN1[3], pstatus);
+                            ah.PastDue = strEXPERIAN1[11];
+                            ah.negativeitems = strEXPERIAN1[9] == "Coll/Chargeoff" ? 1 : strEXPERIAN1[12].StringToInt(0);
+                            ah.LoanStatus = "";
+                            ah.PastDueDays = "";
+                            achexperian.Add(ah);
+                        }
+                    }
+
+                    for (int x = 0; x < dt1.Rows.Count; x++)
+                    {
+                        string accountid = dt1.Rows[x]["accountId"].ToString();
+                        for (int i = 0; i < 14; i++)
+                        {
+                            CreditItems CreditItem = new CreditItems();
+                            CreditItem.Heading = getHeadings()[i];
+
+                            
+
+                            if (CreditItem.Heading == "Merchant Name/Account")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.Bank;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.Bank;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.Bank;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "Account #")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.Account;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.Account;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.Account;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "Account Type")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.AccountType;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.AccountType;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.AccountType;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
+                            if (CreditItem.Heading == "Account Type Details")
+                            {
+
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    CreditItem.EQUIFAX = equifax.AccountTypeDetail;
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    CreditItem.TRANSUNION = transunio.AccountTypeDetail;
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    CreditItem.EXPERIAN = experian.AccountTypeDetail;
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+                            }
                             if (CreditItem.Heading == "Date Opened")
                             {
 
@@ -1646,7 +2426,6 @@ namespace CreditReversal.BLL
                                     CreditItem.EXPERIAN = "-";
                                 }
                             }
-
                             if (CreditItem.Heading == "CreditreportId")
                             {
 
@@ -1680,8 +2459,6 @@ namespace CreditReversal.BLL
                                     CreditItem.EXPERIAN = "-";
                                 }
                             }
-
-
                             if (CreditItem.Heading == "Negativeitems")
                             {
 
@@ -1717,13 +2494,72 @@ namespace CreditReversal.BLL
                             }
 
 
+                            if (CreditItem.Heading == "LoanStatus" || CreditItem.Heading == "PastDueDays")
+                            {
+                                var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
+                                if (equifax != null)
+                                {
+                                    if(equifax.AccountType.ToUpper().Contains("EDUCATION") || equifax.AccountTypeDetail.ToUpper().Contains("EDUCATION"))
+                                    {
+                                        CreditItem.EQUIFAX = "EDUCATION";
+                                    }
+                                    else
+                                    {
+                                        CreditItem.EQUIFAX = "";
+                                    }
+                                   
+                                }
+                                else
+                                {
+                                    CreditItem.EQUIFAX = "-";
+                                }
+
+                                var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                if (transunio != null)
+                                {
+                                    if (transunio.AccountType.ToUpper().Contains("EDUCATION") || transunio.AccountTypeDetail.ToUpper().Contains("EDUCATION"))
+                                    {
+                                        CreditItem.TRANSUNION = "EDUCATION";
+                                    }
+                                    else
+                                    {
+                                        CreditItem.TRANSUNION = "";
+                                    }
+                                    
+                                }
+                                else
+                                {
+                                    CreditItem.TRANSUNION = "-";
+                                }
+
+                                var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                if (experian != null)
+                                {
+                                    if (experian.AccountType.ToUpper().Contains("EDUCATION") || experian.AccountTypeDetail.ToUpper().Contains("EDUCATION"))
+                                    {
+                                        CreditItem.EXPERIAN = "EDUCATION";
+                                    }
+                                    else
+                                    {
+                                        CreditItem.EXPERIAN = "";
+                                    }
+                                    
+                                }
+                                else
+                                {
+                                    CreditItem.EXPERIAN = "-";
+                                }
+
+                                
+                            }
+                            
                             if (CreditItem.EXPERIAN == "-" && CreditItem.TRANSUNION == "-" && CreditItem.EQUIFAX == "-")
                             {
 
                             }
                             else
                             {
-                                CreditItems.Add(CreditItem);
+                                    CreditItems.Add(CreditItem);
                             }
 
                         }

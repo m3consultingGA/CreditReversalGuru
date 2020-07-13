@@ -30,6 +30,6 @@ namespace CreditReversal.Models
 		public string Agency { get; set; }
         public int negativeitems { get; set; }
         public string LoanStatus { get; set; }
-        public int PastDueDays { get; set; }
+        public string PastDueDays { get; set; }
     }
 }

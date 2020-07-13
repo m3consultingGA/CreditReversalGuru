@@ -532,6 +532,7 @@ stringWriter
         {
             string date = string.Empty; bool status = false;
             int sno = 0;
+            
             try
             {
                 string client = Id.ToString();
@@ -543,14 +544,8 @@ stringWriter
                     Agent agentAdddress = cfunction.GetAgentAddressById(agentid);
                     Session["AgentAddress"] = agentAdddress;
                 }
-
-                //
-
                 date = DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Year.ToString()
                 + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
-                List<CreditReportItems> crediteAllAgencies = new List<CreditReportItems>();
-                //List<CreditReportItems> crediteEXPERIAN = new List<CreditReportItems>();
-                //List<CreditReportItems> crediteEQUIFAX = new List<CreditReportItems>();
                 List<CreditReportFiles> filenames = new List<CreditReportFiles>();
 
                 int count = 0;
@@ -600,9 +595,6 @@ stringWriter
                     for (int k = 0; k < credite.Count; k++)
                     {
                         CreditReportItems cr = new CreditReportItems();
-
-                        //
-
                         Session["ClientAddress"] = clientModel;
                         List<string> StringList = new List<string>();
                         StringList.Add(clientModel.FirstName);
@@ -632,31 +624,26 @@ stringWriter
                                 credite[k].AccountType = credite[k].AccountTypeDetail;
                             }
                             cr.AccountType = credite[k].AccountType;
-                            crediteAllAgencies.Add(cr);
                         }
                         PdfManager objPdf = new PdfManager();
                         PdfDocument objDoc = objPdf.CreateDocument();
                         objDoc.Title = "CreditReversalGuru";
                         objDoc.Creator = "CreditReversalGuru";
                         PdfFont objFont = objDoc.Fonts["Helvetica"];
-
-
-
                         MemoryStream pdfStream = new MemoryStream();
                         filenames = new List<CreditReportFiles>();
-                        if (crediteAllAgencies.Count > 0)
+                        if (cr != null)
                         {
-                            StringList.Add(credite[k].Agency);
+                            StringList.Add(cr.Agency);
                             Session["values"] = StringList;
                             objDoc = objPdf.CreateDocument();
                             dynamic model = new ExpandoObject();
-                            int trcount = crediteAllAgencies.Count - 1;
-                            model.clientcredit = crediteAllAgencies[k];
+                            model.clientcredit = cr;
                             string htmlToConvert = RenderViewAsString("ClientChallengeform", model);
                             objDoc.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=54;TopMargin=54;BottomMargin=54; hyperlinks=true; drawbackground=true");
-                            filename = "Challenge-Account-" + credite[k].Agency + "-" + values[0] + "-" + values[1] + "-" + crediteAllAgencies[trcount].RoundType + "-" + date + ".pdf";
+                            filename = "Challenge-Account-" + cr.Agency + "-" + values[0] + "-" + values[1] + "-" + cr.RoundType + "-" + cr.CredRepItemsId + "-" + date + ".pdf";
                             filename = filename.Replace(" ", "");
-                            filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-" + credite[k].Agency + "-" + values[0] + "-" + values[1] + "-" + crediteAllAgencies[trcount].RoundType + "-" + date + ".pdf");
+                            filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-" + cr.Agency + "-" + values[0] + "-" + values[1] + "-" + cr.RoundType + "-" + cr.CredRepItemsId + "-" + date + ".pdf");
                             filepath = filepath.Replace(" ", "");
 
                             try
@@ -678,7 +665,7 @@ stringWriter
                             objDoc.Close();
 
                             CreditReportFiles files = new CreditReportFiles();
-                            files.RoundType = crediteAllAgencies[trcount].RoundType;
+                            files.RoundType = cr.RoundType;
                             files.CRFilename = filename;
                             files.ClientId = Id;
                             filenames.Add(files);
@@ -1280,6 +1267,7 @@ stringWriter
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         ah.Agency = ach.atbureau;
+                        
                         try
                         {
                             ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
