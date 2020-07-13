@@ -1866,7 +1866,9 @@ namespace CreditReversal.BLL
                     + " FROM PaymentHistory a, CreditReportItems b, CreditReport c where a.AccountNo = b.AccountId and b.sno=" + sno
                     + " and a.Agency = b.Agency and a.Merchant = b.MerchantName "
                    + " and b.CredReportId = c.CreditReportId and a.ClientId = c.ClientId and a.RoundType = c.RoundType and a.Agency = c.AgencyName "
-                   + " and(PHStatus != 'C' AND PHStatus != 'U' AND PHStatus != ' ' and PHStatus != 7 and PHStatus != 9) and a.AccountNo = US.AccountId  ";
+                  //+ " and (PHStatus != 'C' AND PHStatus != 'U' AND PHStatus != ' ' and PHStatus != 7 and PHStatus != 9) "
+                  + " and (PHStatus != 'C' AND PHStatus != 'U' AND PHStatus != ' ') "
+                   + "  and a.AccountNo = US.AccountId  ";
                 if (role != "client")
                 {
                     addnagitiveitems = "and isnull(US.negativeitems,0) > 0 ";
@@ -1894,7 +1896,8 @@ namespace CreditReversal.BLL
                       " as 'EQUIFAX' ," +
                       " STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
                       + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
-                      + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                      + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and clientid=" + id
+                      + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
                       + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by  "
                       + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
                       " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EXPERIAN' and us.sno=" + sno
@@ -1974,7 +1977,7 @@ namespace CreditReversal.BLL
                             ah.PaymentStatus = SetStatusForMedical(strTRANS1[2], strTRANS1[3], pstatus);
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strTRANS1[10] : challengestatus;
                             ah.PastDue = strTRANS1[11];
-                            ah.negativeitems = strTRANS1[9] == "Coll/Chargeoff" ? 1 : strTRANS1[12].StringToInt(0);
+                            ah.negativeitems = (strTRANS1[9] == "Coll/Chargeoff" || strTRANS1[9] == "Collection/Chargeoff") ? 1 : strTRANS1[12].StringToInt(0);
                             ah.LoanStatus = "";
                             ah.PastDueDays = "";
                             achtransunion.Add(ah);
@@ -2009,7 +2012,7 @@ namespace CreditReversal.BLL
                             ah.PaymentStatus = SetStatusForMedical(strEQUIFAX1[2], strEQUIFAX1[3], pstatus);
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEQUIFAX1[10] : challengestatus;
                             ah.PastDue = strEQUIFAX1[11];
-                            ah.negativeitems = strEQUIFAX1[9] == "Coll/Chargeoff" ? 1 : strEQUIFAX1[12].StringToInt(0);
+                            ah.negativeitems = (strEQUIFAX1[9] == "Coll/Chargeoff" || strEQUIFAX1[9] == "Collection/Chargeoff") ? 1 : strEQUIFAX1[12].StringToInt(0);
                             ah.LoanStatus = "";
                             ah.PastDueDays = "";
                             achquifax.Add(ah);
@@ -2046,7 +2049,7 @@ namespace CreditReversal.BLL
                             string pstatus = strEXPERIAN1[9] + "~" + strEXPERIAN1[12] + "~" + strEXPERIAN1[13];
                             ah.PaymentStatus = SetStatusForMedical(strEXPERIAN1[2], strEXPERIAN1[3], pstatus);
                             ah.PastDue = strEXPERIAN1[11];
-                            ah.negativeitems = strEXPERIAN1[9] == "Coll/Chargeoff" ? 1 : strEXPERIAN1[12].StringToInt(0);
+                            ah.negativeitems = (strEXPERIAN1[9] == "Coll/Chargeoff" || strEXPERIAN1[9] == "Collection/Chargeoff") ? 1 : strEXPERIAN1[12].StringToInt(0);
                             ah.LoanStatus = "";
                             ah.PastDueDays = "";
                             achexperian.Add(ah);
