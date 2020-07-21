@@ -532,7 +532,10 @@ stringWriter
         {
             string date = string.Empty; bool status = false;
             int sno = 0;
-            
+             if(credit == null || credit.Count == 0)
+            {
+                return Json(status);
+            }
             try
             {
                 string client = Id.ToString();
