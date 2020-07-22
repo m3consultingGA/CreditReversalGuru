@@ -328,7 +328,7 @@ namespace CreditReversal.BLL
                 // + " PHStatus != 7 and PHStatus != 9)";
 
                 string sql = "SELECT DISTINCT AccountId,Agency from CreditReportItems "
-                + " WHERE isnull(negativeitems, 0) > 0 AND CredReportId IN(SELECT CreditReportId FROM CreditReport WHERE ClientId ="+ ClientId + ") ";
+                + " WHERE isnull(negativeitems, 0) > 0 AND CredReportId IN(SELECT CreditReportId FROM CreditReport WHERE ClientId =" + ClientId + ") ";
 
                 DataTable dt = utilities.GetDataTable(sql);
                 items = dt.Rows.Count.ToString();
@@ -462,8 +462,8 @@ namespace CreditReversal.BLL
             try
             {
                 string sql = "select top 1.* from CreditReport where ClientId='" + clientID + "'";
-                 dataTable = utilities.GetDataTable(sql, true);
-                
+                dataTable = utilities.GetDataTable(sql, true);
+
             }
             catch (Exception ex)
             {
@@ -511,55 +511,55 @@ namespace CreditReversal.BLL
                     sql = "select * from client where status=1 and AgentStaffId='" + id + "' order by clientId DESC";
                 }
 
-                DateTime duedate = new DateTime(); 
+                DateTime duedate = new DateTime();
                 DataTable dataTable = utilities.GetDataTable(sql, true);
-               
+
                 if (dataTable.Rows.Count > 0)
                 {
                     sql = "select top 1.* from CreditReport ";
                     DataTable dataTable1 = utilities.GetDataTable(sql, true);
-                    string rund = "";                   
-                    
+                    string rund = "";
+
                     foreach (DataRow row in dataTable.Rows)
                     {
-                        
+
                         bool status = GetCreditReportStatus(row["ClientId"].ToString());
                         DataTable dt = GetCreditReport(row["ClientId"].ToString());
-                        if (dt.Rows.Count>0) 
+                        if (dt.Rows.Count > 0)
                         {
                             NewClient client = new NewClient();
                             client.ClientId = row["ClientId"].ToString().StringToInt(0);
                             client.Name = row["FirstName"].ToString() + " " + row["LastName"].ToString();
-                            client.DOB = Convert.ToDateTime(row["DOB"].ToString());                           
+                            client.DOB = Convert.ToDateTime(row["DOB"].ToString());
 
                             rund = dt.Rows[0]["RoundType"].ToString();
                             duedate = Convert.ToDateTime(dt.Rows[0]["DateReportPulls"].ToString());
-                           
-                                if (rund == "First Round")
-                                {
-                                    client.NextAction = "Second Round";
-                                    client.CurrentStatus = "First Round";
-                                }
-                                if (rund == "Second Round")
-                                {
-                                    client.NextAction = "Third Round";
-                                    client.CurrentStatus = "Second Round";
-                                }
-                                if (rund == "Third Round")
-                                {
-                                    client.NextAction = "";
-                                    client.CurrentStatus = "Third Round";
-                                }
-                                if (rund == "Third Round")
-                                {
-                                    client.DueDate = null;
-                                }
-                                else 
-                                {
-                                    DateTime date = duedate;
-                                    client.DueDate = date.AddDays(30);
-                                }                                  
-                                newClients.Add(client);
+
+                            if (rund == "First Round")
+                            {
+                                client.NextAction = "Second Round";
+                                client.CurrentStatus = "First Round";
+                            }
+                            if (rund == "Second Round")
+                            {
+                                client.NextAction = "Third Round";
+                                client.CurrentStatus = "Second Round";
+                            }
+                            if (rund == "Third Round")
+                            {
+                                client.NextAction = "";
+                                client.CurrentStatus = "Third Round";
+                            }
+                            if (rund == "Third Round")
+                            {
+                                client.DueDate = null;
+                            }
+                            else
+                            {
+                                DateTime date = duedate;
+                                client.DueDate = date.AddDays(30);
+                            }
+                            newClients.Add(client);
                         }
 
 
@@ -1016,8 +1016,33 @@ namespace CreditReversal.BLL
             catch (Exception ex) { ex.insertTrace(""); }
             return CreditItems;
         }
+        public string getAccountType(string clientid,string accountid)
+        {
+            string res = "";
+            try
+            {
+                string sql = "select AccountTypeDetails from CreditReportItems a, CreditReport b "
+                  + " where a.CredReportId = b.CreditReportId and isnull(AccountTypeDetails,'')!= '' AND "
+                  + " Agency = 'EQUIFAX' and accountid = '" + accountid + "' and b.ClientId =" + clientid
+                  + " union "
+                  + " select AccountTypeDetails from CreditReportItems a, CreditReport b "
+                  + " where a.CredReportId = b.CreditReportId and isnull(AccountTypeDetails,'')!= '' AND "
+                  + " Agency = 'EXPERIAN' and accountid = '" + accountid + "' and b.ClientId =" + clientid
+                 + "  union "
+                  + " select AccountTypeDetails from CreditReportItems a, CreditReport b "
+                 + "  where a.CredReportId = b.CreditReportId and isnull(AccountTypeDetails,'')!= '' AND "
+                 + " Agency = 'TRANSUNION' and accountid = '" + accountid + "' and b.ClientId =" + clientid;
+                DataTable dt = utilities.GetDataTable(sql);
+                if (dt.Rows.Count > 0)
+                {
+                    res = dt.Rows[0]["AccountTypeDetails"].ToString();
+                }
+            }
+            catch (Exception ex)
+            {}
+            return res;
+        }
 
-        
         public string getChallengeTextPrev(int clientid, string accountno, string agency, int sno)
         {
             string res = "";
@@ -1028,7 +1053,7 @@ namespace CreditReversal.BLL
                     + " AccountId='" + accountno.Trim() + "' and Agency='" + agency + "' and clientid=" + clientid + " and sno=" + sno
                      + " order by CrdRepItemChallengeId desc";
                 object obj = utilities.ExecuteScalar(sql, true);
-                if(obj != null)
+                if (obj != null)
                 {
                     res = obj.ToString();
                 }
@@ -1042,17 +1067,17 @@ namespace CreditReversal.BLL
             string res = "";
             try
             {
-                
-                
+
+
                 //DateTime date = DateTime.ParseExact(Dateofinquiry, "yyyy-MM-dd", CultureInfo.InvariantCulture);
                 //string x = Dateofinquiry.ToString("yyyy-MM-dd",0);
 
                 sno = sno - 1;
                 string sql = " Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from CreditReportItemChallenges where "
-                    + " MerchantName='" + merchant.Trim() + "' and Agency='" + agency + "' and clientid=" + clientid + " and convert(varchar ,convert( datetime , DateOfInquiry,101 ),101) ='" + Dateofinquiry  + "' and sno=" + sno
+                    + " MerchantName='" + merchant.Trim() + "' and Agency='" + agency + "' and clientid=" + clientid + " and convert(varchar ,convert( datetime , DateOfInquiry,101 ),101) ='" + Dateofinquiry + "' and sno=" + sno
                      + " order by CrdRepItemChallengeId desc";
                 object obj = utilities.ExecuteScalar(sql, true);
-                if(obj != null)
+                if (obj != null)
                 {
                     res = obj.ToString();
                 }
@@ -1108,7 +1133,7 @@ namespace CreditReversal.BLL
                 sql = "SELECT ( STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ "
                     + " CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+'~'+'~'+Status +'~'+  "
                     + " Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
-                    +" +'~'+ ISNULL(LoanStatus,'')+'~'+Convert(varchar(10),ISNULL(PastDueDays,'')) "
+                    + " +'~'+ ISNULL(LoanStatus,'')+'~'+Convert(varchar(10),ISNULL(PastDueDays,'')) "
                     + " from CreditReportItemChallenges where  AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) "
                     + "+'~'+ Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) + '~'+ " + payhistory + " and a.Agency='Equifax' "
                     + " group by PayHistoryId, PHStatus order by PayHistoryId asc),''))" +
@@ -1124,7 +1149,7 @@ namespace CreditReversal.BLL
                       " as 'EQUIFAX' ," +
                       " STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
                       + " MonthlyPayment +'~'+ LastReported +'~'+ Status +'~'+ "
-                      +" Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
+                      + " Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
                       + " +'~'+ ISNULL(LoanStatus,'')+'~'+Convert(varchar(10),ISNULL(PastDueDays,'')) "
                       + " from CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
                       + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by  "
@@ -1142,7 +1167,7 @@ namespace CreditReversal.BLL
                       " as 'EXPERIAN'," +
                       " (SELECT STUFF((SELECT '^ ' + (MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
                       + " MonthlyPayment +'~'+ LastReported+'~'+ Status +'~'+   "
-                      +" Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText)  "
+                      + " Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText)  "
                       + " +'~'+ ISNULL(LoanStatus,'')+'~'+Convert(varchar(10),ISNULL(PastDueDays,'')) "
                       + "  from CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
                       + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='TransUnion' group by "
@@ -1196,7 +1221,7 @@ namespace CreditReversal.BLL
                             ah.MonthlyPayment = strTRANS1[7];
                             ah.LastReported = strTRANS1[8];
                             ah.LoanStatus = strTRANS1[9];
-                            ah.PastDueDays = strTRANS1[10].StringToInt(0) ==0 ? "" : strTRANS1[10];
+                            ah.PastDueDays = strTRANS1[10].StringToInt(0) == 0 ? "" : strTRANS1[10];
                             string challengestatus = "";
                             if (strTRANS1[12] == "0" || strTRANS1[12].Trim() == "")
                             {
@@ -1207,11 +1232,11 @@ namespace CreditReversal.BLL
                                 challengestatus = strTRANS1[12];
                             }
                             ah.PaymentStatus = strTRANS1[11] + "~" + strTRANS1[14] + "~" + strTRANS1[15];
-                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strTRANS1[12] : challengestatus;                            
+                            ah.Comments = string.IsNullOrEmpty(challengestatus) ? strTRANS1[12] : challengestatus;
                             ah.PastDue = strTRANS1[13];
-                            
-                            ah.negativeitems = strTRANS1[11] == "Coll/Chargeoff" ? 1  : strTRANS1[14].StringToInt(0);
-                           
+
+                            ah.negativeitems = strTRANS1[11] == "Coll/Chargeoff" ? 1 : strTRANS1[14].StringToInt(0);
+
                             achtransunion.Add(ah);
 
                         }
@@ -1246,7 +1271,7 @@ namespace CreditReversal.BLL
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEQUIFAX1[12] : challengestatus;
                             ah.PastDue = strEQUIFAX1[13];
                             ah.negativeitems = strEQUIFAX1[11] == "Coll/Chargeoff" ? 1 : strEQUIFAX1[14].StringToInt(0);
-                           
+
                             achquifax.Add(ah);
 
                         }
@@ -1283,7 +1308,7 @@ namespace CreditReversal.BLL
                             ah.PaymentStatus = strEXPERIAN1[11] + "~" + strEXPERIAN1[14] + "~" + strEXPERIAN1[15];
                             ah.PastDue = strEXPERIAN1[13];
                             ah.negativeitems = strEXPERIAN1[11] == "Coll/Chargeoff" ? 1 : strEXPERIAN1[14].StringToInt(0);
-                          
+
                             achexperian.Add(ah);
                         }
                     }
@@ -1805,19 +1830,20 @@ namespace CreditReversal.BLL
                     }
                 }
             }
-            catch (Exception ex) { 
+            catch (Exception ex)
+            {
                 ex.insertTrace("");
             }
 
             return CreditItems;
         }
-        public string SetStatusForMedical(string AccountType,string AccountTypeDetails,string status="", string comments = "")
+        public string SetStatusForMedical(string AccountType, string AccountTypeDetails, string status = "", string comments = "")
         {
             string res = string.Empty;
             try
             {
-                if(AccountType.ToUpper().Contains("MEDICAL") || AccountTypeDetails.ToUpper().Contains("MEDICAL")
-                    || AccountType.ToUpper().Contains("HEALTH") || AccountTypeDetails.ToUpper().Contains("HEALTH") 
+                if (AccountType.ToUpper().Contains("MEDICAL") || AccountTypeDetails.ToUpper().Contains("MEDICAL")
+                    || AccountType.ToUpper().Contains("HEALTH") || AccountTypeDetails.ToUpper().Contains("HEALTH")
                     || comments.ToUpper().Contains("HEALTH") || comments.ToUpper().Contains("HEALTH")
                     || comments.ToUpper().Contains("MEDICAL") || comments.ToUpper().Contains("MEDICAL"))
                 {
@@ -1829,7 +1855,7 @@ namespace CreditReversal.BLL
                 }
             }
             catch (Exception ex)
-            {}
+            { }
             return res;
         }
         public List<CreditItems> GetCreditReportChallengesAgent(int id, string agency = null, string role = "")
@@ -1958,7 +1984,7 @@ namespace CreditReversal.BLL
                             ah.Bank = strTRANS1[0];
                             ah.Account = strTRANS1[1];
                             ah.AccountType = strTRANS1[2];
-                            ah.AccountTypeDetail = strTRANS1[3];
+                            ah.AccountTypeDetail = string.IsNullOrEmpty(strTRANS1[3]) ? getAccountType(id.ToString(), strTRANS1[1]) : strTRANS1[3];
                             ah.DateOpened = strTRANS1[4];
                             ah.HighCredit = strTRANS1[5];
                             ah.Balance = strTRANS1[6];
@@ -1994,7 +2020,8 @@ namespace CreditReversal.BLL
                             ah.Bank = strEQUIFAX1[0];
                             ah.Account = strEQUIFAX1[1];
                             ah.AccountType = strEQUIFAX1[2];
-                            ah.AccountTypeDetail = strEQUIFAX1[3];
+                           // ah.AccountTypeDetail = strEQUIFAX1[3];
+                            ah.AccountTypeDetail = string.IsNullOrEmpty(strEQUIFAX1[3]) ? getAccountType(id.ToString(), strEQUIFAX1[1]) : strEQUIFAX1[3];
                             ah.DateOpened = strEQUIFAX1[4];
                             ah.HighCredit = strEQUIFAX1[5];
                             ah.Balance = strEQUIFAX1[6];
@@ -2031,7 +2058,8 @@ namespace CreditReversal.BLL
                             ah.Bank = strEXPERIAN1[0];
                             ah.Account = strEXPERIAN1[1];
                             ah.AccountType = strEXPERIAN1[2];
-                            ah.AccountTypeDetail = strEXPERIAN1[3];
+                           // ah.AccountTypeDetail = strEXPERIAN1[3];
+                            ah.AccountTypeDetail = string.IsNullOrEmpty(strEXPERIAN1[3]) ? getAccountType(id.ToString(), strEXPERIAN1[1]) : strEXPERIAN1[3];
                             ah.DateOpened = strEXPERIAN1[4];
                             ah.HighCredit = strEXPERIAN1[5];
                             ah.Balance = strEXPERIAN1[6];
@@ -2047,7 +2075,7 @@ namespace CreditReversal.BLL
                                 challengestatus = strEXPERIAN1[10];
                             }
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEXPERIAN1[10] : challengestatus;
-                            ah.Comments = ah.Comments + "^" + (string.IsNullOrEmpty(ah.AccountTypeDetail)  ? ah.AccountType : ah.AccountTypeDetail);
+                            ah.Comments = ah.Comments + "^" + (string.IsNullOrEmpty(ah.AccountTypeDetail) ? ah.AccountType : ah.AccountTypeDetail);
                             string pstatus = strEXPERIAN1[9] + "~" + strEXPERIAN1[12] + "~" + strEXPERIAN1[13];
                             ah.PaymentStatus = SetStatusForMedical(strEXPERIAN1[2], strEXPERIAN1[3], pstatus);
                             ah.PastDue = strEXPERIAN1[11];
@@ -2066,7 +2094,7 @@ namespace CreditReversal.BLL
                             CreditItems CreditItem = new CreditItems();
                             CreditItem.Heading = getHeadings()[i];
 
-                            
+
 
                             if (CreditItem.Heading == "Merchant Name/Account")
                             {
@@ -2504,7 +2532,7 @@ namespace CreditReversal.BLL
                                 var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
                                 if (equifax != null)
                                 {
-                                    if(equifax.AccountType.ToUpper().Contains("EDUCATION") || equifax.AccountTypeDetail.ToUpper().Contains("EDUCATION"))
+                                    if (equifax.AccountType.ToUpper().Contains("EDUCATION") || equifax.AccountTypeDetail.ToUpper().Contains("EDUCATION"))
                                     {
                                         CreditItem.EQUIFAX = "EDUCATION";
                                     }
@@ -2512,7 +2540,7 @@ namespace CreditReversal.BLL
                                     {
                                         CreditItem.EQUIFAX = "";
                                     }
-                                   
+
                                 }
                                 else
                                 {
@@ -2530,7 +2558,7 @@ namespace CreditReversal.BLL
                                     {
                                         CreditItem.TRANSUNION = "";
                                     }
-                                    
+
                                 }
                                 else
                                 {
@@ -2548,23 +2576,23 @@ namespace CreditReversal.BLL
                                     {
                                         CreditItem.EXPERIAN = "";
                                     }
-                                    
+
                                 }
                                 else
                                 {
                                     CreditItem.EXPERIAN = "-";
                                 }
 
-                                
+
                             }
-                            
+
                             if (CreditItem.EXPERIAN == "-" && CreditItem.TRANSUNION == "-" && CreditItem.EQUIFAX == "-")
                             {
 
                             }
                             else
                             {
-                                    CreditItems.Add(CreditItem);
+                                CreditItems.Add(CreditItem);
                             }
 
                         }
@@ -2599,7 +2627,7 @@ namespace CreditReversal.BLL
                 " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),101)" +
                 " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "
                 + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
-                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid ="+ id +" and"
+                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and"
                 + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
                 " FROM" +
                 " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +
@@ -2994,8 +3022,8 @@ namespace CreditReversal.BLL
                         Inq.Dateofinquiry = row["Dateofinquiry"].ToString();
                         Inq.CreditBureau = row["Agency"].ToString();
                         Inq.ChallengeText = row["ChallengeText"].ToString();
-                        Inq.RoundType=row["RoundType"].ToString();
-                        Inq.AccountType= credit[i].AccountType;
+                        Inq.RoundType = row["RoundType"].ToString();
+                        Inq.AccountType = credit[i].AccountType;
                         Inquires.Add(Inq);
                     }
                 }
@@ -3162,15 +3190,15 @@ namespace CreditReversal.BLL
                 {
                     string accounttype = "";
                     int accounttypeid = 0;
-                    accounttypeid=Convert.ToInt32(dr["AccTypeId"]);
-                    accounttype = dr["AccountType"].ToString();                    
+                    accounttypeid = Convert.ToInt32(dr["AccTypeId"]);
+                    accounttype = dr["AccountType"].ToString();
                     string sql1 = "SELECT ChallengeText FROM ChallengeMaster WHERE AccountTypeId='" + accounttypeid + "'";
                     DataTable dt2 = utilities.GetDataTable(sql1, flag);
-                    if (dt2.Rows.Count>0)
+                    if (dt2.Rows.Count > 0)
                     {
                         AccountType.Add(accounttype);
                     }
-                   
+
                 }
             }
             catch (Exception ex)
