@@ -175,7 +175,7 @@
                                     else
                                     {
                                         //displaying all headings except Challenge and creditreportid for client
-                                        if (item.Heading != "Challenge" && item.Heading != "CreditreportId")
+                                        if (item.Heading != "Challenge" && item.Heading != "CreditreportId" && item.Heading != "LoanStatus" && item.Heading != "PastDueDays")
                                         {
                                                 <td class="tdClass">@item.Heading</td>
                                         }
@@ -186,7 +186,7 @@
                                         <lable id="hdnEQUIAccountType_@j" hidden>@item.EQUIFAX</lable>
                                         <lable id="hdnTRANSAccountType_@j" hidden>@item.TRANSUNION</lable>
                                     }
-                                    @if (i == 3 || i == 4 || i == 5)
+                                    @if ( i == 5 || i == 6 || i == 7)
                                     {
                                         //High Credit and Balance and monthly payment right alignment
                                         <td align="right">@item.TRANSUNION</td>
@@ -195,9 +195,10 @@
                                     }
                                     else if (i == 9)
                                     {
-                                        
-                                        if (item.TRANSUNION == "EDUCATION")
+                                        if (role.ToUpper() != "CLIENT")
                                         {
+                                            if (item.TRANSUNION == "EDUCATION")
+                                            {
 
                                             <td>
                                                 <select name="LoanStatus" id="TULoanStatus_@j" class="form-control">
@@ -207,9 +208,9 @@
                                                 </select>
                                             </td>
 
-                                        }
-                                        if (item.EXPERIAN == "EDUCATION")
-                                        {
+                                            }
+                                            if (item.EXPERIAN == "EDUCATION")
+                                            {
                                             <td>
                                                 <select name="LoanStatus" id="EXLoanStatus_@j" class="form-control">
                                                     <option value="0">--Select LoanStatus--</option>
@@ -217,10 +218,10 @@
                                                     <option value="Forbearance">Forbearance</option>
                                                 </select>
                                             </td>
-                                        }
-                                        //if (item.EQUIFAX != "" || item.EQUIFAX != "0")
-                                        if (item.EQUIFAX == "EDUCATION")
-                                        {
+                                            }
+                                            //if (item.EQUIFAX != "" || item.EQUIFAX != "0")
+                                            if (item.EQUIFAX == "EDUCATION")
+                                            {
                                             <td>
                                                 <select name="LoanStatus" id="EQLoanStatus_@j" class="form-control">
                                                     <option value="0">--Select LoanStatus--</option>
@@ -228,22 +229,26 @@
                                                     <option value="Forbearance">Forbearance</option>
                                                 </select>
                                             </td>
+                                            }
                                         }
                                     }
                                     else if (i == 10)
                                     {
-                                        if (item.TRANSUNION == "EDUCATION")
+                                        if (role.ToUpper() != "CLIENT")
                                         {
+                                            if (item.TRANSUNION == "EDUCATION")
+                                            {
                                             <td><input type="number" class="form-control" max="9" id="TUPastDueDays_@j" /></td>
 
-                                        }
-                                        if (item.EXPERIAN == "EDUCATION")
-                                        {
+                                            }
+                                            if (item.EXPERIAN == "EDUCATION")
+                                            {
                                             <td><input type="number" class="form-control" maxlength="9" id="EXPastDueDays_@j" /></td>
-                                        }
-                                        if (item.EQUIFAX == "EDUCATION")
-                                        {
+                                            }
+                                            if (item.EQUIFAX == "EDUCATION")
+                                            {
                                             <td><input type="number" class="form-control" maxlength="9" id="EQPastDueDays_@j" /></td>
+                                            }
                                         }
                                     }
                                     else if (i == 0)
@@ -356,23 +361,7 @@
                                                     strEQValue1 = "CHARGEOFF";
                                                 }
                                             }
-
-                                            bool existsTU = AccountTypes.Any(s => s.ToUpper().Contains(strTUValue1.ToUpper()));
-                                            bool existsEX = AccountTypes.Any(s => s.ToUpper().Contains(strEXValue1.ToUpper()));
-                                            bool existsEQ = AccountTypes.Any(s => s.ToUpper().Contains(strEQValue1.ToUpper()));
-
-                                            if(!existsTU)
-                                            {
-                                                strTUValue1 = "";
-                                            }
-                                            if (!existsEX)
-                                            {
-                                                strEXValue1 = "";
-                                            }
-                                            if (!existsEQ)
-                                            {
-                                                strEQValue1 = "";
-                                            }
+                                            
 
                                             if (role.ToUpper() != "CLIENT")
                                             {
