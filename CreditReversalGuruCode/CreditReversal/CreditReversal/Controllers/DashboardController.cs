@@ -92,7 +92,9 @@ namespace CreditReversal.Controllers
         [Route("staff")]
         public ActionResult AgentStaff()
         {
-            string staffid = sessionData.GetStaffId();            int Id = Convert.ToInt32(staffid);            ViewBag.staffId = Id;
+            string staffid = sessionData.GetStaffId();
+            int Id = Convert.ToInt32(staffid);
+            ViewBag.staffId = Id;
             ViewBag.Dasboard = sessionData.getDasboard();
 			ViewBag.Clients = functions.GetClients(staffid.StringToInt(0));
 			ViewBag.ActiveClients = functions.GetActiveClients(staffid.StringToInt(0));
@@ -102,13 +104,37 @@ namespace CreditReversal.Controllers
 			return View();
         }
 
-        public ActionResult CreditReport()        {            string ClientId = "", CName = "";            string[] round = null;            try            {                ClientId = sessionData.GetClientId();                if (Session["Name"] != null)                {                    CName = Session["Name"].ToString();                }
+        public ActionResult CreditReport()
+        {
+            string ClientId = "", CName = "";
+            string[] round = null;
+            try
+            {
+                ClientId = sessionData.GetClientId();
+                if (Session["Name"] != null)
+                {
+                    CName = Session["Name"].ToString();
+                }
                 //List<CreditItems> CreditItems = functions.GetCreditReportChallenges(Convert.ToInt32(ClientId), null);
                 //ViewBag.CreditItems = CreditItems;
 
-                DashboardFunctions functions = new DashboardFunctions();                List<CreditItems> challenges = functions.GetCreditReportChallengesAgent(Convert.ToInt32(ClientId), null);                ViewBag.challenges = challenges;                ViewBag.Cname = CName;                round = CData.GetRoundType(ClientId);                List<CreditReportItems> creditReportItems = cfunction.GetCreditReportItems(Convert.ToInt32(ClientId));                if (creditReportItems.Count > 0)                {                    ViewBag.DateReportPulls = round[1];                    ViewBag.CreditReportItems = creditReportItems;
+                DashboardFunctions functions = new DashboardFunctions();
+                List<CreditItems> challenges = functions.GetCreditReportChallengesAgent(Convert.ToInt32(ClientId), null);
+                ViewBag.challenges = challenges;
+                ViewBag.Cname = CName;
+
+                round = CData.GetRoundType(ClientId);
+
+                List<CreditReportItems> creditReportItems = cfunction.GetCreditReportItems(Convert.ToInt32(ClientId));
+                if (creditReportItems.Count > 0)
+                {
+                    ViewBag.DateReportPulls = round[1];
+                    ViewBag.CreditReportItems = creditReportItems;
                     //ViewBag.Round = creditReportItems.First().RoundType;
-                    ViewBag.Round = round[0];                }                ViewBag.AgentName = cfunction.getAgentName(Convert.ToInt32(ClientId));
+                    ViewBag.Round = round[0];
+                }
+
+                ViewBag.AgentName = cfunction.getAgentName(Convert.ToInt32(ClientId));
                 //string fullname = string.Empty;
                 //if (Session["Name"] != null)
                 //{
@@ -178,7 +204,15 @@ namespace CreditReversal.Controllers
 
                 //ViewBag.TUcount = functions.GetCountChallenges(Convert.ToInt32(ClientId), "TransUnion");
                 //ViewBag.EXcount = functions.GetCountChallenges(Convert.ToInt32(ClientId), "Experian");
-                ViewBag.Dasboard = sessionData.getDasboard();            }            catch (Exception ex)            {                System.Diagnostics.Debug.WriteLine(ex.Message);            }            return View();        }
+                ViewBag.Dasboard = sessionData.getDasboard();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            return View();
+
+        }
         //public ActionResult CreditReport()
         //{
         //    string ClientId = "",CName="";
