@@ -32,6 +32,7 @@ namespace CreditReversal.Models
         public string RoundType { get; set; }
         public string FirstDate { get; set; }
         public string NegativeItemsCount { get; set; }
+        public string NextCRGDate { get; set; }
     }
 
     public class CreditReportChallenges

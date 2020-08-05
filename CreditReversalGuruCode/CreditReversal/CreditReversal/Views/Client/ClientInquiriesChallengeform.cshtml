@@ -7,7 +7,7 @@
     //var Agency = Session["Agency"];
     dynamic values = Session["values"];
     dynamic clientModel = Session["ClientAddress"];
-    Inquires Inquires = Model.clientcredit;
+    List<Inquires> Inquires = Model.clientcredit;
 
 
 
@@ -119,36 +119,30 @@
 
         <div class="row" style="padding-top:20px;">
             @{
-                string type = Inquires.AccountType;
-                <table style="border:1px solid #000;width:670px;">
-                    <thead>
-                        <tr>
-                            <th style="text-align:left;width:150px;">Creditor Name</th>
-                            <th style="text-align:left;width:150px;">Type of Business</th>
-                            @if (!string.IsNullOrEmpty(type))
-                            {
-                                <th style="text-align:left;width:50px;">Type</th>
-                            }
-                            <th style="text-align:left;width:200px;">Comments </th>
-                        </tr>
-                    </thead>
+                        <table style="border:1px solid #000;width:670px;">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:left;width:150px;">Creditor Name</th>
+                                    <th style="text-align:left;width:150px;">Type of Business</th>
+                                    <th style="text-align:left;width:50px;">Type</th>
+                                    <th style="text-align:left;width:200px;">Comments </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    for (int i = 0; i < Inquires.Count; i++)
+                                    {
+                                        <tr>
+                                            <td style="width:150px;" valign="top">@Inquires[i].CreditorName</td>
+                                            <td style="width:150px;" valign="top">@Inquires[i].TypeofBusiness</td>
+                                            <td style="width:50px;" valign="top">@Inquires[i].AccountType </td>
+                                            <td style="width:200px;text-align:justify;" valign="top">@Inquires[i].ChallengeText</td>
+                                        </tr>
 
-
-                    <tbody>
-                        <tr>
-                            <td style="width:150px;" valign="top">@Inquires.CreditorName</td>
-                            <td style="width:150px;" valign="top">@Inquires.TypeofBusiness</td>
-                            @if (!string.IsNullOrEmpty(type))
-                            {
-                                <td style="width:50px;" valign="top">@Inquires.AccountType </td>
-                            }
-                            <td style="width:200px;text-align:justify;" valign="top">@Inquires.ChallengeText</td>
-                        </tr>
-                    </tbody>
-                    <br />
-
-
-                </table>
+                                    }
+                                }
+                            </tbody>
+                        </table>
             }
             <br />
             <br />  <br />  <br />  <br />

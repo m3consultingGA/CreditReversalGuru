@@ -585,10 +585,16 @@ namespace CreditReversal.Controllers
         public ActionResult Challenges(string ClientId = "")
         {
             List<CreditReportFiles> creditreport = new List<CreditReportFiles>();
+            List<CreditReportFiles> creditreportAH = new List<CreditReportFiles>();
+            List<CreditReportFiles> creditreportINQ = new List<CreditReportFiles>();
             if (ClientId != "")
             {
                 creditreport = agentfunction.GetChallenges(ClientId);
-                ViewBag.creditreportfile = creditreport;
+                creditreportAH = creditreport.Where(x => x.mode != "Inquires").ToList();
+                ViewBag.creditreportfile = creditreportAH;
+
+                creditreportINQ = creditreport.Where(x => x.mode == "Inquires").ToList();
+                ViewBag.creditreportfileInq = creditreportINQ;
                 ViewBag.Dasboard = sessionData.getDasboard();
             }
 

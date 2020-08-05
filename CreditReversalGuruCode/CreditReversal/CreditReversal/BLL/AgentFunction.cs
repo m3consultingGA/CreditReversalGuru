@@ -178,7 +178,16 @@ namespace CreditReversal.BLL
             catch (Exception ex) {  ex.insertTrace("");  }
             return status;
         }
-        public bool DeleteAgent(string agentId, string from = "")        {            bool status = false;            try            {                status = agentdata.DeleteAgent(agentId, from);            }            catch (Exception ex) { ex.insertTrace(""); }            return status;        }
+        public bool DeleteAgent(string agentId, string from = "")
+        {
+            bool status = false;
+            try
+            {
+                status = agentdata.DeleteAgent(agentId, from);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return status;
+        }
 
         public bool CheckUsernameexistorNot(string CurrentEmail = "", int ClientId = 0)
         {
@@ -193,9 +202,35 @@ namespace CreditReversal.BLL
             catch (Exception ex) { ex.insertTrace(""); }
             return status;
         }
-        public bool AddAssignStaff(List<NewClient> client)        {            bool status = false;            try            {
-                status = agentdata.AddAssignStaff(client);            }            catch (Exception ex) { ex.insertTrace(""); }            return status;        }
-        public List<NewClient> GetClient(int id)        {            List<NewClient> newClients = new List<NewClient>();            try            {                newClients = agentdata.GetClient(id);            }            catch (Exception ex) { ex.insertTrace(""); }            return newClients;        }
-        public List<CreditReportFiles> GetChallenges(string ClientId)        {            List<CreditReportFiles> creditreport = new List<CreditReportFiles>();            try            {                creditreport = agentdata.GetChallenges(ClientId);            }            catch (Exception ex) { ex.insertTrace(""); }            return creditreport;        }
+        public bool AddAssignStaff(List<NewClient> client)
+        {
+            bool status = false;
+            try
+            {
+                status = agentdata.AddAssignStaff(client);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return status;
+        }
+        public List<NewClient> GetClient(int id)
+        {
+            List<NewClient> newClients = new List<NewClient>();
+            try
+            {
+                newClients = agentdata.GetClient(id);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return newClients;
+        }
+        public List<CreditReportFiles> GetChallenges(string ClientId)
+        {
+            List<CreditReportFiles> creditreport = new List<CreditReportFiles>();
+            try
+            {
+                creditreport = agentdata.GetChallenges(ClientId);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return creditreport;
+        }
     }
 }

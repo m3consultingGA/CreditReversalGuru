@@ -212,22 +212,22 @@
                                 </tr>
 
 
-                                <tr>
-                                    <td style="padding-left:10px"><label>Current Status </label></td>
+                                @*<tr>
+                                    <td style="padding-left:10px"><label>current status </label></td>
                                     <td style="padding-left:10px"><label>:</label></td>
-                                    @if (ViewBag.CreditReportItems.Status != null)
+                                    @if (viewbag.creditreportitems.status != null)
                                     {
-                                        <td style="padding-left:10px"><label>@ViewBag.CreditReportItems.Status response from credit bureau(s)</label></td>
+                                        <td style="padding-left:10px"><label>@viewbag.creditreportitems.status response from credit bureau(s)</label></td>
                                     }
 
-                                </tr>
+                                </tr>*@
                                 <tr>
                                     <td style="padding-left:10px"><label>Next Action </label></td>
                                     <td style="padding-left:10px"><label>:</label></td>
                                     <td style="padding-left:10px"><label>Credit pull for @ViewBag.Round challenges</label></td>
                                 </tr>
                                 <tr>
-                                    <td style="padding-left:10px"><label>Next Action Date </label></td>
+                                    <td style="padding-left:10px"><label>Next Identity IQ Action date </label></td>
                                     <td style="padding-left:10px"><label>:</label></td>
                                     @if (ViewBag.CreditReportItems.DateReportPulls != null)
                                     {
@@ -235,7 +235,15 @@
                                     }
 
                                 </tr>
+                                <tr>
+                                    <td style="padding-left:10px;"><label>Next CRG Date</label></td>
+                                    <td style="padding-left:10px"><label>:</label></td>
+                                    @if (ViewBag.CreditReportItems.NextCRGDate != null)
+                                    {
+                                        <td style="padding-left:10px"><label>@ViewBag.CreditReportItems.NextCRGDate <span style="color:red">*</span></label></td>
+                                    }
 
+                                </tr>
 
                             </table>
                         </div>

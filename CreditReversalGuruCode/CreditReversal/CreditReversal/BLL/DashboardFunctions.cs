@@ -289,7 +289,8 @@ namespace CreditReversal.BLL
             {
                 string sql = "Select cr.RoundType, min(Convert(varchar(15),cr.DateReportPulls,101)) as FirstDate , max(Convert(varchar(15),cr.DateReportPulls,101)) PullDate, max(Convert(varchar(15),crc.CreatedDate,101)) ChallengeDate ," + nl;
                 sql += "CRC.Status,Count(CRI.CredRepItemsId) as NegativeItemsCount, " + nl;
-                sql += "Convert(varchar(15),DATEADD(DAY, 30, max(cr.DateReportPulls)),101) NextActionDate from CreditReport CR" + nl;
+                sql += "Convert(varchar(15),DATEADD(DAY, 30, max(cr.DateReportPulls)),101) NextActionDate, " + nl;
+                sql += "Convert(varchar(15),DATEADD(DAY, 90, max(cr.DateReportPulls)),101) NextCRGDate from CreditReport CR" + nl;
                 sql += "INNER JOIN  CreditReportItems CRI ON CR.CreditReportId = CRI.CredReportId  LEFT JOIN" + nl;
                 sql += "CreditReportItemChallenges CRC ON CRI.AccountId = CRC.AccountId" + nl;
                 sql += "where CR.ClientId = '" + ClientId + "'  and CRC.Status is not null" + nl;
@@ -306,6 +307,7 @@ namespace CreditReversal.BLL
                     res.CredRepItemsId = row["NegativeItemsCount"].ConvertObjectToIntIfNotNull();
                     res.DateReportPulls = row["NextActionDate"].ConvertObjectToStringIfNotNull();
                     res.NegativeItemsCount = getNagativeItemsCount(ClientId, row["RoundType"].ToString());
+                    res.NextCRGDate = row["NextCRGDate"].ConvertObjectToStringIfNotNull();
                 }
             }
             catch (Exception ex)
@@ -1016,7 +1018,7 @@ namespace CreditReversal.BLL
             catch (Exception ex) { ex.insertTrace(""); }
             return CreditItems;
         }
-        public string getAccountType(string clientid,string accountid)
+        public string getAccountType(string clientid, string accountid)
         {
             string res = "";
             try
@@ -1039,7 +1041,7 @@ namespace CreditReversal.BLL
                 }
             }
             catch (Exception ex)
-            {}
+            { }
             return res;
         }
 
@@ -1865,11 +1867,10 @@ namespace CreditReversal.BLL
             string sql = "";
             DataTable dt;
             DataTable dt1;
-
-
-
             try
             {
+
+
                 int sno = 0;
                 sql = "select top 1 sno from CreditReportItems where AccountId !='-' and "
                + " CredReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ")  order by CredRepItemsId desc";
@@ -1878,6 +1879,16 @@ namespace CreditReversal.BLL
                     sno = utilities.ExecuteScalar(sql, true).ConvertObjectToIntIfNotNull();
                 }
                 catch (Exception)
+                { }
+
+                sql = " Select top 1 a.CredRepItemsId from CreditReportItemChallenges a,CreditReportItems b, CreditReport c   where a.sno=" + sno
+                    + " and a.CredRepItemsId=b.CredRepItemsId and b.CredReportId=c.CreditReportId and c.ClientID=" + id;
+                long val = 0;
+                try
+                {
+                    val = long.Parse(utilities.ExecuteScalar(sql, true).ToString());
+                }
+                catch (Exception ex)
                 { }
 
 
@@ -1904,56 +1915,119 @@ namespace CreditReversal.BLL
                     addnagitiveitems = "";
                 }
 
-
-                sql = "SELECT ( STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ "
+                if (val > 0)
+                {
+                    sql = "SELECT ( STUFF((SELECT '^ ' + ( US.MerchantName + '~'+ US.AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ "
+                    + " CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+US.Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
+                    + " from CreditReportItemChallenges where  AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN US.Status LIKE '%LATE%' THEN '1' ELSE '0' END)) "
+                    + "+'~'+ Convert(varchar,US.CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Equifax' "
+                    + " group by PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
+                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId " +
+                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + sno +
+                     " where US.Agency='EQUIFAX' and us.sno=" + sno;
+                }
+                else
+                {
+                    sql = "SELECT ( STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ "
                     + " CurrentBalance +'~'+ MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
                     + " from CreditReportItemChallenges where  AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) "
                     + "+'~'+ Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Equifax' "
                     + " group by PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
-                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EQUIFAX' and us.sno=" + sno
-                      + " and CR.ClientId='" + id + "'" + addnagitiveitems +
+                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId "
+                     + " where Agency='EQUIFAX' and us.sno=" + sno;
+                }
+                sql += " and CR.ClientId='" + id + "'" + addnagitiveitems;
 
                 //if (role== "agentadmin") {
                 //  sql += "  and US.negativeitems > 0 "+
                 //}
 
-                " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  from CreditReport where ClientId = '" + id + "')" +
+                sql += " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  from CreditReport where ClientId = '" + id + "')" +
                       " FOR XML PATH('')), 1, 1, '')) " +
-                      " as 'EQUIFAX' ," +
-                      " STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
-                      + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
-                      + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and clientid=" + id
-                      + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
-                      + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by  "
-                      + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
-                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EXPERIAN' and us.sno=" + sno
-                      + " and CR.ClientId='" + id + "'" + addnagitiveitems +
-                      //if (role== "agentadmin") {
-                      //  sql += "  and US.negativeitems > 0 "+
-                      //}
+                      " as 'EQUIFAX' ,";
+
+                if (val > 0)
+                {
+                    sql += " STUFF((SELECT '^ ' + ( US.MerchantName + '~'+ US.AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
+                    + " MonthlyPayment +'~'+ LastReported+ '~'+US.Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
+                    + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and clientid=" + id
+                    + " order by CrdRepItemChallengeId desc),CASE WHEN US.Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                    + " Convert(varchar,US.CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by  "
+                    + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
+                    " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId " +
+                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + sno
+                    + " where US.Agency='EXPERIAN' and us.sno=" + sno
+                    + " and CR.ClientId='" + id + "'" + addnagitiveitems;
+                }
+                else
+                {
+                    sql += " STUFF((SELECT '^ ' + ( MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
+                                        + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
+                                        + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and clientid=" + id
+                                        + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                                        + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by  "
+                                        + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
+                                        " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='EXPERIAN' and us.sno=" + sno
+                                        + " and CR.ClientId='" + id + "'" + addnagitiveitems;
+                }
 
 
-                      " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  "
+                sql += " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  "
                       + " from CreditReport where ClientId = '" + id + "')" +
                       " FOR XML PATH('')), 1, 1, '')" +
-                      " as 'EXPERIAN'," +
-                      " (SELECT STUFF((SELECT '^ ' + (MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
-                      + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
-                      + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
-                      + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='TransUnion' group by "
-                      + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
-                      " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='TRANSUNION' and us.sno=" + sno
-                      + " and CR.ClientId='" + id + "'" + addnagitiveitems +
-                      //"  and US.negativeitems > 0 " +
-                      " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  "
-                      + " from CreditReport where ClientId = '" + id + "')" +
-                      " FOR XML PATH('')), 1, 1, ''))" +
-                      " as 'TRANSUNION'";
+                      " as 'EXPERIAN',";
+
+                if (val > 0)
+                {
+                    sql += " (SELECT STUFF((SELECT '^ ' + (US.MerchantName + '~'+ US.AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
+                    + " MonthlyPayment +'~'+ LastReported+ '~'+US.Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
+                    + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN US.Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                    + " Convert(varchar,US.CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='TransUnion' group by "
+                    + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
+                    " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId " +
+                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + sno
+                    + " where US.Agency='TRANSUNION' and us.sno=" + sno
+                    + " and CR.ClientId='" + id + "'" + addnagitiveitems;
+                }
+                else
+                {
+                    sql += " (SELECT STUFF((SELECT '^ ' + (MerchantName + '~'+ AccountId +'~'+ AccountType+'~'+ AccountTypeDetails +'~'+ OpenDate +'~'+ HighestBalance +'~'+ CurrentBalance +'~'+ "
+                    + " MonthlyPayment +'~'+ LastReported+ '~'+Status +'~'+   Convert (varchar,Isnull((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) from "
+                    + " CreditReportItemChallenges where AccountId=US.AccountId and Agency=us.Agency and  clientid=" + id + " order by CrdRepItemChallengeId desc),CASE WHEN Status LIKE '%LATE%' THEN '1' ELSE '0' END)) +'~'+ "
+                    + " Convert(varchar,CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='TransUnion' group by "
+                    + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
+                    " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId where Agency='TRANSUNION' and us.sno=" + sno
+                    + " and CR.ClientId='" + id + "'" + addnagitiveitems;
+                }
+
+
+
+                sql += " and cast(cr.DateReportPulls as date) in (select cast(Max(DateReportPulls) as date) as pulldate  "
+                + " from CreditReport where ClientId = '" + id + "')" +
+                " FOR XML PATH('')), 1, 1, ''))" +
+                " as 'TRANSUNION'";
 
                 dt = utilities.GetDataTable(sql);
                 sql = "";
-                sql = "select distinct accountId from CreditReportItems where AccountId !='-' and "
-                + " CredReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ") and sno=" + sno;
+                //sql = "select distinct accountId from CreditReportItems where AccountId !='-' and "
+                //+ " CredReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ") and sno=" + sno
+                //+ " and CredRepItemsId in (Select CredRepItemsId from CreditReportItemChallenges where sno=" + sno + ")";
+
+
+                if (val > 0)
+                {
+                    sql = "select distinct cr.accountId from CreditReportItems cr join  CreditReport c on cr.CredReportId=c.CreditReportId"
+                    + " and AccountId !='-' and ClientId =" + id + " and cr.sno=" + sno
+                    + " join CreditReportItemChallenges cri on cri.CredRepItemsId = cr.CredRepItemsId and cri.sno =" + sno;
+                }
+                else
+                {
+                    sql = "select distinct accountId from CreditReportItems where AccountId !='-' and "
+                    + " CredReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ") and sno=" + sno;
+                }
+
+
+
                 dt1 = utilities.GetDataTable(sql);
 
 
@@ -2020,7 +2094,7 @@ namespace CreditReversal.BLL
                             ah.Bank = strEQUIFAX1[0];
                             ah.Account = strEQUIFAX1[1];
                             ah.AccountType = strEQUIFAX1[2];
-                           // ah.AccountTypeDetail = strEQUIFAX1[3];
+                            // ah.AccountTypeDetail = strEQUIFAX1[3];
                             ah.AccountTypeDetail = string.IsNullOrEmpty(strEQUIFAX1[3]) ? getAccountType(id.ToString(), strEQUIFAX1[1]) : strEQUIFAX1[3];
                             ah.DateOpened = strEQUIFAX1[4];
                             ah.HighCredit = strEQUIFAX1[5];
@@ -2058,7 +2132,7 @@ namespace CreditReversal.BLL
                             ah.Bank = strEXPERIAN1[0];
                             ah.Account = strEXPERIAN1[1];
                             ah.AccountType = strEXPERIAN1[2];
-                           // ah.AccountTypeDetail = strEXPERIAN1[3];
+                            // ah.AccountTypeDetail = strEXPERIAN1[3];
                             ah.AccountTypeDetail = string.IsNullOrEmpty(strEXPERIAN1[3]) ? getAccountType(id.ToString(), strEXPERIAN1[1]) : strEXPERIAN1[3];
                             ah.DateOpened = strEXPERIAN1[4];
                             ah.HighCredit = strEXPERIAN1[5];
@@ -2622,45 +2696,114 @@ namespace CreditReversal.BLL
                 catch (Exception)
                 { }
 
+                sql = " Select top 1 a.CreditInqId from CreditReportItemChallenges a,CreditInquiries b, CreditReport c   where a.sno=" + sno
+                    + " and a.CreditInqId=b.CreditInqId and b.CreditReportId=c.CreditReportId and c.ClientID=" + id;
+                long val = 0;
+                try
+                {
+                    val = long.Parse(utilities.ExecuteScalar(sql, true).ToString());
+                }
+                catch (Exception ex)
+                { }
 
-                sql = "SELECT (" +
-                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),101)" +
+
+                sql = "SELECT (";
+
+                if (val > 0)
+                {
+                    sql += " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,US.DateOfInquiry,101),101)" +
                 " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "
                 + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
                 + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and"
                 + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
                 " FROM" +
-                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +
-                " where Agency = 'EQUIFAX' and CR.ClientId = '" + id + "' and us.sno=" + sno
+                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
+                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + sno +
+                " where US.Agency = 'EQUIFAX' and CR.ClientId = '" + id + "' and us.sno=" + sno
                 + " FOR XML PATH('')), 1, 1, '')) " +
-                " as 'EQUIFAX'," +
-
-                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),101)" +
+                " as 'EQUIFAX',";
+                }
+                else
+                {
+                    sql += " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,US.DateOfInquiry,101),101)" +
                 " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "
                 + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
                 + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and"
                 + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
                 " FROM" +
-                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +
-                " where Agency = 'EXPERIAN' and CR.ClientId = '" + id + "' and us.sno=" + sno +
-                " FOR XML PATH('')), 1, 1, '')" +
-                " as 'EXPERIAN'," +
+                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
+                " where US.Agency = 'EQUIFAX' and CR.ClientId = '" + id + "' and us.sno=" + sno
+                + " FOR XML PATH('')), 1, 1, '')) " +
+                " as 'EQUIFAX',";
+                }
 
-                " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,DateOfInquiry,101),101)" +
+                if(val > 0)
+                {
+                    sql += " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,US.DateOfInquiry,101),101)" +
+                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "
+                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
+                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and"
+                + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
+                " FROM" +
+                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
+                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + sno +
+                " where US.Agency = 'EXPERIAN' and CR.ClientId = '" + id + "' and us.sno=" + sno
+               + " FOR XML PATH('')), 1, 1, '')" +
+                " as 'EXPERIAN',";
+                }
+                else
+                {
+                    sql += " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,US.DateOfInquiry,101),101)" +
+                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges "
+                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
+                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and"
+                + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
+                " FROM" +
+                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
+                " where US.Agency = 'EXPERIAN' and CR.ClientId = '" + id + "' and us.sno=" + sno
+               + " FOR XML PATH('')), 1, 1, '')" +
+                " as 'EXPERIAN',";
+                }
+                
+
+                if(val > 0)
+                {
+                    sql += " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,US.DateOfInquiry,101),101)" +
                 " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges  "
                 + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
                 + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and"
                 + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
                 " FROM" +
-                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId" +
-                " where Agency = 'TRANSUNION' and CR.ClientId = '" + id + "' and us.sno=" + sno +
+                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
+                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + sno +
+                "  where US.Agency = 'TRANSUNION' and CR.ClientId = '" + id + "' and us.sno=" + sno +
                 " FOR XML PATH('')), 1, 1, '')" +
                 " as 'TRANSUNION'";
+                }
+                else
+                {
+                    sql += " STUFF((SELECT '^ ' + (CreditorName + '~' + TypeOfBusiness + '~' + CONVERT(varchar,CONVERT(datetime,US.DateOfInquiry,101),101)" +
+                " + '~' + isnull(Convert(varchar, ((select top 1 RoundType from CreditReportItemChallenges  "
+                + " where CreditInqId=US.CreditInqId))), '-') +'~'+ isnull(Convert(varchar, ((Select top 1 RoundType+'-'+convert(varchar,ChallengeText) "
+                + " from CreditReportItemChallenges where  MerchantName=US.CreditorName and AccountId is null and Agency=us.Agency and clientid =" + id + " and"
+                + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
+                " FROM" +
+                " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
+                "  where US.Agency = 'TRANSUNION' and CR.ClientId = '" + id + "' and us.sno=" + sno +
+                " FOR XML PATH('')), 1, 1, '')" +
+                " as 'TRANSUNION'";
+                }
+
+               
 
                 dt = utilities.GetDataTable(sql);
                 sql = "";
-                sql = "select distinct CreditorName from CreditInquiries where  "
-                + " CreditReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ") and sno=" + sno;
+                //sql = "select distinct CreditorName from CreditInquiries where  "
+                //+ " CreditReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ") and sno=" + sno
+                //+ " and CreditInqId in (select CreditInqId from CreditReportItemChallenges where sno="+ sno+")";
+
+                sql = "select distinct CreditorName from CreditInquiries ci join  CreditReport c on ci.CreditReportId=c.CreditReportId "
+                    + " and ClientId =" + id + " and ci.sno=" + sno + " left join CreditReportItemChallenges cri on cri.CreditInqId = ci.CreditInqId and cri.sno =" + sno;
                 dt1 = utilities.GetDataTable(sql);
 
                 for (int r = 0; r < dt.Rows.Count; r++)
@@ -2735,7 +2878,6 @@ namespace CreditReversal.BLL
                             inq.ChallengeText = string.IsNullOrEmpty(challengestatus) ? strEQUIFAX1[4] : challengestatus;
                         }
                     }
-
                     if (EXPERIAN != "")
                     {
                         for (int l = 0; l < strEXPERIAN.Length; l++)
@@ -2764,7 +2906,6 @@ namespace CreditReversal.BLL
                             inq.ChallengeText = string.IsNullOrEmpty(challengestatus) ? strEXPERIAN1[4] : challengestatus;
                         }
                     }
-
                     for (int x = 0; x < dt1.Rows.Count; x++)
                     {
                         //string accountid = dt1.Rows[x]["accountId"].ToString();
@@ -2774,195 +2915,301 @@ namespace CreditReversal.BLL
                             Inq.Heading = getHeadingsForInquires()[i];
                             if (Inq.Heading == "Creditor Name")
                             {
+                                try
+                                {
+                                    if (inqquifax[x].CreditorName != null)
+                                    {
+                                        Inq.EQUIFAX = inqquifax[x].CreditorName;
+                                    }
+                                    else
+                                    {
+                                        Inq.EQUIFAX = "-";
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
 
-                                if (inqquifax[x].CreditorName != null)
-                                {
-                                    Inq.EQUIFAX = inqquifax[x].CreditorName;
-                                }
-                                else
-                                {
-                                    Inq.EQUIFAX = "-";
-                                }
-
-                                if (inqtransunion[x].CreditorName != null)
-                                {
-                                    Inq.TRANSUNION = inqtransunion[x].CreditorName;
-                                }
-                                else
-                                {
-                                    Inq.TRANSUNION = "-";
                                 }
 
-                                if (inqexperian[x].CreditorName != null)
+                                try
                                 {
-                                    Inq.EXPERIAN = inqexperian[x].CreditorName;
+                                    if (inqtransunion[x].CreditorName != null)
+                                    {
+                                        Inq.TRANSUNION = inqtransunion[x].CreditorName;
+                                    }
+                                    else
+                                    {
+                                        Inq.TRANSUNION = "-";
+                                    }
                                 }
-                                else
+                                catch (Exception)
                                 {
-                                    Inq.EXPERIAN = "-";
+
                                 }
+
+                                try
+                                {
+                                    if (inqexperian[x].CreditorName != null)
+                                    {
+                                        Inq.EXPERIAN = inqexperian[x].CreditorName;
+                                    }
+                                    else
+                                    {
+                                        Inq.EXPERIAN = "-";
+                                    }
+                                }
+                                catch (Exception)
+                                {
+
+                                }
+
                             }
                             if (Inq.Heading == "Type Of Business")
                             {
 
                                 //var equifax = achquifax.FirstOrDefault(t => t.Account == accountid);
-                                if (inqquifax[x].TypeofBusiness != null && inqquifax[x].TypeofBusiness != "")
+                                try
                                 {
-                                    Inq.EQUIFAX = inqquifax[x].TypeofBusiness;
+                                    if (inqquifax[x].TypeofBusiness != null && inqquifax[x].TypeofBusiness != "")
+                                    {
+                                        Inq.EQUIFAX = inqquifax[x].TypeofBusiness;
+                                    }
+                                    else
+                                    {
+                                        Inq.EQUIFAX = "-";
+                                    }
                                 }
-                                else
+                                catch (Exception)
                                 {
-                                    Inq.EQUIFAX = "-";
+
                                 }
 
-                                //var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
-                                if (inqtransunion[x].TypeofBusiness != null && inqtransunion[x].TypeofBusiness != "")
+                                try
                                 {
-                                    Inq.TRANSUNION = inqtransunion[x].TypeofBusiness;
+                                    //var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                    if (inqtransunion[x].TypeofBusiness != null && inqtransunion[x].TypeofBusiness != "")
+                                    {
+                                        Inq.TRANSUNION = inqtransunion[x].TypeofBusiness;
+                                    }
+                                    else
+                                    {
+                                        Inq.TRANSUNION = "-";
+                                    }
                                 }
-                                else
+                                catch (Exception)
                                 {
-                                    Inq.TRANSUNION = "-";
+
                                 }
 
-                                //var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
-                                if (inqexperian[x].TypeofBusiness != null && inqexperian[x].TypeofBusiness != "")
+                                try
                                 {
-                                    Inq.EXPERIAN = inqexperian[x].TypeofBusiness;
+                                    //var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                    if (inqexperian[x].TypeofBusiness != null && inqexperian[x].TypeofBusiness != "")
+                                    {
+                                        Inq.EXPERIAN = inqexperian[x].TypeofBusiness;
+                                    }
+                                    else
+                                    {
+                                        Inq.EXPERIAN = "-";
+                                    }
                                 }
-                                else
+                                catch (Exception)
                                 {
-                                    Inq.EXPERIAN = "-";
+
                                 }
+
                             }
                             if (Inq.Heading == "Date Of Inquiry")
                             {
+                                try
+                                {
+                                    if (inqquifax[x].Dateofinquiry != null)
+                                    {
+                                        Inq.EQUIFAX = inqquifax[x].Dateofinquiry;
+                                    }
+                                    else
+                                    {
+                                        Inq.EQUIFAX = "-";
+                                    }
 
-                                if (inqquifax[x].Dateofinquiry != null)
-                                {
-                                    Inq.EQUIFAX = inqquifax[x].Dateofinquiry;
                                 }
-                                else
+                                catch (Exception)
+                                { }
+
+                                try
                                 {
-                                    Inq.EQUIFAX = "-";
+                                    if (inqtransunion[x].Dateofinquiry != null)
+                                    {
+                                        Inq.TRANSUNION = inqtransunion[x].Dateofinquiry;
+                                    }
+                                    else
+                                    {
+                                        Inq.TRANSUNION = "-";
+                                    }
+                                }
+                                catch (Exception)
+                                {
+
                                 }
 
 
-                                if (inqtransunion[x].Dateofinquiry != null)
+                                try
                                 {
-                                    Inq.TRANSUNION = inqtransunion[x].Dateofinquiry;
+                                    if (inqexperian[x].Dateofinquiry != null)
+                                    {
+                                        Inq.EXPERIAN = inqexperian[x].Dateofinquiry;
+                                    }
+                                    else
+                                    {
+                                        Inq.EXPERIAN = "-";
+                                    }
                                 }
-                                else
-                                {
-                                    Inq.TRANSUNION = "-";
-                                }
+                                catch (Exception)
+                                { }
 
-
-                                if (inqexperian[x].Dateofinquiry != null)
-                                {
-                                    Inq.EXPERIAN = inqexperian[x].Dateofinquiry;
-                                }
-                                else
-                                {
-                                    Inq.EXPERIAN = "-";
-                                }
                             }
 
                             if (Inq.Heading == "Challenge Status")
                             {
-
-                                if (inqquifax[x].ChallengeStatus != null)
+                                try
                                 {
-                                    Inq.EQUIFAX = inqquifax[x].ChallengeStatus;
+                                    if (inqquifax[x].ChallengeStatus != null)
+                                    {
+                                        Inq.EQUIFAX = inqquifax[x].ChallengeStatus;
+                                    }
+                                    else
+                                    {
+                                        Inq.EQUIFAX = "-";
+                                    }
                                 }
-                                else
-                                {
-                                    Inq.EQUIFAX = "-";
-                                }
-
-
-                                if (inqtransunion[x].ChallengeStatus != null)
-                                {
-                                    Inq.TRANSUNION = inqtransunion[x].ChallengeStatus;
-                                }
-                                else
-                                {
-                                    Inq.TRANSUNION = "-";
-                                }
+                                catch (Exception)
+                                { }
 
 
-                                if (inqexperian[x].ChallengeStatus != null)
+                                try
                                 {
-                                    Inq.EXPERIAN = inqexperian[x].ChallengeStatus;
+                                    if (inqtransunion[x].ChallengeStatus != null)
+                                    {
+                                        Inq.TRANSUNION = inqtransunion[x].ChallengeStatus;
+                                    }
+                                    else
+                                    {
+                                        Inq.TRANSUNION = "-";
+                                    }
                                 }
-                                else
+                                catch (Exception)
+                                { }
+
+
+                                try
                                 {
-                                    Inq.EXPERIAN = "-";
+                                    if (inqexperian[x].ChallengeStatus != null)
+                                    {
+                                        Inq.EXPERIAN = inqexperian[x].ChallengeStatus;
+                                    }
+                                    else
+                                    {
+                                        Inq.EXPERIAN = "-";
+                                    }
                                 }
+                                catch (Exception)
+                                { }
+
                             }
                             if (Inq.Heading == "Challenge")
                             {
+                                try
+                                {
+                                    if (inqquifax[x].ChallengeText != null && inqquifax[x].ChallengeText != "-")
+                                    {
+                                        Inq.EQUIFAX = inqquifax[x].ChallengeText;
+                                    }
+                                    else
+                                    {
+                                        Inq.EQUIFAX = "-";
+                                    }
+                                }
+                                catch (Exception)
+                                { }
 
-                                if (inqquifax[x].ChallengeText != null && inqquifax[x].ChallengeText != "-")
-                                {
-                                    Inq.EQUIFAX = inqquifax[x].ChallengeText;
-                                }
-                                else
-                                {
-                                    Inq.EQUIFAX = "-";
-                                }
 
-                                //var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
-                                if (inqtransunion[x].ChallengeText != null && inqtransunion[x].ChallengeText != "-")
+                                try
                                 {
-                                    Inq.TRANSUNION = inqtransunion[x].ChallengeText;
+                                    //var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                    if (inqtransunion[x].ChallengeText != null && inqtransunion[x].ChallengeText != "-")
+                                    {
+                                        Inq.TRANSUNION = inqtransunion[x].ChallengeText;
+                                    }
+                                    else
+                                    {
+                                        Inq.TRANSUNION = "-";
+                                    }
                                 }
-                                else
-                                {
-                                    Inq.TRANSUNION = "-";
-                                }
+                                catch (Exception)
+                                { }
 
-                                //var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
-                                if (inqexperian[x].ChallengeText != null && inqexperian[x].ChallengeText != "-")
+                                try
                                 {
-                                    Inq.EXPERIAN = inqexperian[x].ChallengeText;
+                                    //var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                    if (inqexperian[x].ChallengeText != null && inqexperian[x].ChallengeText != "-")
+                                    {
+                                        Inq.EXPERIAN = inqexperian[x].ChallengeText;
+                                    }
+                                    else
+                                    {
+                                        Inq.EXPERIAN = "-";
+                                    }
                                 }
-                                else
-                                {
-                                    Inq.EXPERIAN = "-";
-                                }
+                                catch (Exception)
+                                { }
+
                             }
                             if (Inq.Heading == "CreditInqId")
                             {
+                                try
+                                {
+                                    if (inqquifax[x].CreditInqId != null)
+                                    {
+                                        Inq.EQUIFAX = inqquifax[x].CreditInqId;
+                                    }
+                                    else
+                                    {
+                                        Inq.EQUIFAX = "-";
+                                    }
+                                }
+                                catch (Exception)
+                                { }
 
-                                if (inqquifax[x].CreditInqId != null)
+                                try
                                 {
-                                    Inq.EQUIFAX = inqquifax[x].CreditInqId;
+                                    //var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
+                                    if (inqtransunion[x].CreditInqId != null)
+                                    {
+                                        Inq.TRANSUNION = inqtransunion[x].CreditInqId;
+                                    }
+                                    else
+                                    {
+                                        Inq.TRANSUNION = "-";
+                                    }
                                 }
-                                else
-                                {
-                                    Inq.EQUIFAX = "-";
-                                }
+                                catch (Exception)
+                                { }
 
-                                //var transunio = achtransunion.FirstOrDefault(t => t.Account == accountid);
-                                if (inqtransunion[x].CreditInqId != null)
+                                try
                                 {
-                                    Inq.TRANSUNION = inqtransunion[x].CreditInqId;
+                                    //var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
+                                    if (inqexperian[x].CreditInqId != null)
+                                    {
+                                        Inq.EXPERIAN = inqexperian[x].CreditInqId;
+                                    }
+                                    else
+                                    {
+                                        Inq.EXPERIAN = "-";
+                                    }
                                 }
-                                else
-                                {
-                                    Inq.TRANSUNION = "-";
-                                }
+                                catch (Exception)
+                                { }
 
-                                //var experian = achexperian.FirstOrDefault(t => t.Account == accountid);
-                                if (inqexperian[x].CreditInqId != null)
-                                {
-                                    Inq.EXPERIAN = inqexperian[x].CreditInqId;
-                                }
-                                else
-                                {
-                                    Inq.EXPERIAN = "-";
-                                }
                             }
 
 
@@ -2972,15 +3219,20 @@ namespace CreditReversal.BLL
                             //}
                             //else
                             //{
-                            Inquires.Add(Inq);
+
                             //}
+
+                            if (Inq.EXPERIAN == null && Inq.TRANSUNION == null && Inq.EQUIFAX == null)
+                            {
+
+                            }
+                            else
+                            {
+                                Inquires.Add(Inq);
+                            }
 
                         }
                     }
-
-
-
-
                 }
             }
             catch (Exception ex) { ex.insertTrace(""); }

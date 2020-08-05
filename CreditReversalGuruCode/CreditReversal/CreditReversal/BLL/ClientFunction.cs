@@ -96,7 +96,7 @@ namespace CreditReversal.BLL
             catch (Exception ex) { ex.insertTrace(""); }
             return userstatus;
         }
-       
+
         public List<CreditReportItems> GetCreditReportItems(int id)
         {
             List<CreditReportItems> creditReportItems = new List<CreditReportItems>();
@@ -128,7 +128,7 @@ namespace CreditReversal.BLL
                             Agency = row["AgencyName"].ToString(),
                             Challenge = row["ChallengeText"].ToString(),
                             RoundType = row["RoundType"].ToString(),
-                          LoanStatus = row["LoanStatus"].ToString(),
+                            LoanStatus = row["LoanStatus"].ToString(),
                             PastDueDays = row["PastDueDays"].ConvertObjectToIntIfNotNull()
                         });
                     }
@@ -178,6 +178,7 @@ namespace CreditReversal.BLL
 
             return challengeMasters;
         }
+        
         public bool AddChallenge(CreditReportItems credit, string AgentId = "", string staffId = "")
         {
             long res = 0;
@@ -523,22 +524,22 @@ namespace CreditReversal.BLL
 
             return ReportId;
         }
-        public bool AddReportItemChallenges(CreditReportItems credit, int sno, int clientid,string PrevItem=null)
+        public bool AddReportItemChallenges(CreditReportItems credit, int sno, int clientid, string PrevItem = null)
         {
             string sql = string.Empty;
             try
             {
                 int PrevNo = sno;
-                if(!string.IsNullOrEmpty(PrevItem))
+                if (!string.IsNullOrEmpty(PrevItem))
                 {
-                    if(Convert.ToBoolean(PrevItem))
+                    if (Convert.ToBoolean(PrevItem))
                     {
                         PrevNo++;
                     }
                 }
                 object ChallengeText = "";
 
-                if (credit.PastDueDays > 0 && credit.AccountType=="EDUCATION") //Account Type education 
+                if (credit.PastDueDays > 0 && credit.AccountType == "EDUCATION") //Account Type education 
                 {
                     sql = "Select ChallengeText from ChallengeMaster where ChallengeId=50"; //eDUCATION Challenge
                     ChallengeText = utilities.ExecuteScalar(sql, true);
@@ -570,24 +571,24 @@ namespace CreditReversal.BLL
                     }
                 }
                 CreditReportItems creditReportItems = cd.GetCreditReportItems(credit.CredRepItemsId.ToString())[0];
-                
+
                 sql = "Insert Into CreditReportItemChallenges (CredRepItemsId,ChallengeText,Status,MerchantName,AccountId, "
                     + " Agency,RoundType,sno,clientid,LoanStatus,PastDueDays) "
-                    + " values(@CredRepItemsId,@ChallengeText,@Status,@MerchantName,@AccountId,@Agency,@RoundType," 
+                    + " values(@CredRepItemsId,@ChallengeText,@Status,@MerchantName,@AccountId,@Agency,@RoundType,"
                     + sno + "," + clientid + ",@LoanStatus,@PastDueDays)";
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@CredRepItemsId", credit.CredRepItemsId);
                 cmd.Parameters.AddWithValue("@LoanStatus", (credit.LoanStatus != null ? credit.LoanStatus : ""));
-                cmd.Parameters.AddWithValue("@PastDueDays", credit.PastDueDays );
+                cmd.Parameters.AddWithValue("@PastDueDays", credit.PastDueDays);
 
                 credit.Challenge = ChallengeText.ToString();
                 if (sno == 1)
                 {
-                    creditReportItems.RoundType = "Round-"+ sno;
+                    creditReportItems.RoundType = "Round-" + sno;
                 }
-                else if (sno > 1) { creditReportItems.RoundType = "Round-"+ sno; }
-               
+                else if (sno > 1) { creditReportItems.RoundType = "Round-" + sno; }
+
                 cmd.Parameters.AddWithValue("@ChallengeText", credit.Challenge);
                 cmd.Parameters.AddWithValue("@Status", creditReportItems.Status);
                 cmd.Parameters.AddWithValue("@MerchantName", creditReportItems.MerchantName);
@@ -601,7 +602,7 @@ namespace CreditReversal.BLL
 
             return true;
         }
-        public bool AddReportItemInquiriesChallenges(Inquires Inquires, string round, int sno, int clientid, string previtem=null)
+        public bool AddReportItemInquiriesChallenges(Inquires Inquires, string round, int sno, int clientid, string previtem = null)
         {
             object ChallengeText = "";
             try
@@ -616,7 +617,7 @@ namespace CreditReversal.BLL
                 }
                 //
 
-                string sql2 = "Select AccTypeId from AccountTypes where AccountType = '" + Inquires.AccountType + "'";               
+                string sql2 = "Select AccTypeId from AccountTypes where AccountType = '" + Inquires.AccountType + "'";
                 object AccountTypeId = utilities.ExecuteScalar(sql2, true);
                 if (AccountTypeId != null && sno != 0)
                 {
@@ -648,15 +649,15 @@ namespace CreditReversal.BLL
                     + " values(@CreditInqId,@ChallengeText,@Status,@MerchantName,@Agency,@RoundType," + sno + "," + clientid + ",@DateOfInquiry)";
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandText = sql;
-               
-                    Inquires.ChallengeText = ChallengeText.ToString();
+
+                Inquires.ChallengeText = ChallengeText.ToString();
                 if (sno == 1)
                 {
                     Inquires.RoundType = "Round-" + sno;
                 }
                 else if (sno > 1) { Inquires.RoundType = "Round-" + sno; }
-                
-               
+
+
                 cmd.Parameters.AddWithValue("@CreditInqId", Inquires.CreditInqId);
                 cmd.Parameters.AddWithValue("@ChallengeText", Inquires.ChallengeText);
                 cmd.Parameters.AddWithValue("@Status", "");
@@ -733,7 +734,7 @@ namespace CreditReversal.BLL
 
                 sql = "select DISTINCT CI.CreditReportId,CI.CreditorName,CI.TypeOfBusiness,CRC.RoundType,CI.Agency"
                 + " from CreditReportItemChallenges CRC INNER JOIN CreditInquiries CI  ON CRC.CreditInqId = CI.CreditInqId "
-                + " where CRC.CreditInqId is Not null and CRC.ClientId = '"+id+"' ORDER BY CI.CreditorName ";
+                + " where CRC.CreditInqId is Not null and CRC.ClientId = '" + id + "' ORDER BY CI.CreditorName ";
 
 
                 if (!string.IsNullOrEmpty(agency))
@@ -751,7 +752,7 @@ namespace CreditReversal.BLL
                             TypeofBusiness = row["TypeofBusiness"].ToString(),
                             RoundType = row["RoundType"].ToString(),
                             CreditBureau = row["Agency"].ToString(),
-                            
+
                             //ChallengeText = row["ChallengeText"].ToString(),
                         });
                     }

@@ -34,6 +34,8 @@
 
                     </div>
                 </div>
+                <br />
+                <h2>Account History</h2>
                 <div class="row m-2 p-2">
                     <div class="table-responsive">
                         <table id="tblChallenge" class="table table-bordered">
@@ -50,22 +52,20 @@
                             }
                             @if (ViewBag.creditreportfile != null && ViewBag.creditreportfile.Count > 0)
                             {
-                               <tbody>
-                            @{
-                                int i = 0;
-                                int j = 0;
-                                int k = 0;
-                            }
-                               
-                               @foreach (var item in ViewBag.creditreportfile)
-                               {
-                                   //if (item.RoundType == "First Round")
-                                   //{
+                                <tbody>
+                                    @{
+                                        int i = 0;
+                                    }
+
+                                    @foreach (var item in ViewBag.creditreportfile)
+                                    {
+                                        //if (item.RoundType == "First Round")
+                                        //{
                                         <tr>
-                                           
+
                                             <td>@item.RoundType</td>
-                                            <td>@item.CAgency - @item.RoundType-1.@i.ToString()</td>
-                                            
+                                            <td>@item.CAgency - @item.RoundType</td>
+
                                             @{
                                                 string file = item.CRFilename;
 
@@ -73,56 +73,17 @@
                                             }
 
                                             <td>
-                                                <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
+                                                @if (item.isAutoChallenges == 0)
+                                                {
+                                                    <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
+                                                }
+
                                             </td>
 
                                         </tr>
                                         i++;
-                                    @*}*@
-
-                                    @*if (item.RoundType == "Second Round")
-                                    {
-                                        <tr>
-                                            
-                                            <td>@item.RoundType</td>
-                                            <td>@item.CAgency - @item.RoundType-1.@j.ToString()</td>
-                                            @{
-                                                string file = item.CRFilename;
-
-                                                path = file.Replace(" ", "");
-                                            }
-
-                                            <td>
-                                                <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
-                                            </td>
-
-                                        </tr>
-                                        j++;
-                                    }*@
-
-                                    @*if (item.RoundType == "Third Round")
-                                    {
-                                        <tr>
-                                           
-                                            <td>@item.RoundType</td>
-                                            <td>@item.CAgency - @item.RoundType-1.@k.ToString()</td>
-                                            @{
-                                                string file = item.CRFilename;
-
-                                                path = file.Replace(" ", "");
-                                            }
-
-                                            <td>
-                                                <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
-                                            </td>
-
-                                        </tr>
-                                        k++;
-                                    }*@
-
-
-                                }
-                            </tbody>
+                                    }
+                                </tbody>
                             }
                             else
                             {
@@ -132,7 +93,64 @@
                         </table>
                     </div>
                 </div>
+                <br />
+                <h2>Inquires</h2>
+                <div class="row m-2 p-2">
+                    <div class="table-responsive">
+                        <table id="tblChallengeINQ" class="table table-bordered">
+                            <thead>
+                                <tr class="trTable">
+                                    @*<th>Client </th>*@
+                                    <th>Round Type</th>
+                                    <th>File Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            @{
+                                string path1 = string.Empty;
+                            }
+                            @if (ViewBag.creditreportfile != null && ViewBag.creditreportfile.Count > 0)
+                            {
+                                <tbody>
+                                    @{
+                                        int i = 0;
+                                    }
 
+                                    @foreach (var item in ViewBag.creditreportfileInq)
+                                    {
+                                        <tr>
+
+                                            <td>@item.RoundType</td>
+                                            <td>@item.CAgency - @item.RoundType</td>
+
+                                            @{
+                                                string file = item.CRFilename;
+
+                                                path1 = file.Replace(" ", "");
+                                            }
+
+                                            <td>
+                                                @if (item.isAutoChallenges == 0)
+                                                {
+                                                    <a href="~/documents/Challenge/@path1" target="_blank" class="btn btn-danger btn-xs"> Print</a>
+                                                }
+
+                                            </td>
+
+                                        </tr>
+                                        i++;
+
+                                    }
+                                </tbody>
+                            }
+                            else
+                            {
+                                <td colspan="3" style="text-align:center"><strong> No Challenges for Inquires </strong></td>
+                            }
+
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

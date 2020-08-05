@@ -379,6 +379,49 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div class="form-group">
+                                            <div class="row">
+                                                <div class="col-md-2">
+                                                    <label>Include Challenge Inquiries</label>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    @if (Model.IncChallengeInq != "")
+                                                    {
+                                                        if (Model.IncChallengeInq == "True")
+                                                        {
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="IncChallengeInq" value="True" checked>Yes
+                                                            </label>
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="IncChallengeInq" value="False">No
+                                                            </label>
+
+                                                        }
+                                                        else
+                                                        {
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="IncChallengeInq" value="True">Yes
+                                                            </label>
+
+                                                            <label class="radio-inline">
+                                                                <input type="radio" name="IncChallengeInq" value="False" checked>No
+                                                            </label>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="IncChallengeInq" value="True">Yes
+                                                        </label>
+                                                        <label class="radio-inline">
+                                                            <input type="radio" name="IncChallengeInq" value="False" checked>No
+                                                        </label>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         @if (BusinessName == "")
                                         {
                                             <div class="form-group">
@@ -454,6 +497,8 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+
 
                                         }
                                         <div class="form-group">
@@ -1291,7 +1336,7 @@
                 $("#FedTaxIdentityNo").focus();
                 document.getElementById("Msg_FedTaxIdentityNo").innerHTML = fedidentityno.validationMessage;
             }
-            else if (!checkfed(fedidentityno)) {               
+            else if (!checkfed(fedidentityno)) {
                 $("#FedTaxIdentityNo").focus();
                 document.getElementById("Msg_FedTaxIdentityNo").innerHTML = "Please enter a valid fed tax identity no.";
             }
@@ -1418,7 +1463,7 @@
             document.getElementById("Msg_BillingZip").innerHTML = "please enter a valid zip code";
         }
         else if (!billingphone.checkValidity()) {
-            
+
             document.getElementById("Msg_BillingPhone").innerHTML = billingphone.validationMessage;
         } else if (!checkphone(billingphone)) {
             $("#BillingPhone").focus();
@@ -1427,7 +1472,7 @@
         else if (!billingemail.checkValidity()) {
             $("#BillingEmail").focus();
             document.getElementById("Msg_BillingEmail").innerHTML = billingemail.validationMessage;
-        } else if (!checkZip(primaryzip)) {           
+        } else if (!checkZip(primaryzip)) {
             $("#PrimaryBusinessZip").focus();
             document.getElementById("Msg_PrimaryBusinessZip").innerHTML = "please enter a valid zip code";
 
