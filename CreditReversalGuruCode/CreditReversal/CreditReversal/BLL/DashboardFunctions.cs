@@ -287,14 +287,14 @@ namespace CreditReversal.BLL
             CreditReportItems res = new CreditReportItems();
             try
             {
-                string sql = "Select cr.RoundType, min(Convert(varchar(15),cr.DateReportPulls,101)) as FirstDate , max(Convert(varchar(15),cr.DateReportPulls,101)) PullDate, max(Convert(varchar(15),crc.CreatedDate,101)) ChallengeDate ," + nl;
+                string sql = "Select crc.RoundType, min(Convert(varchar(15),cr.DateReportPulls,101)) as FirstDate , max(Convert(varchar(15),cr.DateReportPulls,101)) PullDate, max(Convert(varchar(15),crc.CreatedDate,101)) ChallengeDate ," + nl;
                 sql += "CRC.Status,Count(CRI.CredRepItemsId) as NegativeItemsCount, " + nl;
                 sql += "Convert(varchar(15),DATEADD(DAY, 30, max(cr.DateReportPulls)),101) NextActionDate, " + nl;
                 sql += "Convert(varchar(15),DATEADD(DAY, 90, max(cr.DateReportPulls)),101) NextCRGDate from CreditReport CR" + nl;
                 sql += "INNER JOIN  CreditReportItems CRI ON CR.CreditReportId = CRI.CredReportId  LEFT JOIN" + nl;
                 sql += "CreditReportItemChallenges CRC ON CRI.AccountId = CRC.AccountId" + nl;
                 sql += "where CR.ClientId = '" + ClientId + "'  and CRC.Status is not null" + nl;
-                sql += "Group by  CRC.Status,cr.RoundType";
+                sql += "Group by  CRC.Status,crc.RoundType";
 
                 DataTable dt = utilities.GetDataTable(sql, true);
                 if (dt.Rows.Count > 0)
@@ -319,7 +319,7 @@ namespace CreditReversal.BLL
 
         public string getNagativeItemsCount(string ClientId, string round)
         {
-            string items = "";
+            string items = "0";
             try
             {
 
@@ -329,14 +329,18 @@ namespace CreditReversal.BLL
                 // + " where ClientId =" + ClientId + " and RoundType = '" + round + "' and(PHStatus != 'C' AND PHStatus != 'U' AND PHStatus != ' ' and "
                 // + " PHStatus != 7 and PHStatus != 9)";
 
-                string sql = "SELECT DISTINCT AccountId,Agency from CreditReportItems "
-                + " WHERE isnull(negativeitems, 0) > 0 AND CredReportId IN(SELECT CreditReportId FROM CreditReport WHERE ClientId =" + ClientId + ") ";
+                //string sql = "SELECT DISTINCT AccountId,Agency from CreditReportItems "
+                //+ " WHERE isnull(negativeitems, 0) > 0 AND CredReportId IN(SELECT CreditReportId FROM CreditReport WHERE ClientId =" + ClientId + ") ";
 
-                DataTable dt = utilities.GetDataTable(sql);
-                items = dt.Rows.Count.ToString();
+                string sql = "Select Count(*) as itemscount from CreditReportItemChallenges cri, CreditReportItems cr, CreditReport c "
+                   + " where cr.CredRepItemsId = cri.CredRepItemsId and c.CreditReportId = cr.CredReportId "
+                   + " and c.ClientId =" + ClientId + " and cri.RoundType ='" + round + "'";
+                 items = utilities.ExecuteScalar(sql,true).ToString();
+                
             }
             catch (Exception ex)
             {
+                items = "0";
                 ex.insertTrace("");
             }
             return items;
@@ -1886,7 +1890,8 @@ namespace CreditReversal.BLL
                 long val = 0;
                 try
                 {
-                    val = long.Parse(utilities.ExecuteScalar(sql, true).ToString());
+                    object _obj = utilities.ExecuteScalar(sql, true);
+                    val = _obj != null ? long.Parse(_obj.ToString()) : 0;
                 }
                 catch (Exception ex)
                 { }
@@ -2701,7 +2706,9 @@ namespace CreditReversal.BLL
                 long val = 0;
                 try
                 {
-                    val = long.Parse(utilities.ExecuteScalar(sql, true).ToString());
+                    object _obj = utilities.ExecuteScalar(sql, true);
+
+                    val = _obj != null ? long.Parse(_obj.ToString()) : 0;
                 }
                 catch (Exception ex)
                 { }

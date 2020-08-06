@@ -1467,15 +1467,15 @@
 
         $(".loader1").show();
         $("#overlay").show();
-            //debugger;
+            debugger;
         $.ajax({
             method: "POST",
             url: "/Client/ClientChallengeform",
             dataType: "json",
             data: { credit: AllAgenciesvalues, Id: ClientId, values: values },
             success: function (data) {
-                //debugger;
-                if (data == true) {
+                debugger;
+                if (data == "1") {
                     $(".loader1").hide();
                     $("#overlay").hide();
                     Swal.fire({
@@ -1503,6 +1503,18 @@
                     })
                 }
                 else {
+                    if (data != "" && data != "1" && data != "0") {
+                        Swal.fire("Success!", "Challenge created successfully.!", 'success');
+                        var files = data.split('^');
+                        for (var i = 0; i < files.length; i++) {
+                            window.open('/Documents/Challenge/' + files[i], "_blank");
+                            //var url = '/Documents/Challenge/' + files[i]
+                            //var link = document.createElement('a');
+                            //document.body.appendChild(link);
+                            //link.href = url;
+                            //link.click();
+                        }
+                    }
                     $(".loader1").hide();
                     $("#overlay").hide();
                     location.reload();
@@ -1790,7 +1802,7 @@
             data: { credit: AllAgenciesvalues, Id: Id, values: values },
             success: function (data) {
                 debugger;
-                if (data == true) {
+                if (data == "1") {
                     $(".loader1").hide();
                     $("#overlay").hide();
                     Swal.fire({
@@ -1817,6 +1829,18 @@
                     })
                 }
                 else {
+                    if (data != "" && data != "1" && data != "0") {
+                        Swal.fire("Success!", "Challenge created successfully.!", 'success');
+                        var files = data.split('^');
+                        for (var i = 0; i < files.length; i++) {
+                         window.open('/Documents/Challenge/' + files[i], "_blank");
+                            //var url = '/Documents/Challenge/' + files[i]
+                            //var link = document.createElement('a');
+                            //document.body.appendChild(link);
+                            //link.href = url;
+                            //link.click();
+                        }
+                    }
                     $(".loader1").hide();
                     $("#overlay").hide();
                     location.reload();

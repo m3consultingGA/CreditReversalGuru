@@ -1334,7 +1334,7 @@ stringWriter
         }
         public JsonResult ClientChallengeform(List<CreditReportItems> credit, int Id, string[] values)
         {
-            bool status = false;
+            string  status = "0";
             int sno = 0;
             if (credit == null || credit.Count == 0)
             {
@@ -1392,23 +1392,45 @@ stringWriter
                     List<CreditReportItems> EXCreditItems = credite.Where(x => x.Agency.ToUpper() == "EXPERIAN").ToList();
                     List<CreditReportItems> TUCreditItems = credite.Where(x => x.Agency.ToUpper() == "TRANSUNION").ToList();
 
+                    string file1 = "", file2 = "", file3 = "";
                     if (EQCreditItems.Count > 0)
                     {
-                        CreateChallengeLetters(EQCreditItems, clientModel, values, Id, sno);
+                       file1 =  CreateChallengeLetters(EQCreditItems, clientModel, values, Id, sno);
                     }
                     if (EXCreditItems.Count > 0)
                     {
-                        CreateChallengeLetters(EXCreditItems, clientModel, values, Id, sno);
+                     file2 =  CreateChallengeLetters(EXCreditItems, clientModel, values, Id, sno);
                     }
                     if (TUCreditItems.Count > 0)
                     {
-                        CreateChallengeLetters(TUCreditItems, clientModel, values, Id, sno);
+                    file3 =    CreateChallengeLetters(TUCreditItems, clientModel, values, Id, sno);
                     }
-                    status = true;
+
+                    if(string.IsNullOrEmpty(file1) && string.IsNullOrEmpty(file2) && string.IsNullOrEmpty(file3))
+                    {
+                        status = "1";
+                    }
+                    else
+                    {
+                        if(!string.IsNullOrEmpty(file1))
+                        {
+                            status = file1;
+                        }
+                        if (!string.IsNullOrEmpty(file2))
+                        {
+                            status = status + "^" + file2;
+                        }
+                        if (!string.IsNullOrEmpty(file3))
+                        {
+                            status = status + "^" + file3;
+                        }
+                        status = status.TrimStart('^'); status = status.TrimEnd('^');
+                    }
+                    
                 }
                 catch (Exception ex)
                 {
-                    status = true;
+                    status = "0";
                 }
             }
             catch (Exception ex)
@@ -1416,8 +1438,9 @@ stringWriter
             return Json(status);
         }
 
-        public void CreateChallengeLetters(List<CreditReportItems> credite, ClientModel clientModel, string[] values, int Id, int sno)
+        public string CreateChallengeLetters(List<CreditReportItems> credite, ClientModel clientModel, string[] values, int Id, int sno)
         {
+            string res = "";
             try
             {
                 string date = DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Year.ToString()
@@ -1511,10 +1534,16 @@ stringWriter
                     functions.updatechallengefilepath(filenames, sno);
                 }
                 StringList.Clear();
-
+                AgentData agentData = new AgentData();
+                int _checkExists =agentData.checkAutoChallenges(crItems[0].RoundType, crItems[0].Agency,Id.ToString(),"Account");
+                if(_checkExists == 0)
+                {
+                    res = filename;
+                }
             }
             catch (Exception ex)
             { }
+            return res;
         }
 
         public JsonResult ClientChallengeInquiresform(List<Inquires> credit, int Id, string[] values)
@@ -1524,7 +1553,7 @@ stringWriter
             ClientModel clientModel = cfunction.GetClient(client);
             int sno = 0;
             
-            bool status = false;
+            string status = "";
             int count = 0;
             if (credit != null)
             {
@@ -1569,29 +1598,54 @@ stringWriter
                 List<Inquires> exInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EXPERIAN").ToList();
                 List<Inquires> tuInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "TRANSUNION").ToList();
 
-                if(eqInquires.Count > 0)
+                string file1 = "", file2 = "", file3 = "";
+                if (eqInquires.Count > 0)
                 {
-                    CreateChallengeLettersForInq(eqInquires, Id, values, clientModel, sno);
+                  file1=  CreateChallengeLettersForInq(eqInquires, Id, values, clientModel, sno);
                 }
                 if (exInquires.Count > 0)
                 {
-                    CreateChallengeLettersForInq(exInquires, Id, values, clientModel, sno);
+                  file2=  CreateChallengeLettersForInq(exInquires, Id, values, clientModel, sno);
                 }
                 if (tuInquires.Count > 0)
                 {
-                    CreateChallengeLettersForInq(tuInquires, Id, values, clientModel, sno);
+                 file3 =  CreateChallengeLettersForInq(tuInquires, Id, values, clientModel, sno);
                 }
-                status = true;
+                
+
+                if (string.IsNullOrEmpty(file1) && string.IsNullOrEmpty(file2) && string.IsNullOrEmpty(file3))
+                {
+                    status = "1";
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(file1))
+                    {
+                        status = file1;
+                    }
+                    if (!string.IsNullOrEmpty(file2))
+                    {
+                        status = status + "^" + file2;
+                    }
+                    if (!string.IsNullOrEmpty(file3))
+                    {
+                        status = status + "^" + file3;
+                    }
+                    status = status.TrimStart('^'); status = status.TrimEnd('^');
+                }
+
+                
             }
             catch (Exception ex)
             {
-                status = true;
+                status = "0";
             }
             return Json(status);
         }
 
-        public void CreateChallengeLettersForInq(List<Inquires> Inquires, int Id, string[] values, ClientModel clientModel,int sno)
+        public string CreateChallengeLettersForInq(List<Inquires> Inquires, int Id, string[] values, ClientModel clientModel,int sno)
         {
+            string res = "";
             try
             {
                 List<Inquires> InquiresAllAgencies = new List<Inquires>();
@@ -1671,10 +1725,16 @@ stringWriter
                         functions.updatechallengefilepath(filenames, sno);
                     }
                     StringList.Clear();
-                
+                AgentData agentData = new AgentData();
+                int _checkExists = agentData.checkAutoChallenges(InquiresAllAgencies[0].RoundType, Inquires[0].CreditBureau, Id.ToString(), "Inquires");
+                if (_checkExists == 0)
+                {
+                    res = filename;
+                }
             }
             catch (Exception ex)
             {}
+            return res;
         }
 
         //public JsonResult ClientChallengeInquiresform(List<Inquires> credit, int Id, string[] values)

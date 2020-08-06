@@ -124,7 +124,16 @@ namespace CreditReversal.Controllers
             return Json(res);
         }
 
-        public ActionResult Billing()        {            try            {                List<Agent> agent = objAdminfunction.GetBilling();                ViewBag.Agent = agent;            }            catch (Exception ex) { ex.insertTrace(""); }            return View();        }
+        public ActionResult Billing()
+        {
+            try
+            {
+                List<Agent> agent = objAdminfunction.GetBilling();
+                ViewBag.Agent = agent;
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return View();
+        }
 
 
         #region Letters
@@ -367,17 +376,39 @@ namespace CreditReversal.Controllers
         #endregion
 
 
-        public ActionResult ServiceSettings()        {            try            {
-                ViewBag.Dasboard = objSData.getDasboard();            }            catch (Exception ex) { ex.insertTrace(""); }            return View();        }
+        public ActionResult ServiceSettings()
+        {
+            try
+            {
+                ViewBag.Dasboard = objSData.getDasboard();
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return View();
+        }
 
         [HttpPost]
-        public JsonResult AddServiceSettings(ServiceSettings servicesettings)        {            try            {
-                res = objAdminfunction.InsertServiceSettings(servicesettings);            }            catch (Exception ex) { ex.insertTrace(""); }            return Json(res);        }
+        public JsonResult AddServiceSettings(ServiceSettings servicesettings)
+        {
+            try
+            {
+                res = objAdminfunction.InsertServiceSettings(servicesettings);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return Json(res);
+        }
 
 
         [HttpPost]
-        public JsonResult GetServiceSettings()        {            ServiceSettings res = new ServiceSettings();            try            {
-                res = objAdminfunction.GetServiceSettings();            }            catch (Exception ex) { ex.insertTrace(""); }            return Json(res);        }
+        public JsonResult GetServiceSettings()
+        {
+            ServiceSettings res = new ServiceSettings();
+            try
+            {
+                res = objAdminfunction.GetServiceSettings();
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return Json(res);
+        }
 
 
         [HttpGet]
@@ -492,12 +523,30 @@ namespace CreditReversal.Controllers
         }
 
 
-        public ActionResult Investors()        {            try            {
+        public ActionResult Investors()
+        {
+            try
+            {
                 ViewBag.Dasboard = objSData.getDasboard();
-                ViewBag.Investors = objAdminfunction.GetInvestors();            }            catch (Exception ex) { ex.insertTrace(""); }            return View();        }
+                ViewBag.Investors = objAdminfunction.GetInvestors();
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return View();
+        }
 
-        [HttpPost]        public JsonResult DeleteInvestor(string InvestorId)        {            long res = 0;            try            {
-                res = objAdminfunction.DeleteInvestor(InvestorId);            }            catch (Exception ex)            {            }            return Json(res);        }
+        [HttpPost]
+        public JsonResult DeleteInvestor(string InvestorId)
+        {
+            long res = 0;
+            try
+            {
+                res = objAdminfunction.DeleteInvestor(InvestorId);
+            }
+            catch (Exception ex)
+            {
+            }
+            return Json(res);
+        }
         /// <summary>
         /// Account Type
         /// </summary>
@@ -519,8 +568,13 @@ namespace CreditReversal.Controllers
 
         [HttpPost]
         public JsonResult AddAccountType(AccountTypes ACTypes)
-        {            try            {
-                res = objAdminfunction.InsertAccountTypes(ACTypes);            }            catch (Exception ex) { ex.insertTrace(""); }            return Json(res);
+        {
+            try
+            {
+                res = objAdminfunction.InsertAccountTypes(ACTypes);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return Json(res);
 
 
         }
