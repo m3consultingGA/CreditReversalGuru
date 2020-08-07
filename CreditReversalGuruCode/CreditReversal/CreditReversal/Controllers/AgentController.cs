@@ -593,8 +593,22 @@ namespace CreditReversal.Controllers
                 creditreportAH = creditreport.Where(x => x.mode != "Inquires").ToList();
                 ViewBag.creditreportfile = creditreportAH;
 
-                creditreportINQ = creditreport.Where(x => x.mode == "Inquires").ToList();
-                ViewBag.creditreportfileInq = creditreportINQ;
+                int AgentClientId = sessionData.GetAgentClientId();
+                Agent agent = new Agent();
+                AccountFunctions _accFunctions = new AccountFunctions();
+                agent = _accFunctions.GetAgent(AgentClientId.ToString());
+                bool checkIncInq = false;
+                if (agent != null)
+                {
+                    checkIncInq = string.IsNullOrEmpty(agent.IncChallengeInq) ? false : Convert.ToBoolean(agent.IncChallengeInq);
+                }
+
+                if (checkIncInq)
+                {
+                    creditreportINQ = creditreport.Where(x => x.mode == "Inquires").ToList();
+                    ViewBag.creditreportfileInq = creditreportINQ;
+                }
+                
                 ViewBag.Dasboard = sessionData.getDasboard();
             }
 

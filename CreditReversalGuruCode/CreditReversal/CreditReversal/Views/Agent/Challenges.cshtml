@@ -47,7 +47,7 @@
                                     @*<th>Client </th>*@
                                     <th>Round Type</th>
                                     <th>File Name</th>
-                                    <th  @dispPrint>Actions</th>
+                                    <th @dispPrint>Actions</th>
                                 </tr>
                             </thead>
                             @{
@@ -75,14 +75,14 @@
                                                 path = file.Replace(" ", "");
                                             }
 
-                                        <td @dispPrint>
-                                            @if (item.isAutoChallenges == 0)
-                                            {
-                                                <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
-                                            }
+                                            <td @dispPrint>
+                                                @if (item.isAutoChallenges == 0)
+                                                {
+                                                    <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
+                                                }
 
-                                            @*<a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>*@
-                                        </td>
+                                                @*<a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>*@
+                                            </td>
 
                                         </tr>
                                         i++;
@@ -98,34 +98,36 @@
                     </div>
                 </div>
                 <br />
-                <h2>Inquires</h2>
-                <div class="row m-2 p-2">
-                    <div class="table-responsive">
-                        <table id="tblChallengeINQ" class="table table-bordered">
-                            <thead>
-                                <tr class="trTable">
-                                    @*<th>Client </th>*@
-                                    <th>Round Type</th>
-                                    <th>File Name</th>
-                                    <th @dispPrint>Actions</th>
-                                </tr>
-                            </thead>
-                            @{
-                                string path1 = string.Empty;
-                            }
-                            @if (ViewBag.creditreportfile != null && ViewBag.creditreportfileInq.Count > 0)
-                            {
-                                <tbody>
-                                    @{
-                                        int i = 0;
-                                    }
+                @if (ViewBag.creditreportfileInq != null)
+                {
+                    <h2> Inquires </h2>
+                    <div class="row m-2 p-2">
+                        <div class="table-responsive">
+                            <table id="tblChallengeINQ" class="table table-bordered">
+                                <thead>
+                                    <tr class="trTable">
+                                        @*<th>Client </th>*@
+                                        <th>Round Type</th>
+                                        <th>File Name</th>
+                                        <th @dispPrint>Actions</th>
+                                    </tr>
+                                </thead>
+                                @{
+                                    string path1 = string.Empty;
+                                }
+                                @if (ViewBag.creditreportfileInq != null && ViewBag.creditreportfileInq.Count > 0)
+                                {
+                                    <tbody>
+                                        @{
+                                            int i = 0;
+                                        }
 
-                                    @foreach (var item in ViewBag.creditreportfileInq)
-                                    {
-                                        <tr>
+                                        @foreach (var item in ViewBag.creditreportfileInq)
+                                        {
+                                            <tr>
 
-                                            <td>@item.RoundType</td>
-                                            <td>@item.CAgency - @item.RoundType</td>
+                                            <td> @item.RoundType </td>
+                                            <td> @item.CAgency - @item.RoundType </td>
 
                                             @{
                                                 string file = item.CRFilename;
@@ -133,28 +135,29 @@
                                                 path1 = file.Replace(" ", "");
                                             }
 
-                                        <td @dispPrint>
+                                            <td @dispPrint >
                                             @if (item.isAutoChallenges == 0)
                                             {
-                                                <a href="~/documents/Challenge/@path1" target="_blank" class="btn btn-danger btn-xs"> Print</a>
+                                                <a href = "~/documents/Challenge/@path1" target = "_blank" class="btn btn-danger btn-xs"> Print</a>
                                             }
                                             @*<a href="~/documents/Challenge/@path1" target="_blank" class="btn btn-danger btn-xs"> Print</a>*@
-                                        </td>
+                                            </td>
 
-                                        </tr>
-                                        i++;
+                                            </tr>
+                                            i++;
 
-                                    }
-                                </tbody>
-                            }
-                            else
-                            {
-                                <td colspan="3" style="text-align:center"><strong> No Challenges for Inquires </strong></td>
-                            }
+                                        }
+                                    </tbody>
+                                }
+                                else
+                                {
+                                    <td colspan="3" style="text-align:center"><strong> No Challenges for Inquires </strong></td>
+                                }
 
-                        </table>
+                            </table>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
         </div>
     </div>
