@@ -785,7 +785,7 @@
 
 
                                                                 <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
-                                                                          name="TRANSInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text"></textarea>
+                                                                          name="TRANSInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                             </div>
                                                         </td>
                                                     }
@@ -817,8 +817,8 @@
                                 id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
                                 name="TRChallenge" style="height:43px;" />*@
 
-                                                                <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
-                                                                          name="TRANSInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text"></textarea>
+                                                            <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
+                                                                      name="TRANSInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                             </div>
                                                             <label id="lblroundITU_@j" hidden>@strTU[0]-@strTU[1]</label>
 
@@ -844,8 +844,8 @@
                                 aria-describedby="sizing-addon1" id="EXPEInquiriesChallenge_@j"
                                 onkeydown="AutoFillInquiriesAccountTypeEX(@j)" name="TRChallenge" style="height:43px;">*@
 
-                                                                <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
-                                                                          name="EXPEInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text"></textarea>
+                                                            <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
+                                                                      name="EXPEInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                             </div>
                                                         </td>
 
@@ -879,8 +879,8 @@
                                 name="TRChallenge" style="height:43px;" />*@
 
 
-                                                                <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
-                                                                          name="EXPEInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text"></textarea>
+                                                            <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
+                                                                      name="EXPEInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                             </div>
                                                             <label id="lblroundIEX_@j" hidden>@strEX[0]-@strEX[1]</label>
                                                         </td>
@@ -904,8 +904,8 @@
                                 aria-describedby="sizing-addon1" id="EQUIInquiriesChallenge_@j"
                                 onkeydown="AutoFillInquiriesAccountTypeEQ(@j)" name="TRChallenge" style="height:43px;">*@
 
-                                                                <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
-                                                                          name="EQUIInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text"></textarea>
+                                                            <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
+                                                                      name="EQUIInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                             </div>
                                                         </td>
                                                     }
@@ -936,8 +936,8 @@
                                 id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
                                 name="TRChallenge" style="height:43px;" />*@
 
-                                                                <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
-                                                                          name="EQUIInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text"></textarea>
+                                                            <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
+                                                                      name="EQUIInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                             </div>
                                                             <label id="lblroundIEQ_@j" hidden>@strEQ[0]-@strEQ[1]</label>
 
@@ -2327,17 +2327,17 @@
                 var hdnEXPECreditInqId = $("#hdnEXPECreditInqId_" + k).text();
                 var hdnTRANSCreditInqId = $("#hdnTRANSCreditInqId_" + k).text();
 
-                if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditInqId != "") {
-                    $("#EQUIInquiriesChallenge_" + i).attr('disabled', 'disabled');
-                }
+                //if (EQUIChallenge != "" && EQUIChallenge != undefined && hdnEQUICreditInqId != "") {
+                //    $("#EQUIInquiriesChallenge_" + i).attr('disabled', 'disabled');
+                //}
 
-                if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditInqId != "") {
-                     $("#EXPEInquiriesChallenge_" + i).attr('disabled', 'disabled');
-                }
+                //if (EXPEChallenge != "" && EXPEChallenge != undefined && hdnEXPECreditInqId != "") {
+                //     $("#EXPEInquiriesChallenge_" + i).attr('disabled', 'disabled');
+                //}
 
-                if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditInqId != "") {
-                      $("#TRANSInquiriesChallenge_" + i).attr('disabled', 'disabled');
-                }
+                //if (TRANSChallenge != "" && TRANSChallenge != undefined && hdnTRANSCreditInqId != "") {
+                //      $("#TRANSInquiriesChallenge_" + i).attr('disabled', 'disabled');
+                //}
         }
 
     }

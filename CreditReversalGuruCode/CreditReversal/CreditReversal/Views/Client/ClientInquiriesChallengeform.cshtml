@@ -58,9 +58,9 @@
             <tr>
                 <td>
                     @*To Address<br />
-                        Equifax Information Services LLC<br />
-                        P.O. Box 740256<br />
-                        Atlanta, GA 30348*@
+                    Equifax Information Services LLC<br />
+                    P.O. Box 740256<br />
+                    Atlanta, GA 30348*@
                     @*To Address<br />*@
                     @Toaddress1<br />
                     @Toaddress2<br />
@@ -104,6 +104,24 @@
         width: 670px;">
                 <tr>
                     <td>
+                        <p style="word-wrap:break-word; font-weight:bold">
+                            DISCLAIMER: THE WRITTEN CORRESPONDENCE ENCLOSED WITHIN IS INTENDED ONLY FOR THE ENTITY TO
+                            WHICH IT IS ADDRESSED AND/OR SPECIFIED. THE CORRESPONDENCE WILL BE USED FOR THE SOLE
+                            PURPOSES OF INVESTIGATING AND RECTIFYING ERRONEOUS AND OBSOLETE ERRORS FOUND WITHIN MY
+                            CONSUMER REPORT. UPON INVESTIGATION, CONCLUSION, AND ANYTIME THEREAFTER, PLEASE DO NOT
+                            DISCLOSE OR TRANSMIT COMMUNICATIONS TO ANY INDIVIDUAL, OUTSIDE ENTITY, OR THIRD PARTY TO
+                            WHOM DOES NOT APPLY.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="row" style="padding-top:20px;">
+            <table style="text-align: justify;
+        line-height: 20px;
+        width: 670px;">
+                <tr>
+                    <td>
                         <p style="word-wrap:break-word;">
 
 
@@ -119,30 +137,30 @@
 
         <div class="row" style="padding-top:20px;">
             @{
-                        <table style="border:1px solid #000;width:670px;">
-                            <thead>
+                <table style="border:1px solid #000;width:670px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;width:150px;">Creditor Name</th>
+                            <th style="text-align:left;width:150px;">Type of Business</th>
+                            <th style="text-align:left;width:50px;">Type</th>
+                            <th style="text-align:left;width:200px;">Comments </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            for (int i = 0; i < Inquires.Count; i++)
+                            {
                                 <tr>
-                                    <th style="text-align:left;width:150px;">Creditor Name</th>
-                                    <th style="text-align:left;width:150px;">Type of Business</th>
-                                    <th style="text-align:left;width:50px;">Type</th>
-                                    <th style="text-align:left;width:200px;">Comments </th>
+                                    <td style="width:150px;" valign="top">@Inquires[i].CreditorName</td>
+                                    <td style="width:150px;" valign="top">@Inquires[i].TypeofBusiness</td>
+                                    <td style="width:50px;" valign="top">@Inquires[i].AccountType </td>
+                                    <td style="width:200px;text-align:justify;" valign="top">@Inquires[i].ChallengeText</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @{
-                                    for (int i = 0; i < Inquires.Count; i++)
-                                    {
-                                        <tr>
-                                            <td style="width:150px;" valign="top">@Inquires[i].CreditorName</td>
-                                            <td style="width:150px;" valign="top">@Inquires[i].TypeofBusiness</td>
-                                            <td style="width:50px;" valign="top">@Inquires[i].AccountType </td>
-                                            <td style="width:200px;text-align:justify;" valign="top">@Inquires[i].ChallengeText</td>
-                                        </tr>
 
-                                    }
-                                }
-                            </tbody>
-                        </table>
+                            }
+                        }
+                    </tbody>
+                </table>
             }
             <br />
             <br />  <br />  <br />  <br />
