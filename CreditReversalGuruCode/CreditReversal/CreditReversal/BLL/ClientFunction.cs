@@ -178,7 +178,7 @@ namespace CreditReversal.BLL
 
             return challengeMasters;
         }
-        
+
         public bool AddChallenge(CreditReportItems credit, string AgentId = "", string staffId = "")
         {
             long res = 0;
@@ -526,7 +526,7 @@ namespace CreditReversal.BLL
         }
         public bool AddReportItemChallenges(CreditReportItems credit, int sno, int clientid, string PrevItem = null)
         {
-            string sql = string.Empty;
+            string sql = string.Empty; string AccountType = credit.AccountType;
             try
             {
                 int PrevNo = sno;
@@ -537,40 +537,58 @@ namespace CreditReversal.BLL
                         PrevNo++;
                     }
                 }
-                object ChallengeText = "";
 
-                if (credit.PastDueDays > 0 && credit.AccountType == "EDUCATION") //Account Type education 
+                CreditReportItems creditReportItems = cd.GetCreditReportItems(credit.CredRepItemsId.ToString())[0];
+                var opendate1 = creditReportItems.OpenDate.MMDDYYStringToDateTime("MM/dd/yyyy");
+
+                if (credit.PastDueDays > 0 && credit.AccountType.ToUpper() == "EDUCATION" && credit.LoanStatus.ToUpper() == "DEFERMENT")
                 {
-                    sql = "Select ChallengeText from ChallengeMaster where ChallengeId=50"; //eDUCATION Challenge
-                    ChallengeText = utilities.ExecuteScalar(sql, true);
+                    //   PrevNo = PrevNo + 3;
+                    AccountType = "Education Deferment";
                 }
-                else
+                if(credit.AccountType.ToUpper() == "MEDICAL" )
                 {
-                    string sql2 = "Select AccTypeId from AccountTypes where AccountType = '" + credit.AccountType + "'";
-                    object AccountTypeId = utilities.ExecuteScalar(sql2, true);
-                    if (AccountTypeId != null && sno != 0)
+                    decimal balamt = -1.00m;
+                    string bal = creditReportItems.CurrentBalance;
+                    var opendate = creditReportItems.OpenDate.MMDDYYStringToDateTime("MM/dd/yyyy");
+                    var year = DateTime.Now.Year - opendate.Year;
+                    bal = bal.Replace("$", "");
+                     balamt = Convert.ToDecimal(bal);
+                    if(balamt == 0 && year < 2)
+                    {
+                        AccountType = "Medical Zero Balance";
+                   //     PrevNo = PrevNo + 3;
+                    }
+                    if(year >= 2)
+                    {
+                        AccountType = "Medical Outdated";
+                        //  PrevNo = PrevNo + 5;
+                    }
+                }
+                object ChallengeText = "";
+                string sql2 = "Select AccTypeId from AccountTypes where AccountType = '" + AccountType + "'";
+                object AccountTypeId = utilities.ExecuteScalar(sql2, true);
+                if (AccountTypeId != null && sno != 0)
+                {
+                    sql2 = "";
+                    sql2 = "Select ChallengeText from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' and ChallengeLevel='" + PrevNo + "'";
+                    ChallengeText = utilities.ExecuteScalar(sql2, true);
+
+                    if (ChallengeText == null)
                     {
                         sql2 = "";
-                        sql2 = "Select ChallengeText from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' and ChallengeLevel='" + PrevNo + "'";
+                        sql2 = "Select max(ChallengeLevel) from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' ";
+                        var Challengelevelid = utilities.ExecuteScalar(sql2, true);
+                        sql2 = "";
+                        sql2 = "Select ChallengeText from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' and ChallengeLevel='" + Challengelevelid + "'";
                         ChallengeText = utilities.ExecuteScalar(sql2, true);
-
-                        if (ChallengeText == null)
-                        {
-                            sql2 = "";
-                            sql2 = "Select max(ChallengeLevel) from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' ";
-                            var Challengelevelid = utilities.ExecuteScalar(sql2, true);
-                            sql2 = "";
-                            sql2 = "Select ChallengeText from ChallengeMaster where AccountTypeId = '" + AccountTypeId + "' and ChallengeLevel='" + Challengelevelid + "'";
-                            ChallengeText = utilities.ExecuteScalar(sql2, true);
-                        }
-                    }
-                    //if agent gave own challenge
-                    if (string.IsNullOrEmpty(ChallengeText.ToString()))
-                    {
-                        ChallengeText = credit.AccountType;
                     }
                 }
-                CreditReportItems creditReportItems = cd.GetCreditReportItems(credit.CredRepItemsId.ToString())[0];
+                //if agent gave own challenge
+                if (string.IsNullOrEmpty(ChallengeText.ToString()))
+                {
+                    ChallengeText = AccountType;
+                }
 
                 sql = "Insert Into CreditReportItemChallenges (CredRepItemsId,ChallengeText,Status,MerchantName,AccountId, "
                     + " Agency,RoundType,sno,clientid,LoanStatus,PastDueDays) "

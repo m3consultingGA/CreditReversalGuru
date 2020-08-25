@@ -991,9 +991,11 @@ namespace CreditReversal.BLL
                 for (int i = 0; i < credit.Count; i++)
                 {
                     sql = "select cr.MerchantName,cr.AccountId,cr.OpenDate,cr.HighestBalance,cr.CurrentBalance,cr.MonthlyPayment,cr.LastReported,crc.RoundType, ";
-                    sql += "cr.Agency,crc.ChallengeText,cr.Status,cr.CredRepItemsId,cr.AccountTypeDetails from CreditReportItemChallenges as crc inner join CreditReportItems as cr on crc.CredRepItemsId = cr.CredRepItemsId ";
+                    sql += "cr.Agency,crc.ChallengeText,cr.Status,cr.CredRepItemsId,cr.AccountTypeDetails from "
+                        + " CreditReportItemChallenges as crc inner join CreditReportItems as cr on crc.CredRepItemsId = cr.CredRepItemsId ";
                     sql += "inner join CreditReport as c on c.CreditReportId = cr.CredReportId ";
-                    sql += "where c.ClientId = '" + id + "' and crc.sno=(select max(sno) from CreditReportItemChallenges where  Agency=crc.Agency and  AccountId=crc.AccountId and clientid=crc.clientid) and  crc.CredRepItemsId='" + credit[i].CredRepItemsId + "'";
+                    sql += "where c.ClientId = '" + id + "' and crc.sno=(select max(sno) from CreditReportItemChallenges"
+                        +" where  Agency=crc.Agency and  AccountId=crc.AccountId and clientid=crc.clientid) and  crc.CredRepItemsId='" + credit[i].CredRepItemsId + "'";
                     sql += "order by cr.Agency";
 
                     dt = utilities.GetDataTable(sql);
@@ -1843,7 +1845,7 @@ namespace CreditReversal.BLL
 
             return CreditItems;
         }
-        public string SetStatusForMedical(string AccountType, string AccountTypeDetails, string status = "", string comments = "")
+        public string SetStatusForMedical(string AccountType, string AccountTypeDetails, string status = "", string comments = "",string dateopened="")
         {
             string res = string.Empty;
             try
@@ -1853,7 +1855,17 @@ namespace CreditReversal.BLL
                     || comments.ToUpper().Contains("HEALTH") || comments.ToUpper().Contains("HEALTH")
                     || comments.ToUpper().Contains("MEDICAL") || comments.ToUpper().Contains("MEDICAL"))
                 {
-                    res = "Outdated 2+ years.";
+                    var opendate = dateopened.MMDDYYStringToDateTime("MM/dd/yyyy");
+                    var year = DateTime.Now.Year - opendate.Year;
+                    if(year >=2 )
+                    {
+                        res = "Outdated 2+ years.";
+                    }
+                    else
+                    {
+                        res = status;
+                    }
+                    
                 }
                 else
                 {
@@ -2079,7 +2091,9 @@ namespace CreditReversal.BLL
                                 challengestatus = strTRANS1[10];
                             }
                             string pstatus = strTRANS1[9] + "~" + strTRANS1[12] + "~" + strTRANS1[13];
-                            ah.PaymentStatus = SetStatusForMedical(strTRANS1[2], strTRANS1[3], pstatus);
+
+
+                            ah.PaymentStatus = SetStatusForMedical(strTRANS1[2], strTRANS1[3], pstatus,"", strTRANS1[4]);
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strTRANS1[10] : challengestatus;
                             ah.Comments = ah.Comments + "^" + (string.IsNullOrEmpty(ah.AccountTypeDetail) ? ah.AccountType : ah.AccountTypeDetail);
                             ah.PastDue = strTRANS1[11];
@@ -2116,7 +2130,7 @@ namespace CreditReversal.BLL
                                 challengestatus = strEQUIFAX1[10];
                             }
                             string pstatus = strEQUIFAX1[9] + "~" + strEQUIFAX1[12] + "~" + strEQUIFAX1[13];
-                            ah.PaymentStatus = SetStatusForMedical(strEQUIFAX1[2], strEQUIFAX1[3], pstatus);
+                            ah.PaymentStatus = SetStatusForMedical(strEQUIFAX1[2], strEQUIFAX1[3], pstatus,"", strEQUIFAX1[4]);
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEQUIFAX1[10] : challengestatus;
                             ah.Comments = ah.Comments + "^" + (string.IsNullOrEmpty(ah.AccountTypeDetail) ? ah.AccountType : ah.AccountTypeDetail);
                             ah.PastDue = strEQUIFAX1[11];
@@ -2156,7 +2170,7 @@ namespace CreditReversal.BLL
                             ah.Comments = string.IsNullOrEmpty(challengestatus) ? strEXPERIAN1[10] : challengestatus;
                             ah.Comments = ah.Comments + "^" + (string.IsNullOrEmpty(ah.AccountTypeDetail) ? ah.AccountType : ah.AccountTypeDetail);
                             string pstatus = strEXPERIAN1[9] + "~" + strEXPERIAN1[12] + "~" + strEXPERIAN1[13];
-                            ah.PaymentStatus = SetStatusForMedical(strEXPERIAN1[2], strEXPERIAN1[3], pstatus);
+                            ah.PaymentStatus = SetStatusForMedical(strEXPERIAN1[2], strEXPERIAN1[3], pstatus,"", strEXPERIAN1[4]);
                             ah.PastDue = strEXPERIAN1[11];
                             ah.negativeitems = (strEXPERIAN1[9] == "Coll/Chargeoff" || strEXPERIAN1[9] == "Collection/Chargeoff") ? 1 : strEXPERIAN1[12].StringToInt(0);
                             ah.LoanStatus = "";
@@ -2809,8 +2823,10 @@ namespace CreditReversal.BLL
                 //+ " CreditReportId in (Select CreditReportId from CreditReport where  ClientId =" + id + ") and sno=" + sno
                 //+ " and CreditInqId in (select CreditInqId from CreditReportItemChallenges where sno="+ sno+")";
 
+               
                 sql = "select distinct CreditorName from CreditInquiries ci join  CreditReport c on ci.CreditReportId=c.CreditReportId "
                     + " and ClientId =" + id + " and ci.sno=" + sno + " left join CreditReportItemChallenges cri on cri.CreditInqId = ci.CreditInqId and cri.sno =" + sno;
+
                 dt1 = utilities.GetDataTable(sql);
 
                 for (int r = 0; r < dt.Rows.Count; r++)

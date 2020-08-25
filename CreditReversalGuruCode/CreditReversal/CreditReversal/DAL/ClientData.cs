@@ -489,9 +489,12 @@ namespace CreditReversal.DAL
                     res.sDrivingLicense = row["DrivingLicense"].ConvertObjectToStringIfNotNull();
                     res.sSocialSecCard = row["SocialSecCard"].ConvertObjectToStringIfNotNull();
                     res.sProofOfCard = row["ProofOfCard"].ConvertObjectToStringIfNotNull();
-                    res.Password = common.Decrypt(row["Password"].ConvertObjectToStringIfNotNull());
-
-
+                    try
+                    {
+                        res.Password = common.Decrypt(row["Password"].ConvertObjectToStringIfNotNull());
+                    }
+                    catch (Exception)
+                    {}
 
                     res.IdQuestion = row["Question"].ConvertObjectToStringIfNotNull();
                     res.IdAnswer = row["Answer"].ConvertObjectToStringIfNotNull();
