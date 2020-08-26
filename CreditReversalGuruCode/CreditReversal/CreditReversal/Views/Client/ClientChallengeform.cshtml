@@ -152,13 +152,14 @@
                 </thead>
                 <tbody>
                     @{
+                        string str = " Once investigation has been completed, please remove all notations that this account is still being disputed.";
                         for (int i = 0; i < CreditReportItems.Count; i++)
                         {
                             <tr>
                                 <td style="width:150px;" valign="top">@CreditReportItems[i].MerchantName</td>
                                 <td style="width:150px;" valign="top">@CreditReportItems[i].AccountId</td>
                                 <td style="width:50px;" valign="top">@CreditReportItems[i].AccountType </td>
-                                <td style="width:200px;text-align:left;" valign="top">@CreditReportItems[i].ChallengeText</td>
+                                <td style="width:200px;text-align:left;" valign="top">@CreditReportItems[i].ChallengeText  @str</td>
                             </tr>
                         }
                     }

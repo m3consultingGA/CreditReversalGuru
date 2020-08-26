@@ -3,7 +3,7 @@
     ViewBag.Title = "Challenges";
     Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
 
-    string dispPrint = ""; // "hidden";
+   string dispPrint =  "hidden";
     //string dispPrint = "";
 }
 
@@ -76,10 +76,10 @@
                                             }
 
                                             <td @dispPrint>
-                                                @if (item.isAutoChallenges == 0)
+                                                @*@if (item.isAutoChallenges == 0)
                                                 {
                                                     <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
-                                                }
+                                                }*@
 
                                                 <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
                                             </td>
@@ -136,10 +136,10 @@
                                             }
 
                                             <td @dispPrint >
-                                            @if (item.isAutoChallenges == 0)
+                                            @*@if (item.isAutoChallenges == 0)
                                             {
                                                 <a href = "~/documents/Challenge/@path1" target = "_blank" class="btn btn-danger btn-xs"> Print</a>
-                                            }
+                                            }*@
                                             <a href="~/documents/Challenge/@path1" target="_blank" class="btn btn-danger btn-xs"> Print</a>
                                             </td>
 

@@ -284,11 +284,11 @@
                                                         {
                                                             strTUValue1 = "AUTO";
                                                         }
-                                                        if (strTUValue1.ToUpper().Contains("CREDIT") || strTUValue1.ToUpper().Contains("REVOLVING"))
+                                                        if (strTUValue1.ToUpper().Contains("CREDIT CARD") || strTUValue1.ToUpper().Contains("REVOLVING"))
                                                         {
                                                             strTUValue1 = "CREDITCARD";
                                                         }
-                                                        if (strTUValue1.ToUpper().Contains("COLLECTION"))
+                                                        if (strTUValue1.ToUpper().Contains("COLLECTION") || strTUValue1.ToUpper().Contains("FAMILY"))
                                                         {
                                                             strTUValue1 = "COLLECTIONS";
                                                         }
@@ -296,7 +296,8 @@
                                                         {
                                                             strTUValue1 = "EDUCATION";
                                                         }
-                                                        if (strTUValue1.ToUpper().Contains("MORTGAGE"))
+                                                        if (strTUValue1.ToUpper().Contains("MORTGAGE") || strTUValue1.ToUpper().Contains("HOME EQUITY")
+                                                            || strTUValue1.ToUpper().Contains("CREDIT LINE"))
                                                         {
                                                             strTUValue1 = "MORTGAGE";
                                                         }
@@ -312,11 +313,11 @@
                                                         {
                                                             strEXValue1 = "AUTO";
                                                         }
-                                                        if (strEXValue1.ToUpper().Contains("CREDIT") || strEXValue1.ToUpper().Contains("REVOLVING"))
+                                                        if (strEXValue1.ToUpper().Contains("CREDIT CARD") || strEXValue1.ToUpper().Contains("REVOLVING"))
                                                         {
                                                             strEXValue1 = "CREDITCARD";
                                                         }
-                                                        if (strEXValue1.ToUpper().Contains("COLLECTION"))
+                                                        if (strEXValue1.ToUpper().Contains("COLLECTION") || strEXValue1.ToUpper().Contains("FAMILY"))
                                                         {
                                                             strEXValue1 = "COLLECTIONS";
                                                         }
@@ -324,7 +325,8 @@
                                                         {
                                                             strEXValue1 = "EDUCATION";
                                                         }
-                                                        if (strEXValue1.ToUpper().Contains("MORTGAGE"))
+                                                        if (strEXValue1.ToUpper().Contains("MORTGAGE") || strEXValue1.ToUpper().Contains("HOME EQUITY")
+                                                            || strEXValue1.ToUpper().Contains("CREDIT LINE"))
                                                         {
                                                             strEXValue1 = "MORTGAGE";
                                                         }
@@ -340,11 +342,11 @@
                                                         {
                                                             strEQValue1 = "AUTO";
                                                         }
-                                                        if (strEQValue1.ToUpper().Contains("CREDIT") || strEQValue1.ToUpper().Contains("REVOLVING"))
+                                                        if (strEQValue1.ToUpper().Contains("CREDIT CARD") || strEQValue1.ToUpper().Contains("REVOLVING"))
                                                         {
                                                             strEQValue1 = "CREDITCARD";
                                                         }
-                                                        if (strEQValue1.ToUpper().Contains("COLLECTION"))
+                                                        if (strEQValue1.ToUpper().Contains("COLLECTION") || strEQValue1.ToUpper().Contains("FAMILY"))
                                                         {
                                                             strEQValue1 = "COLLECTIONS";
                                                         }
@@ -352,7 +354,8 @@
                                                         {
                                                             strEQValue1 = "EDUCATION";
                                                         }
-                                                        if (strEQValue1.ToUpper().Contains("MORTGAGE"))
+                                                        if (strEQValue1.ToUpper().Contains("MORTGAGE") || strEQValue1.ToUpper().Contains("HOME EQUITY")
+                                                            || strEQValue1.ToUpper().Contains("CREDIT LINE"))
                                                         {
                                                             strEQValue1 = "MORTGAGE";
                                                         }
@@ -1480,20 +1483,22 @@
                     $("#overlay").hide();
                     Swal.fire({
                         title: "Success!",
-                        text: "Challenge created successfully.!",
+                        text: "Challenge letter(s) generated successfully.",
                         type: 'success',
                     }).then(function () {
                         if (from == "db")
                         {
+                          //  window.location.reload();
                             if (role == "agentadmin")
                             {
-								//window.location.href = "/dashboard/agent";
-								window.location.href = "/Agent/Challenges?ClientId="+ Id;
+                                
+								window.location.href = "/dashboard/agent";
+								//window.location.href = "/Agent/Challenges?ClientId="+ Id;
                             }
                             else if (role == "agentstaff")
                             {
-								//window.location.href = "/dashboard/staff";
-                                window.location.href = "/Agent/Challenges?ClientId="+ Id;
+								window.location.href = "/dashboard/staff";
+                                //window.location.href = "/Agent/Challenges?ClientId="+ Id;
 							}
                         }
                         else
@@ -1503,8 +1508,9 @@
                     })
                 }
                 else {
+                    debugger
                     if (data != "" && data != "1" && data != "0") {
-                        Swal.fire("Success!", "Challenge created successfully.!", 'success');
+                        Swal.fire("Success!", "Challenge letter(s) generated successfully.", 'success');
                         var files = data.split('^');
                         for (var i = 0; i < files.length; i++) {
                             window.open('/Documents/Challenge/' + files[i], "_blank");
@@ -1522,7 +1528,7 @@
             }
         });
         } catch (e) {
-            location.href="/Account/SignIn"
+            
         }
     }
 
@@ -1673,11 +1679,11 @@
                         }
                 }
                  else {
-                    if (hdnTRANSCreditInqId != "" && $("#chkInquiriesTRANS_" + j).prop("checked") == false && TRANSAccountType != "") {
-                         $("#TRANSInquiriesChallenge_" + j).focus();
-                             Swal.fire("Warning!", "Please check challenge !", 'warning');
-                            return false;
-                    }
+                    //if (hdnTRANSCreditInqId != "" && $("#chkInquiriesTRANS_" + j).prop("checked") == false && TRANSAccountType != "") {
+                    //     $("#TRANSInquiriesChallenge_" + j).focus();
+                    //         Swal.fire("Warning!", "Please check challenge !", 'warning');
+                    //        return false;
+                    //}
 
                 }
 
@@ -1719,11 +1725,11 @@
                      }
                 }
                  else {
-                    if (hdnEXPECreditInqId != "" && $("#chkInquiriesEXPE_" + j).prop("checked") == false && EXPEAccountType != "") {
-                         $("#EXPEInquiriesChallenge_" + j).focus();
-                             Swal.fire("Warning!", "Please check challenge !", 'warning');
-                            return false;
-                    }
+                    //if (hdnEXPECreditInqId != "" && $("#chkInquiriesEXPE_" + j).prop("checked") == false && EXPEAccountType != "") {
+                    //     $("#EXPEInquiriesChallenge_" + j).focus();
+                    //         Swal.fire("Warning!", "Please check challenge !", 'warning');
+                    //        return false;
+                    //}
 
                 }
 
@@ -1768,11 +1774,11 @@
                      }
                 }
                  else {
-                    if (hdnEQUICreditInqId != "" && $("#chkInquiriesEQUI_" + j).prop("checked") == false && EQUIAccountType != "") {
-                         $("#EQUIInquiriesChallenge_" + j).focus();
-                             Swal.fire("Warning!", "Please check challenge !", 'warning');
-                            return false;
-                    }
+                    //if (hdnEQUICreditInqId != "" && $("#chkInquiriesEQUI_" + j).prop("checked") == false && EQUIAccountType != "") {
+                    //     $("#EQUIInquiriesChallenge_" + j).focus();
+                    //         Swal.fire("Warning!", "Please check challenge !", 'warning');
+                    //        return false;
+                    //}
 
                     }
         }
@@ -1807,19 +1813,20 @@
                     $("#overlay").hide();
                     Swal.fire({
                         title: "Success!",
-                        text: "Challenge created successfully.!",
+                        text: "Challenge letter(s) generated successfully.",
                         type: 'success',
                     }).then(function () {
                         if (from == "db")
                         {
+                            window.location.reload();
                             if (role == "agentadmin")
                             {
-                                window.location.href = "/Agent/Challenges?ClientId="+ Id;
-								//window.location.href = "/dashboard/agent";
+                               // window.location.href = "/Agent/Challenges?ClientId="+ Id;
+								window.location.href = "/dashboard/agent";
                             }
                             else if (role == "agentstaff") {
-                                //window.location.href = "/dashboard/staff";
-                                window.location.href = "/Agent/Challenges?ClientId="+ Id;
+                                window.location.href = "/dashboard/staff";
+                                //window.location.href = "/Agent/Challenges?ClientId="+ Id;
 							}
                         }
                         else
@@ -1830,7 +1837,7 @@
                 }
                 else {
                     if (data != "" && data != "1" && data != "0") {
-                        Swal.fire("Success!", "Challenge created successfully.!", 'success');
+                        Swal.fire("Success!", "Challenge letter(s) generated successfully.", 'success');
                         var files = data.split('^');
                         for (var i = 0; i < files.length; i++) {
                          window.open('/Documents/Challenge/' + files[i], "_blank");

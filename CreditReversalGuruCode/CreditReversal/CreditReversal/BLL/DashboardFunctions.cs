@@ -1897,8 +1897,8 @@ namespace CreditReversal.BLL
                 catch (Exception)
                 { }
 
-                sql = " Select top 1 a.CredRepItemsId from CreditReportItemChallenges a,CreditReportItems b, CreditReport c   where a.sno=" + sno
-                    + " and a.CredRepItemsId=b.CredRepItemsId and b.CredReportId=c.CreditReportId and c.ClientID=" + id;
+                sql = " Select  max(a.sno) from CreditReportItemChallenges a,CreditReportItems b, CreditReport c   where "
+                    + " a.CredRepItemsId=b.CredRepItemsId and b.CredReportId=c.CreditReportId and c.ClientID=" + id;
                 long val = 0;
                 try
                 {
@@ -1925,7 +1925,8 @@ namespace CreditReversal.BLL
                    + "  and a.AccountNo = US.AccountId  ";
                 if (role != "client")
                 {
-                    addnagitiveitems = "and isnull(US.negativeitems,0) > 0 ";
+                    // addnagitiveitems = "and isnull(US.negativeitems,0) > 0 ";
+                    addnagitiveitems = "and (isnull(US.negativeitems,0) > 0   or UPPER(US.Status) like '%DELINQ%' or UPPER(US.Status) like '%DEROGATORY%'  ) ";
                 }
                 else
                 {
@@ -1940,7 +1941,7 @@ namespace CreditReversal.BLL
                     + "+'~'+ Convert(varchar,US.CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Equifax' "
                     + " group by PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
                       " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId " +
-                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + sno +
+                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + val +
                      " where US.Agency='EQUIFAX' and us.sno=" + sno;
                 }
                 else
@@ -1972,7 +1973,7 @@ namespace CreditReversal.BLL
                     + " Convert(varchar,US.CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by  "
                     + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
                     " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId " +
-                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + sno
+                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + val
                     + " where US.Agency='EXPERIAN' and us.sno=" + sno
                     + " and CR.ClientId='" + id + "'" + addnagitiveitems;
                 }
@@ -2002,7 +2003,7 @@ namespace CreditReversal.BLL
                     + " Convert(varchar,US.CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='TransUnion' group by "
                     + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
                     " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId " +
-                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + sno
+                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + val
                     + " where US.Agency='TRANSUNION' and us.sno=" + sno
                     + " and CR.ClientId='" + id + "'" + addnagitiveitems;
                 }
@@ -2715,8 +2716,8 @@ namespace CreditReversal.BLL
                 catch (Exception)
                 { }
 
-                sql = " Select top 1 a.CreditInqId from CreditReportItemChallenges a,CreditInquiries b, CreditReport c   where a.sno=" + sno
-                    + " and a.CreditInqId=b.CreditInqId and b.CreditReportId=c.CreditReportId and c.ClientID=" + id;
+                sql = " Select max(a.sno) from CreditReportItemChallenges a,CreditInquiries b, CreditReport c   where "
+                    + "  a.CreditInqId=b.CreditInqId and b.CreditReportId=c.CreditReportId and c.ClientID=" + id;
                 long val = 0;
                 try
                 {
@@ -2739,7 +2740,7 @@ namespace CreditReversal.BLL
                 + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
                 " FROM" +
                 " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
-                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + sno +
+                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + val +
                 " where US.Agency = 'EQUIFAX' and CR.ClientId = '" + id + "' and us.sno=" + sno
                 + " FOR XML PATH('')), 1, 1, '')) " +
                 " as 'EQUIFAX',";
@@ -2767,7 +2768,7 @@ namespace CreditReversal.BLL
                 + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
                 " FROM" +
                 " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
-                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + sno +
+                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + val +
                 " where US.Agency = 'EXPERIAN' and CR.ClientId = '" + id + "' and us.sno=" + sno
                + " FOR XML PATH('')), 1, 1, '')" +
                 " as 'EXPERIAN',";
@@ -2796,7 +2797,7 @@ namespace CreditReversal.BLL
                 + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
                 " FROM" +
                 " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
-                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + sno +
+                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + val +
                 "  where US.Agency = 'TRANSUNION' and CR.ClientId = '" + id + "' and us.sno=" + sno +
                 " FOR XML PATH('')), 1, 1, '')" +
                 " as 'TRANSUNION'";
@@ -2851,7 +2852,7 @@ namespace CreditReversal.BLL
                         {
                             string[] strTRANS1 = strTRANSUNION[k].Split('~');
                             Inquires inq = new Inquires();
-                            inq.CreditorName = strTRANS1[0];
+                            inq.CreditorName = strTRANS1[0].Replace("&amp;","");
                             inq.TypeofBusiness = strTRANS1[1];
                             inq.Dateofinquiry = strTRANS1[2];
                             inq.ChallengeStatus = strTRANS1[3];
@@ -2879,7 +2880,7 @@ namespace CreditReversal.BLL
                         {
                             string[] strEQUIFAX1 = strEQUIFAX[k].Split('~');
                             Inquires inq = new Inquires();
-                            inq.CreditorName = strEQUIFAX1[0];
+                            inq.CreditorName = strEQUIFAX1[0].Replace("&amp;", "");
                             inq.TypeofBusiness = strEQUIFAX1[1];
                             inq.Dateofinquiry = strEQUIFAX1[2];
                             inq.ChallengeStatus = strEQUIFAX1[3];
@@ -2907,7 +2908,7 @@ namespace CreditReversal.BLL
                         {
                             string[] strEXPERIAN1 = strEXPERIAN[l].Split('~');
                             Inquires inq = new Inquires();
-                            inq.CreditorName = strEXPERIAN1[0];
+                            inq.CreditorName = strEXPERIAN1[0].Replace("&amp;", "");
                             inq.TypeofBusiness = strEXPERIAN1[1];
                             inq.Dateofinquiry = strEXPERIAN1[2];
                             inq.ChallengeStatus = strEXPERIAN1[3];
