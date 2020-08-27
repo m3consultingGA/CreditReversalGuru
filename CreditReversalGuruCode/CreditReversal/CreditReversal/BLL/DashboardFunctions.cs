@@ -2036,7 +2036,7 @@ namespace CreditReversal.BLL
                 {
                     sql = "select distinct cr.accountId from CreditReportItems cr join  CreditReport c on cr.CredReportId=c.CreditReportId"
                     + " and AccountId !='-' and ClientId =" + id + " and cr.sno=" + sno
-                    + " join CreditReportItemChallenges cri on cri.CredRepItemsId = cr.CredRepItemsId and cri.sno =" + sno;
+                    + " join CreditReportItemChallenges cri on cri.CredRepItemsId = cr.CredRepItemsId and cri.sno =" + val;
                 }
                 else
                 {
