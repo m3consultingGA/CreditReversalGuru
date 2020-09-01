@@ -38,8 +38,9 @@ namespace CreditReversal.BLL
                 browser.Navigate("https://www.identityiq.com/CreditReport.aspx");
                 // browser.Find("imgDownloadAction").Click();
                 //browser.Find("a", new { @class="imgDownloadAction" }).Click();
-                // browser.Find("ucCreditReport_ImgSecureAlacarte").Click();
+                 //browser.Find("ucCreditReport_ImgSecureAlacarte").Click();
 
+                
                 var val = browser.Find("div", FindBy.Id, "divReprtOuter");
 
                 var html3 = browser.CurrentHtml;
@@ -47,7 +48,16 @@ namespace CreditReversal.BLL
                 browser.Navigate("https://www.identityiq.com/CreditReport.aspx");
                 var html4 = browser.CurrentHtml;
 
+                //browser.Find("$('#divReprtOuter').clone().find('.link_header,.moreAboutLink').remove().end()"
+                //            + ".find('.riskfactors').find('[ng-show='showDetail']').remove().end()"
+                //            + ".find('.ng-hide').removeClass('ng-hide').end().end().find('#reportUrl,#hdnRptContent').remove().end().html()");
+                //browser.FindAll("$('#divReprtOuter').clone().find('.link_header,.moreAboutLink').remove().end()"
+                //            + ".find('.riskfactors').find('[ng-show='showDetail']').remove().end()"
+                //            + ".find('.ng-hide').removeClass('ng-hide').end().end().find('#reportUrl,#hdnRptContent').remove().end().html()");
                 var value = browser.Find("input", new { id = "reportUrl" }).Value;
+
+                //var val1 = browser.Find("div", FindBy.Id, "ctrlCreditReport");
+                //var html6 = browser.CurrentHtml;
                 var prevValue = value;
                 value = prevValue;
                 // value = value.Replace("&xsl=CC2IDENTITYIQ_GENERIC_JSON", " ");

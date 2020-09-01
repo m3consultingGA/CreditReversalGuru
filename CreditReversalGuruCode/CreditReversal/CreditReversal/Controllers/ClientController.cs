@@ -11,6 +11,7 @@ using CreditReversal.Utilities;
 using Persits.PDF;
 using System.Dynamic;
 using CreditReversal.DAL;
+using Newtonsoft.Json;
 
 namespace CreditReversal.Controllers
 {
@@ -1115,8 +1116,22 @@ stringWriter
                         ah.Bank = ach.atcreditorName.Replace("&", " And ");
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
+                        var remark = ach.Remark;
+                        if(remark != null)
+                        {
+                            try
+                            {
+                                var data = JsonConvert.DeserializeObject<Remark>(remark.ToString());
+                                if (data != null)
+                                {
+                                    ah.AccountComments = data.RemarkCode.atdescription;
+                                }
+                            }
+                            catch (Exception ex)
+                            {}
+                        }
                         ah.Agency = ach.atbureau;
-                        
+                        ah.AccountCondition = ach.AccountCondition.atdescription;
                         try
                         {
                             ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
@@ -1127,7 +1142,11 @@ stringWriter
                             ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
                             ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
                         }
-
+                        if (ah.AccountType == "Unknown")
+                        {
+                            ah.AccountType = ach.AccountCondition.atdescription;
+                            ah.AccountTypeDetail = ach.AccountCondition.atdescription;
+                        }
                         //Date formating
                         date = ach.atdateOpened;
                         strr = date.Split('-');
@@ -1162,7 +1181,7 @@ stringWriter
                         dat = strr[2];
                         FormatedDate = month + "/" + dat + "/" + year;
                         ah.LastReported = FormatedDate;
-                        ah.PaymentStatus = ach.PayStatus.atabbreviation;
+                        ah.PaymentStatus = ach.PayStatus.atdescription;
                         var payStatus = monthlyPayStatusTU.FirstOrDefault(x => x.AccountNo == ach.ataccountNumber);
                         ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
                         accountHistories.Add(ah);
@@ -1182,6 +1201,21 @@ stringWriter
                         ah.Bank = ach.atcreditorName.Replace("&", " And ");
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
+                        var remark = ach.Remark;
+                        if (remark != null)
+                        {
+                            try
+                            {
+                                var data = JsonConvert.DeserializeObject<Remark>(remark.ToString());
+                                if (data != null)
+                                {
+                                    ah.AccountComments = data.RemarkCode.atdescription;
+                                }
+                            }
+                            catch (Exception ex)
+                            { }
+                        }
+                        ah.AccountCondition = ach.AccountCondition.atdescription;
                         ah.Agency = ach.atbureau;
                         try
                         {
@@ -1192,6 +1226,11 @@ stringWriter
                         {
                             ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
                             ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
+                        }
+                        if (ah.AccountType == "Unknown")
+                        {
+                            ah.AccountType = ach.AccountCondition.atdescription;
+                            ah.AccountTypeDetail = ach.AccountCondition.atdescription;
                         }
                         //Date formating
                         date = ach.atdateOpened;
@@ -1226,7 +1265,7 @@ stringWriter
                         dat = strr[2];
                         FormatedDate = month + "/" + dat + "/" + year;
                         ah.LastReported = FormatedDate;
-                        ah.PaymentStatus = ach.PayStatus.atabbreviation;
+                        ah.PaymentStatus = ach.PayStatus.atdescription;
                         var payStatus = monthlyPayStatusEX.FirstOrDefault(x => x.AccountNo == ach.ataccountNumber);
                         ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
                         accountHistories.Add(ah);
@@ -1247,16 +1286,37 @@ stringWriter
                         ah.Bank = ach.atcreditorName.Replace("&", " And ");
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
+                        ah.AccountCondition = ach.AccountCondition.atdescription;
+                        var remark = ach.Remark;
+                        if (remark != null)
+                        {
+                            try
+                            {
+                                var data = JsonConvert.DeserializeObject<Remark>(remark.ToString());
+                                if (data != null)
+                                {
+                                    ah.AccountComments = data.RemarkCode.atdescription;
+                                }
+                            }
+                            catch (Exception ex)
+                            { }
+                        }
                         ah.Agency = ach.atbureau;
                         try
                         {
                             ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
                             ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+                            
                         }
                         catch (Exception)
                         {
                             ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
                             ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
+                        }
+                        if (ah.AccountType == "Unknown")
+                        {
+                            ah.AccountType = ach.AccountCondition.atdescription;
+                            ah.AccountTypeDetail = ach.AccountCondition.atdescription;
                         }
                         //Date formating
                         date = ach.atdateOpened;
@@ -1292,7 +1352,7 @@ stringWriter
                         dat = strr[2];
                         FormatedDate = month + "/" + dat + "/" + year;
                         ah.LastReported = FormatedDate;
-                        ah.PaymentStatus = ach.PayStatus.atabbreviation;
+                        ah.PaymentStatus = ach.PayStatus.atdescription;
                         var payStatus = monthlyPayStatusEQ.FirstOrDefault(x => x.AccountNo == ach.ataccountNumber);
                         ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
                         accountHistories.Add(ah);

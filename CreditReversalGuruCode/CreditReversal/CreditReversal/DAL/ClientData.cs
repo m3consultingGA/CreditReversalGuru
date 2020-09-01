@@ -1019,11 +1019,13 @@ namespace CreditReversal.DAL
                 {
                     string sql = "Insert Into CreditReportItems(CredReportId,MerchantName,AccountId,OpenDate,"
                         + " CurrentBalance,HighestBalance,Status,MonthlyPayment,LastReported,Agency,CreatedBy, "
-                        + " CreatedDate,negativeitems,RoundType,sno,AccountType,AccountTypeDetails) values(@CredReportId,@MerchantName,@AccountId,"
+                        + " CreatedDate,negativeitems,RoundType,sno,AccountType,AccountTypeDetails,AccountCondition,AccountComments) values(@CredReportId,@MerchantName,@AccountId,"
                         + " @OpenDate,@CurrentBalance,@HighestBalance,@Status,@MonthlyPayment,@LastReported,@Agency, "
-                        + " @CreatedBy,getdate(),@negativeitems,@RoundType," + sno + ",@AccountType,@AccountTypeDetails)";
+                        + " @CreatedBy,getdate(),@negativeitems,@RoundType," + sno + ",@AccountType,@AccountTypeDetails,@AccountCondition,@AccountComments)";
                     SqlCommand cmd = new SqlCommand();
                     cmd.CommandText = sql;
+                    cmd.Parameters.AddWithValue("@AccountComments", string.IsNullOrEmpty(credit[i].AccountComments) ? "" : credit[i].AccountComments);
+                    cmd.Parameters.AddWithValue("@AccountCondition", string.IsNullOrEmpty(credit[i].AccountCondition) ? "" : credit[i].AccountCondition);
                     cmd.Parameters.AddWithValue("@CredReportId", Id);
                     cmd.Parameters.AddWithValue("@Agency", agency);
                     cmd.Parameters.AddWithValue("@MerchantName", credit[i].Bank);

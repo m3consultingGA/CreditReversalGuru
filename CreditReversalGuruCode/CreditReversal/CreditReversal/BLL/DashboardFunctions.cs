@@ -1926,7 +1926,13 @@ namespace CreditReversal.BLL
                 if (role != "client")
                 {
                     // addnagitiveitems = "and isnull(US.negativeitems,0) > 0 ";
-                    addnagitiveitems = "and (isnull(US.negativeitems,0) > 0   or UPPER(US.Status) like '%DELINQ%' or UPPER(US.Status) like '%DEROGATORY%'  ) ";
+                    addnagitiveitems = "and (isnull(US.negativeitems,0) > 0  "
+                        + " or UPPER(US.Status) like '%DELINQ%' or UPPER(US.Status) like '%DEROGATORY%'  "
+                        + " or UPPER(US.AccountCondition) like '%DEROGATORY%' "
+                        + " or UPPER(US.AccountCondition) like '%TRANSFERRED%'  "
+                        + " or UPPER(US.AccountCondition) like '%OPEN%'  "
+                        + " or UPPER(US.AccountCondition) like '%CLOSE%'  "
+                        + " or UPPER(US.AccountCondition) like '%PAID%'  ) ";
                 }
                 else
                 {

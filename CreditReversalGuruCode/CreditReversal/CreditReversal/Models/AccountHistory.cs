@@ -5,8 +5,20 @@ using System.Web;
 
 namespace CreditReversal.Models
 {
+    public class Remark
+    {
+        public string atcustomRemark { get; set; }
+        public RemarkCode RemarkCode { get; set; }
+    }
+    public class RemarkCode
+    {
+        public string atabbreviation { get; set; }
+        public string atdescription { get; set; }
+    }
     public class AccountHistory
     {
+        public string AccountComments { get; set; }
+        public string AccountCondition { get; set; }
         public string ChallengeText { get; set; }
         public string Account { get; set; }
         public string AccountType { get; set; }       
