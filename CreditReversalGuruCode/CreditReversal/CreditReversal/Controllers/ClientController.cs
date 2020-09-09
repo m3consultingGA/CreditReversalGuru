@@ -154,15 +154,18 @@ namespace CreditReversal.Controllers
                 AccountFunctions _accFunctions = new AccountFunctions();
                 agent = _accFunctions.GetAgent(AgentClientId.ToString());
                 bool checkIncInq = false;
-                if(agent != null)
+                if (agent != null)
                 {
                     checkIncInq = string.IsNullOrEmpty(agent.IncChallengeInq) ? false : Convert.ToBoolean(agent.IncChallengeInq);
                 }
-                if(checkIncInq)
+                if (checkIncInq)
                 {
                     List<Inquires> Inquires = functions.GetCreditReportInquiresAgent(Convert.ToInt32(ClientId), null, role);
                     ViewBag.Inquires = Inquires;
                 }
+
+                List<PublicRecord> publicRecords = functions.GetCreditReportPublicRecordsAgent(Convert.ToInt32(ClientId), null, role);
+                ViewBag.PublicRecords = publicRecords;
             }
             catch (Exception ex) { ex.insertTrace(""); }
             return View();
@@ -259,7 +262,7 @@ namespace CreditReversal.Controllers
                 {
                     string SFileName = Path.GetFileName(clientModel.FSocialSecCard.FileName);
                     filename = "Client-SocialSecCard-" + SFileName;
-                     path = Server.MapPath("~/documents/" + filename);
+                    path = Server.MapPath("~/documents/" + filename);
                     clientModel.FSocialSecCard.SaveAs(path);
                     clientModel.sSocialSecCard = filename;
                 }
@@ -541,7 +544,7 @@ stringWriter
         }
 
 
-    
+
 
         //public JsonResult ClientChallengeform(List<CreditReportItems> credit, int Id, string[] values)
         //{
@@ -837,6 +840,7 @@ stringWriter
             {
                 List<AccountHistory> accountHistories = new List<AccountHistory>();
                 List<Inquires> inquires = new List<Inquires>();
+                List<PublicRecord> publicRecords = new List<PublicRecord>();
                 IdentityIQInfo IdentityIQInfo = new IdentityIQInfo();
 
                 IdentityIQInfo = IQfunction.CheckIdentityIQInfo(clientId);
@@ -846,27 +850,8 @@ stringWriter
                 {
                     accountHistories = tuple.AccHistory;
                     inquires = tuple.inquiryDetails;
-                    try
-                    {
-                        //List<CreditReportFiles> files = cfunction.GetCreditReportsFilesByround(clientId, round);
-                        //if (files.Count > 0)
-                        //{
-                        //    foreach (CreditReportFiles file in files)
-                        //    {
-                        //        // Check if file exists with its full path    
-                        //        string filepath = Server.MapPath("~/documents/Challenge/" + file.CRFilename);
-                        //        if (System.IO.File.Exists(filepath))
-                        //        {
-                        //            // If file found, delete it    
-                        //            System.IO.File.Delete(filepath);
-                        //        }
-                        //    }
-                        //}
-                    }
-                    catch (Exception ex)
-                    { string msg = ex.Message; }
-
-                    ReportId = cfunction.RefreshCreditReport(accountHistories, inquires, tuple.monthlyPayStatusHistoryDetails, clientId, mode, round);
+                    publicRecords = tuple.PublicRecords;
+                    ReportId = cfunction.RefreshCreditReport(accountHistories, inquires, tuple.monthlyPayStatusHistoryDetails, clientId, mode, round, publicRecords);
                 }
                 else
                 {
@@ -935,13 +920,16 @@ stringWriter
                 {
                     List<AccountHistory> accountHistories = new List<AccountHistory>();
                     List<Inquires> inquires = new List<Inquires>();
+                    List<PublicRecord> publicRecords = new List<PublicRecord>();
                     CreditReportData tuple = GetCreditReportItemsbyReading(objidentity);
                     //string ds = "";
                     if (tuple.AccHistory.Count > 0 && tuple.inquiryDetails.Count > 0)
                     {
                         accountHistories = tuple.AccHistory;
                         inquires = tuple.inquiryDetails;
-                        ReportId = cfunction.AddCreditReport(accountHistories, inquires, tuple.monthlyPayStatusHistoryDetails, clientId, mode);
+                        publicRecords = tuple.PublicRecords;
+
+                        ReportId = cfunction.AddCreditReport(accountHistories, inquires, tuple.monthlyPayStatusHistoryDetails, clientId, mode,"",publicRecords);
                         return RedirectToAction("CreditItems", "Client", new { @ClientId = clientId, @from = from, @mode = mode });
                     }
                     else
@@ -1040,13 +1028,15 @@ stringWriter
                 {
                     List<AccountHistory> accountHistories = new List<AccountHistory>();
                     List<Inquires> inquires = new List<Inquires>();
+                    List<PublicRecord> publicRecords = new List<PublicRecord>();
                     CreditReportData tuple = GetCreditReportItemsbyReading(objidentity);
                     //string ds = "";
                     if (tuple.AccHistory.Count > 0 && tuple.inquiryDetails.Count > 0)
                     {
                         accountHistories = tuple.AccHistory;
                         inquires = tuple.inquiryDetails;
-                        ReportId = cfunction.AddCreditReport(accountHistories, inquires, tuple.monthlyPayStatusHistoryDetails, clientId, mode);
+                        publicRecords = tuple.PublicRecords;
+                        ReportId = cfunction.AddCreditReport(accountHistories, inquires, tuple.monthlyPayStatusHistoryDetails, clientId, mode,"", publicRecords);
                         return RedirectToAction("CreditItems", "Client", new { @ClientId = clientId, @from = from, @mode = mode });
                     }
                     else
@@ -1076,6 +1066,7 @@ stringWriter
         {
             List<AccountHistory> accountHistories = new List<AccountHistory>();
             List<Inquires> inquires = new List<Inquires>();
+            List<PublicRecord> publicRecords = new List<PublicRecord>();
             CreditReportData creditReportData = new CreditReportData();
 
 
@@ -1117,7 +1108,7 @@ stringWriter
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
                         var remark = ach.Remark;
-                        if(remark != null)
+                        if (remark != null)
                         {
                             try
                             {
@@ -1128,7 +1119,7 @@ stringWriter
                                 }
                             }
                             catch (Exception ex)
-                            {}
+                            { }
                         }
                         ah.Agency = ach.atbureau;
                         ah.AccountCondition = ach.AccountCondition.atdescription;
@@ -1306,7 +1297,7 @@ stringWriter
                         {
                             ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
                             ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
-                            
+
                         }
                         catch (Exception)
                         {
@@ -1380,11 +1371,28 @@ stringWriter
 
                     string msg = ex.Message;
                 }
+                try
+                {
+                    foreach (var ach in cr.PublicRecords)
+                    {
+                        PublicRecord publicRecord = new PublicRecord();
+                        publicRecord.atcourtName = ach.atcourtName;
+                        publicRecord.AccountType = ach.Type.atdescription;
+                        publicRecord.atdateFiled = ach.atdateFiled;
+                        publicRecord.atbureau = ach.atbureau;
+                        publicRecords.Add(publicRecord);
+                    }
+                }
+                catch (Exception ex)
+                {
 
+                    string msg = ex.Message;
+                }
 
                 creditReportData.AccHistory = accountHistories;
                 creditReportData.inquiryDetails = inquires;
                 creditReportData.monthlyPayStatusHistoryDetails = cr.monthlyPayStatusHistoryList;
+                creditReportData.PublicRecords = publicRecords;
             }
             catch (Exception ex)
             {
@@ -1394,7 +1402,7 @@ stringWriter
         }
         public JsonResult ClientChallengeform(List<CreditReportItems> credit, int Id, string[] values)
         {
-            string  status = "0";
+            string status = "0";
             int sno = 0;
             if (credit == null || credit.Count == 0)
             {
@@ -1422,10 +1430,10 @@ stringWriter
                     ClientData cd = new ClientData();
                     if (credit != null)
                     {
-
+                        sno = cd.getsnofromitems(Id.ToString(), credit[0].RoundType, "AH");
                         for (i = 0; i < count; i++)
                         {
-                            sno = cd.getsnofromitems(Id.ToString(), credit[i].RoundType);
+                            
                             cfunction.AddReportItemChallenges(credit[i], sno, Id, clientModel.isPrevItemInLastYear);
                             dynamic model = new ExpandoObject();
                             string AgentId = sessionData.GetAgentId();
@@ -1455,24 +1463,24 @@ stringWriter
                     string file1 = "", file2 = "", file3 = "";
                     if (EQCreditItems.Count > 0)
                     {
-                       file1 =  CreateChallengeLetters(EQCreditItems, clientModel, values, Id, sno);
+                        file1 = CreateChallengeLetters(EQCreditItems, clientModel, values, Id, sno);
                     }
                     if (EXCreditItems.Count > 0)
                     {
-                     file2 =  CreateChallengeLetters(EXCreditItems, clientModel, values, Id, sno);
+                        file2 = CreateChallengeLetters(EXCreditItems, clientModel, values, Id, sno);
                     }
                     if (TUCreditItems.Count > 0)
                     {
-                    file3 =    CreateChallengeLetters(TUCreditItems, clientModel, values, Id, sno);
+                        file3 = CreateChallengeLetters(TUCreditItems, clientModel, values, Id, sno);
                     }
 
-                    if(string.IsNullOrEmpty(file1) && string.IsNullOrEmpty(file2) && string.IsNullOrEmpty(file3))
+                    if (string.IsNullOrEmpty(file1) && string.IsNullOrEmpty(file2) && string.IsNullOrEmpty(file3))
                     {
                         status = "1";
                     }
                     else
                     {
-                        if(!string.IsNullOrEmpty(file1))
+                        if (!string.IsNullOrEmpty(file1))
                         {
                             status = file1;
                         }
@@ -1486,7 +1494,7 @@ stringWriter
                         }
                         status = status.TrimStart('^'); status = status.TrimEnd('^');
                     }
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -1569,14 +1577,18 @@ stringWriter
                     {
                         if (!string.IsNullOrEmpty(clientModel.sProofOfCard))
                         {
-                            byte[] bytes = null;
-                            bytes = pdfBuffer = System.IO.File.ReadAllBytes(Server.MapPath("~/Documents/" + clientModel.sProofOfCard));
-                            PdfImage objImage = objDoc.OpenImage(bytes);
-                            PdfPage objPage = objDoc.Pages.Add();
-                            PdfParam objParam = objPdf.CreateParam();
-                            objPage.Canvas.DrawImage(objImage, "x=0, y=0");
+                            try
+                            {
+                                byte[] bytes = null;
+                                bytes = pdfBuffer = System.IO.File.ReadAllBytes(Server.MapPath("~/Documents/" + clientModel.sProofOfCard));
+                                PdfImage objImage = objDoc.OpenImage(bytes);
+                                PdfPage objPage = objDoc.Pages.Add();
+                                PdfParam objParam = objPdf.CreateParam();
+                                objPage.Canvas.DrawImage(objImage, "x=0, y=0");
+                            }
+                            catch (Exception)
+                            {}
                         }
-
                     }
                     catch (Exception ex)
                     { }
@@ -1595,8 +1607,8 @@ stringWriter
                 }
                 StringList.Clear();
                 AgentData agentData = new AgentData();
-                int _checkExists =agentData.checkAutoChallenges(crItems[0].RoundType, crItems[0].Agency,Id.ToString(),"Account");
-                if(_checkExists == 0)
+                int _checkExists = agentData.checkAutoChallenges(crItems[0].RoundType, crItems[0].Agency, Id.ToString(), "Account");
+                if (_checkExists == 0)
                 {
                     res = filename;
                 }
@@ -1606,13 +1618,13 @@ stringWriter
             return res;
         }
 
-        public JsonResult ClientChallengeInquiresform(List<Inquires> credit, int Id, string[] values)
+        public JsonResult ClientChallengePRform(List<PublicRecord> credit, int Id, string[] values)
         {
-            
+
             string client = Id.ToString();
             ClientModel clientModel = cfunction.GetClient(client);
             int sno = 0;
-            
+
             string status = "";
             int count = 0;
             if (credit != null)
@@ -1620,23 +1632,24 @@ stringWriter
                 count = credit.Count();
             }
             int i = 0;
-            
+
             try
             {
                 ClientData cd = new ClientData();
 
                 if (credit != null)
                 {
+                    sno = cd.getsnofromitems(Id.ToString(), credit[0].RoundType, "PR");
+
                     for (i = 0; i < count; i++)
                     {
-                        sno = cd.getsnofromitems(Id.ToString(), credit[i].RoundType);
-                        cfunction.AddReportItemInquiriesChallenges(credit[i], values[3], sno, Id);
+                        cfunction.AddReportItemPRChallenges(credit[i], values[3], sno, Id);
                         dynamic model = new ExpandoObject();
                         string AgentId = sessionData.GetAgentId();
                         string staffId = sessionData.GetStaffId();
                         string fullname = "";
 
-                        cfunction.AddInquiresChallenge(credit[i], AgentId, staffId);
+                      //  cfunction.AddInquiresChallenge(credit[i], AgentId, staffId);
                         ViewBag.CreditReportItems = credit[i];
 
                         model.clientcredit = credit[i];
@@ -1648,30 +1661,30 @@ stringWriter
                         var names = fullname.Split(' ');
                         string name = names[0];
                         int clientid = Id;
-                        string Report = credit[i].CreditInqId;
+                        string Report = credit[i].PublicRecordId;
 
                     }
                 }
-                List<Inquires> Inquires = functions.GetInquiriesChallengesAgentById(credit, Id);
-                
-                List<Inquires> eqInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EQUIFAX").ToList();
-                List<Inquires> exInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EXPERIAN").ToList();
-                List<Inquires> tuInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "TRANSUNION").ToList();
+                List<PublicRecord> PublicRecords = functions.GetPRChallengesAgentById(credit, Id);
+
+                List<PublicRecord> eqInquires = PublicRecords.Where(x => x.atbureau.ToUpper() == "EQUIFAX").ToList();
+                List<PublicRecord> exInquires = PublicRecords.Where(x => x.atbureau.ToUpper() == "EXPERIAN").ToList();
+                List<PublicRecord> tuInquires = PublicRecords.Where(x => x.atbureau.ToUpper() == "TRANSUNION").ToList();
 
                 string file1 = "", file2 = "", file3 = "";
                 if (eqInquires.Count > 0)
                 {
-                  file1=  CreateChallengeLettersForInq(eqInquires, Id, values, clientModel, sno);
+                    file1 = CreateChallengeLettersForPR(eqInquires, Id, values, clientModel, sno);
                 }
                 if (exInquires.Count > 0)
                 {
-                  file2=  CreateChallengeLettersForInq(exInquires, Id, values, clientModel, sno);
+                    file2 = CreateChallengeLettersForPR(exInquires, Id, values, clientModel, sno);
                 }
                 if (tuInquires.Count > 0)
                 {
-                 file3 =  CreateChallengeLettersForInq(tuInquires, Id, values, clientModel, sno);
+                    file3 = CreateChallengeLettersForPR(tuInquires, Id, values, clientModel, sno);
                 }
-                
+
 
                 if (string.IsNullOrEmpty(file1) && string.IsNullOrEmpty(file2) && string.IsNullOrEmpty(file3))
                 {
@@ -1694,7 +1707,202 @@ stringWriter
                     status = status.TrimStart('^'); status = status.TrimEnd('^');
                 }
 
-                
+
+            }
+            catch (Exception ex)
+            {
+                status = "0";
+            }
+            return Json(status);
+        }
+        public string CreateChallengeLettersForPR(List<PublicRecord> Inquires, int Id, string[] values, ClientModel clientModel, int sno)
+        {
+            string res = "";
+            try
+            {
+                List<PublicRecord> InquiresAllAgencies = new List<PublicRecord>();
+                List<CreditReportFiles> filenames = new List<CreditReportFiles>();
+                byte[] pdfBuffer = null;
+                PdfManager objPdf = new PdfManager();
+                PdfDocument objDoc = objPdf.CreateDocument();
+                MemoryStream pdfStream = new MemoryStream();
+                string filepath = "", filename = "";
+
+                string date = DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Year.ToString()
+                   + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
+                List<string> StringList = new List<string>();
+                Session["ClientAddress"] = clientModel;
+                StringList.Add(clientModel.FirstName);
+                StringList.Add(clientModel.LastName);
+                StringList.Add(values[2]);
+                StringList.Add(values[3]);
+                StringList.Add(clientModel.SSN);
+
+                for (int k = 0; k < Inquires.Count; k++)
+                {
+                    PublicRecord cr = new PublicRecord();
+                    if (Inquires[k].ChallengeText != "NO CHALLENGE")
+                    {
+                        cr.atcourtName = Inquires[k].atcourtName;
+                        cr.AccountType = Inquires[k].AccountType;
+                        cr.atdateFiled = Inquires[k].atdateFiled;
+                        cr.atbureau = Inquires[k].atbureau;
+                        if (Inquires[k].AccountType == Inquires[k].ChallengeText)
+                        {
+                            Inquires[k].AccountType = Inquires[k].AccountType; //Need to fix
+                        }
+                        cr.ChallengeText = Inquires[k].ChallengeText;
+                        cr.RoundType = Inquires[k].RoundType;
+                        cr.AccountType = Inquires[k].AccountType;
+                        InquiresAllAgencies.Add(cr);
+                    }
+                }
+                filenames = new List<CreditReportFiles>();
+                if (InquiresAllAgencies.Count > 0)
+                {
+                    StringList.Add(Inquires[0].atbureau);
+                    Session["values"] = StringList;
+                    objDoc = objPdf.CreateDocument();
+                    dynamic model = new ExpandoObject();
+                    int trcount = InquiresAllAgencies.Count - 1;
+                    model.clientcredit = InquiresAllAgencies;
+                    string htmlToConvert = RenderViewAsString("ClientPRChallengeform", model);
+                    objDoc.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=54;TopMargin=54;BottomMargin=54; hyperlinks=true; drawbackground=true");
+                    filename = "Challenge-PublicRecords-" + Inquires[0].atbureau + "-" + values[0] + "-" + values[1] + "-" + InquiresAllAgencies[0].RoundType + "-" + date + ".pdf";
+                    filename = filename.Replace(" ", "");
+                    filepath = Server.MapPath("~/Documents/Challenge/Challenge-PublicRecords-" + Inquires[0].atbureau + "-"
+                        + values[0] + "-" + values[1] + "-" + InquiresAllAgencies[0].RoundType + "-" + date + ".pdf");
+                    filepath = filepath.Replace(" ", "");
+
+                    if (!string.IsNullOrEmpty(clientModel.sProofOfCard))
+                    {
+                        try
+                        {
+                            byte[] bytes = null;
+                            bytes = pdfBuffer = System.IO.File.ReadAllBytes(Server.MapPath("~/Documents/" + clientModel.sProofOfCard));
+                            PdfImage objImage = objDoc.OpenImage(bytes);
+                            PdfPage objPage = objDoc.Pages.Add();
+                            PdfParam objParam = objPdf.CreateParam();
+                            objPage.Canvas.DrawImage(objImage, "x=0, y=0");
+                        }
+                        catch (Exception)
+                        {}
+                        
+                    }
+                    objDoc.Save(filepath, false);
+                    objDoc.Close();
+
+                    CreditReportFiles files = new CreditReportFiles();
+                    files.RoundType = InquiresAllAgencies[trcount].RoundType;
+                    files.CRFilename = filename;
+                    files.ClientId = Id;
+                    filenames.Add(files);
+                }
+                if (filenames.Count > 0)
+                {
+                    functions.updatechallengefilepath(filenames, sno);
+                }
+                StringList.Clear();
+                AgentData agentData = new AgentData();
+                int _checkExists = agentData.checkAutoChallenges(InquiresAllAgencies[0].RoundType, Inquires[0].atbureau, Id.ToString(), "PR");
+                if (_checkExists == 0)
+                {
+                    res = filename;
+                }
+            }
+            catch (Exception ex)
+            { }
+            return res;
+        }
+        public JsonResult ClientChallengeInquiresform(List<Inquires> credit, int Id, string[] values)
+        {
+
+            string client = Id.ToString();
+            ClientModel clientModel = cfunction.GetClient(client);
+            int sno = 0;
+
+            string status = "";
+            int count = 0;
+            if (credit != null)
+            {
+                count = credit.Count();
+            }
+            int i = 0;
+
+            try
+            {
+                ClientData cd = new ClientData();
+
+                if (credit != null)
+                {
+                    sno = cd.getsnofromitems(Id.ToString(), credit[0].RoundType, "INQ");
+                    for (i = 0; i < count; i++)
+                    {
+                        cfunction.AddReportItemInquiriesChallenges(credit[i], "", sno, Id);
+                        dynamic model = new ExpandoObject();
+                        string AgentId = sessionData.GetAgentId();
+                        string staffId = sessionData.GetStaffId();
+                        string fullname = "";
+
+                        cfunction.AddInquiresChallenge(credit[i], AgentId, staffId);
+                        ViewBag.CreditReportItems = credit[i];
+
+                        model.clientcredit = credit[i];
+
+                        if (Session["Name"] != null)
+                        {
+                            fullname = Session["Name"].ToString();
+                        }
+                        var names = fullname.Split(' ');
+                        string name = names[0];
+                        int clientid = Id;
+                        string Report = credit[i].CreditInqId;
+
+                    }
+                }
+                List<Inquires> Inquires = functions.GetInquiriesChallengesAgentById(credit, Id);
+
+                List<Inquires> eqInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EQUIFAX").ToList();
+                List<Inquires> exInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EXPERIAN").ToList();
+                List<Inquires> tuInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "TRANSUNION").ToList();
+
+                string file1 = "", file2 = "", file3 = "";
+                if (eqInquires.Count > 0)
+                {
+                    file1 = CreateChallengeLettersForInq(eqInquires, Id, values, clientModel, sno);
+                }
+                if (exInquires.Count > 0)
+                {
+                    file2 = CreateChallengeLettersForInq(exInquires, Id, values, clientModel, sno);
+                }
+                if (tuInquires.Count > 0)
+                {
+                    file3 = CreateChallengeLettersForInq(tuInquires, Id, values, clientModel, sno);
+                }
+
+
+                if (string.IsNullOrEmpty(file1) && string.IsNullOrEmpty(file2) && string.IsNullOrEmpty(file3))
+                {
+                    status = "1";
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(file1))
+                    {
+                        status = file1;
+                    }
+                    if (!string.IsNullOrEmpty(file2))
+                    {
+                        status = status + "^" + file2;
+                    }
+                    if (!string.IsNullOrEmpty(file3))
+                    {
+                        status = status + "^" + file3;
+                    }
+                    status = status.TrimStart('^'); status = status.TrimEnd('^');
+                }
+
+
             }
             catch (Exception ex)
             {
@@ -1703,7 +1911,7 @@ stringWriter
             return Json(status);
         }
 
-        public string CreateChallengeLettersForInq(List<Inquires> Inquires, int Id, string[] values, ClientModel clientModel,int sno)
+        public string CreateChallengeLettersForInq(List<Inquires> Inquires, int Id, string[] values, ClientModel clientModel, int sno)
         {
             string res = "";
             try
@@ -1716,7 +1924,7 @@ stringWriter
                 MemoryStream pdfStream = new MemoryStream();
                 string filepath = "", filename = "";
 
-                string  date = DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Year.ToString()
+                string date = DateTime.Now.Month.ToString() + DateTime.Now.Day.ToString() + DateTime.Now.Year.ToString()
                    + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString();
                 List<string> StringList = new List<string>();
                 Session["ClientAddress"] = clientModel;
@@ -1745,24 +1953,26 @@ stringWriter
                         InquiresAllAgencies.Add(cr);
                     }
                 }
-                    filenames = new List<CreditReportFiles>();
-                    if (InquiresAllAgencies.Count > 0)
-                    {
-                        StringList.Add(Inquires[0].CreditBureau);
-                        Session["values"] = StringList;
-                        objDoc = objPdf.CreateDocument();
-                        dynamic model = new ExpandoObject();
-                        int trcount = InquiresAllAgencies.Count - 1;
-                        model.clientcredit = InquiresAllAgencies;
-                        string htmlToConvert = RenderViewAsString("ClientInquiriesChallengeform", model);
-                        objDoc.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=54;TopMargin=54;BottomMargin=54; hyperlinks=true; drawbackground=true");
-                        filename = "Challenge-Inquires-" + Inquires[0].CreditBureau + "-" + values[0] + "-" + values[1] + "-" + InquiresAllAgencies[0].RoundType + "-" + date + ".pdf";
-                        filename = filename.Replace(" ", "");
-                        filepath = Server.MapPath("~/Documents/Challenge/Challenge-Inquires-" + Inquires[0].CreditBureau + "-"
-                            + values[0] + "-" + values[1] + "-" + InquiresAllAgencies[0].RoundType + "-" + date + ".pdf");
-                        filepath = filepath.Replace(" ", "");
+                filenames = new List<CreditReportFiles>();
+                if (InquiresAllAgencies.Count > 0)
+                {
+                    StringList.Add(Inquires[0].CreditBureau);
+                    Session["values"] = StringList;
+                    objDoc = objPdf.CreateDocument();
+                    dynamic model = new ExpandoObject();
+                    int trcount = InquiresAllAgencies.Count - 1;
+                    model.clientcredit = InquiresAllAgencies;
+                    string htmlToConvert = RenderViewAsString("ClientInquiriesChallengeform", model);
+                    objDoc.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=54;TopMargin=54;BottomMargin=54; hyperlinks=true; drawbackground=true");
+                    filename = "Challenge-Inquires-" + Inquires[0].CreditBureau + "-" + values[0] + "-" + values[1] + "-" + InquiresAllAgencies[0].RoundType + "-" + date + ".pdf";
+                    filename = filename.Replace(" ", "");
+                    filepath = Server.MapPath("~/Documents/Challenge/Challenge-Inquires-" + Inquires[0].CreditBureau + "-"
+                        + values[0] + "-" + values[1] + "-" + InquiresAllAgencies[0].RoundType + "-" + date + ".pdf");
+                    filepath = filepath.Replace(" ", "");
 
-                        if (!string.IsNullOrEmpty(clientModel.sProofOfCard))
+                    if (!string.IsNullOrEmpty(clientModel.sProofOfCard))
+                    {
+                        try
                         {
                             byte[] bytes = null;
                             bytes = pdfBuffer = System.IO.File.ReadAllBytes(Server.MapPath("~/Documents/" + clientModel.sProofOfCard));
@@ -1771,20 +1981,24 @@ stringWriter
                             PdfParam objParam = objPdf.CreateParam();
                             objPage.Canvas.DrawImage(objImage, "x=0, y=0");
                         }
-                        objDoc.Save(filepath, false);
-                        objDoc.Close();
+                        catch (Exception)
+                        {}
+                       
+                    }
+                    objDoc.Save(filepath, false);
+                    objDoc.Close();
 
-                        CreditReportFiles files = new CreditReportFiles();
-                        files.RoundType = InquiresAllAgencies[trcount].RoundType;
-                        files.CRFilename = filename;
-                        files.ClientId = Id;
-                        filenames.Add(files);
-                    }
-                    if (filenames.Count > 0)
-                    {
-                        functions.updatechallengefilepath(filenames, sno);
-                    }
-                    StringList.Clear();
+                    CreditReportFiles files = new CreditReportFiles();
+                    files.RoundType = InquiresAllAgencies[trcount].RoundType;
+                    files.CRFilename = filename;
+                    files.ClientId = Id;
+                    filenames.Add(files);
+                }
+                if (filenames.Count > 0)
+                {
+                    functions.updatechallengefilepath(filenames, sno);
+                }
+                StringList.Clear();
                 AgentData agentData = new AgentData();
                 int _checkExists = agentData.checkAutoChallenges(InquiresAllAgencies[0].RoundType, Inquires[0].CreditBureau, Id.ToString(), "Inquires");
                 if (_checkExists == 0)
@@ -1793,7 +2007,7 @@ stringWriter
                 }
             }
             catch (Exception ex)
-            {}
+            { }
             return res;
         }
 

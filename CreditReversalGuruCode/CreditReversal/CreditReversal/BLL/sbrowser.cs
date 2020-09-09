@@ -12,7 +12,8 @@ namespace CreditReversal.BLL
 {
     public class sbrowser
     {
-        public CreditReport pullcredit(string Username, string Password, string SecurityAnswer,string clientid)
+        
+        public CreditReport pullcredit(string Username, string Password, string SecurityAnswer, string clientid)
         {
             CreditReport cr = new CreditReport();
             try
@@ -34,37 +35,16 @@ namespace CreditReversal.BLL
                 browser.Find("FBfbforcechangesecurityanswer_txtSecurityAnswer").Value = SecurityAnswer; // "4344";
                 browser.Find("FBfbforcechangesecurityanswer_ibtSubmit").Click();
                 var html1 = browser.CurrentHtml;
-
                 browser.Navigate("https://www.identityiq.com/CreditReport.aspx");
-                // browser.Find("imgDownloadAction").Click();
-                //browser.Find("a", new { @class="imgDownloadAction" }).Click();
-                 //browser.Find("ucCreditReport_ImgSecureAlacarte").Click();
-
-                
                 var val = browser.Find("div", FindBy.Id, "divReprtOuter");
-
                 var html3 = browser.CurrentHtml;
-
                 browser.Navigate("https://www.identityiq.com/CreditReport.aspx");
                 var html4 = browser.CurrentHtml;
-
-                //browser.Find("$('#divReprtOuter').clone().find('.link_header,.moreAboutLink').remove().end()"
-                //            + ".find('.riskfactors').find('[ng-show='showDetail']').remove().end()"
-                //            + ".find('.ng-hide').removeClass('ng-hide').end().end().find('#reportUrl,#hdnRptContent').remove().end().html()");
-                //browser.FindAll("$('#divReprtOuter').clone().find('.link_header,.moreAboutLink').remove().end()"
-                //            + ".find('.riskfactors').find('[ng-show='showDetail']').remove().end()"
-                //            + ".find('.ng-hide').removeClass('ng-hide').end().end().find('#reportUrl,#hdnRptContent').remove().end().html()");
                 var value = browser.Find("input", new { id = "reportUrl" }).Value;
-
-                //var val1 = browser.Find("div", FindBy.Id, "ctrlCreditReport");
-                //var html6 = browser.CurrentHtml;
                 var prevValue = value;
                 value = prevValue;
-                // value = value.Replace("&xsl=CC2IDENTITYIQ_GENERIC_JSON", " ");
                 browser.Navigate(value);
                 var html2 = browser.CurrentHtml;
-                //    var list = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(html2);
-                // var items = Newtonsoft.Json.JsonConvert.DeserializeObject<IEnumerable<report>>(html2);
                 html2 = html2.Replace("JSON_CALLBACK(", "");
                 html2 = html2.TrimEnd(')', ' ');
                 html2 = html2.Replace("$", "dollar");
@@ -87,14 +67,17 @@ namespace CreditReversal.BLL
                 catch (Exception)
                 { }
 
-                //DBUtilities utilities = new DBUtilities();
-                //string sql = "select top 1  JsonData from CreditReportData order by 1 desc";
-                //object jsonRes = utilities.ExecuteScalar(sql, true);
-                //string html2 = jsonRes.ConvertObjectToStringIfNotNull();
-                //html2 = html2.Replace("\"","'" );
+               // string html2 = System.IO.File.ReadAllText(@"E:\\CreditReportData09082020.txt");
 
+                ////need to comment
+                //html2 = html2.Replace("JSON_CALLBACK(", "");
+                //html2 = html2.TrimEnd(')', ' ');
+                //html2 = html2.Replace("$", "dollar");
+                //html2 = html2.Replace("@", "at");
+                //html2 = html2.Replace("{ \"", " { ");
+                //html2 = html2.Replace("\" :", " : ");
+                //html2 = html2.Replace(", \"", " , ");
 
-                ///
                 RootObject rootObj = JsonConvert.DeserializeObject<RootObject>(html2);
                 //TU  EQ  EXP
                 List<TradeLinePartition> tdl = new List<TradeLinePartition>();
@@ -103,9 +86,28 @@ namespace CreditReversal.BLL
                 List<TradeLine> transunion = new List<TradeLine>();
                 List<TradeLine> equifax = new List<TradeLine>();
                 List<TradeLine> experian = new List<TradeLine>();
+                List<PublicRecord> PublicRecords = new List<PublicRecord>();
 
-                tdl.AddRange(rootObj.BundleComponents.BundleComponent[6].TrueLinkCreditReportType.TradeLinePartition);
-                InquiryPartition.AddRange(rootObj.BundleComponents.BundleComponent[6].TrueLinkCreditReportType.InquiryPartition);
+                try
+                {
+                    tdl.AddRange(rootObj.BundleComponents.BundleComponent[6].TrueLinkCreditReportType.TradeLinePartition);
+                }
+                catch (Exception)
+                {}
+
+                try
+                {
+                    InquiryPartition.AddRange(rootObj.BundleComponents.BundleComponent[6].TrueLinkCreditReportType.InquiryPartition);
+                }
+                catch (Exception)
+                {}
+
+                try
+                {
+                    PublicRecords.AddRange(rootObj.BundleComponents.BundleComponent[6].TrueLinkCreditReportType.PulblicRecordPartition.PublicRecord);
+                }
+                catch (Exception)
+                {}
                 for (int i = 0; i < tdl.Count; i++)
                 {
                     string str = tdl[i].Tradeline.ToString();
@@ -157,6 +159,7 @@ namespace CreditReversal.BLL
                 cr.Experian = experian;
                 cr.TransUnion = transunion;
                 cr.inquiries = InquiryPartition;
+                cr.PublicRecords = PublicRecords;
 
                 List<MonthlyPayStatus> monthlyPayStatusEQ = new List<MonthlyPayStatus>();
                 List<MonthlyPayStatus> monthlyPayStatusTU = new List<MonthlyPayStatus>();
@@ -221,10 +224,10 @@ namespace CreditReversal.BLL
                 {
                     string msg = ex.Message;
                 }
-               
 
 
-              
+
+
                 MonthlyPayStatus monthlyPayStatusTUItem = new MonthlyPayStatus();
                 try
                 {
@@ -279,9 +282,9 @@ namespace CreditReversal.BLL
                 {
                     string msg = ex.Message;
                 }
-               
 
-                
+
+
                 MonthlyPayStatus monthlyPayStatusEXItem = new MonthlyPayStatus();
                 try
                 {
@@ -336,12 +339,296 @@ namespace CreditReversal.BLL
                 {
                     string msg = ex.Message;
                 }
-             
-               
+
+
                 cr.monthlyPayStatusEQ = monthlyPayStatusEQ;
                 cr.monthlyPayStatusEX = monthlyPayStatusEX;
                 cr.monthlyPayStatusTU = monthlyPayStatusTU;
                 cr.monthlyPayStatusHistoryList = monthlyPayStatusHistoryList;
+            }
+            catch (Exception ex)
+            {
+                string msg = ex.Message;
+            }
+
+            return cr;
+        }
+
+        public static object pullcreditTesting()
+        {
+            CreditReport cr = new CreditReport();
+            try
+            {
+                string html2 = System.IO.File.ReadAllText(@"E:\\CreditReportData09082020.txt");
+                html2 = html2.Replace("JSON_CALLBACK(", "");
+                html2 = html2.TrimEnd(')', ' ');
+                html2 = html2.Replace("$", "dollar");
+                html2 = html2.Replace("@", "at");
+                html2 = html2.Replace("{ \"", " { ");
+                html2 = html2.Replace("\" :", " : ");
+                html2 = html2.Replace(", \"", " , ");
+
+                var data = JsonConvert.DeserializeObject<dynamic>(html2);
+                RootObject rootObj = JsonConvert.DeserializeObject<RootObject>(html2);
+                //TU  EQ  EXP
+                List<TradeLinePartition> tdl = new List<TradeLinePartition>();
+                List<InquiryPartition> InquiryPartition = new List<InquiryPartition>();
+                List<TradeLine> trdlines = new List<TradeLine>();
+                List<TradeLine> transunion = new List<TradeLine>();
+                List<TradeLine> equifax = new List<TradeLine>();
+                List<TradeLine> experian = new List<TradeLine>();
+
+                tdl.AddRange(rootObj.BundleComponents.BundleComponent[6].TrueLinkCreditReportType.TradeLinePartition);
+                //InquiryPartition.AddRange(rootObj.BundleComponents.BundleComponent[6].TrueLinkCreditReportType.InquiryPartition);
+                for (int i = 0; i < tdl.Count; i++)
+                {
+                    string str = tdl[i].Tradeline.ToString();
+                    string name = string.Empty;
+                    if (str.Substring(0, 1).Contains("["))
+                    {
+                        name = "{ TradeLine: " + str + " }";
+                    }
+                    else
+                    {
+                        name = "{ TradeLine: [ " + str + " ] }";
+                    }
+
+                    //str = str.Replace("[{", "TradeLine: [ {");
+                    try
+                    {
+                        ChildModel td = JsonConvert.DeserializeObject<ChildModel>(name);
+                        trdlines.AddRange(td.TradeLine);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+                if (trdlines.Count > 0)
+                {
+
+                    transunion = new List<TradeLine>();
+                    equifax = new List<TradeLine>();
+                    experian = new List<TradeLine>();
+                    var trcount = trdlines.Where(x => x.atbureau == "TransUnion");
+                    var Equifaxcount = trdlines.Where(x => x.atbureau == "Equifax");
+                    var Experiancount = trdlines.Where(x => x.atbureau == "Experian");
+                    if (trcount.Count() > 0)
+                    {
+                        transunion.AddRange(trcount);
+                    }
+                    if (Equifaxcount.Count() > 0)
+                    {
+                        equifax.AddRange(Equifaxcount);
+                    }
+                    if (Experiancount.Count() > 0)
+                    {
+                        experian.AddRange(Experiancount);
+                    }
+                }
+
+                cr.Equifax = equifax;
+                cr.Experian = experian;
+                cr.TransUnion = transunion;
+
+
+
+                List<MonthlyPayStatus> monthlyPayStatusEQ = new List<MonthlyPayStatus>();
+                List<MonthlyPayStatus> monthlyPayStatusTU = new List<MonthlyPayStatus>();
+                List<MonthlyPayStatus> monthlyPayStatusEX = new List<MonthlyPayStatus>();
+
+                monthlyPayStatusEQ = new List<MonthlyPayStatus>();
+                monthlyPayStatusTU = new List<MonthlyPayStatus>();
+                monthlyPayStatusEX = new List<MonthlyPayStatus>();
+                List<MonthlyPayStatusHistory> monthlyPayStatusHistoryList = new List<MonthlyPayStatusHistory>();
+                MonthlyPayStatusHistory monthlyPayStatusHistory = new MonthlyPayStatusHistory();
+
+                MonthlyPayStatus monthlyPayStatusEQItem = new MonthlyPayStatus();
+                try
+                {
+                    for (int i = 0; i < equifax.Count; i++)
+                    {
+                        monthlyPayStatusEQItem = new MonthlyPayStatus();
+                        monthlyPayStatusEQItem.Agency = equifax[i].atbureau;
+                        monthlyPayStatusEQItem.Bank = equifax[i].atcreditorName;
+                        monthlyPayStatusEQItem.AccountNo = equifax[i].ataccountNumber;
+                        GrantedTrade gt = equifax[i].GrantedTrade;
+                        if (gt != null)
+                        {
+                            monthlyPayStatusEQItem.atmonthsReviewed = gt.atmonthsReviewed;
+                            monthlyPayStatusEQItem.atmonthlyPayment = gt.atmonthlyPayment;
+                            monthlyPayStatusEQItem.atlate90Count = gt.atlate90Count;
+                            monthlyPayStatusEQItem.atlate60Count = gt.atlate60Count;
+                            monthlyPayStatusEQItem.atlate30Count = gt.atlate30Count;
+                            monthlyPayStatusEQItem.atdateLastPayment = gt.atdateLastPayment;
+                            monthlyPayStatusEQItem.attermMonths = gt.attermMonths;
+                            monthlyPayStatusEQItem.atcollateral = gt.atcollateral;
+                            monthlyPayStatusEQItem.atamountPastDue = gt.atamountPastDue;
+                            monthlyPayStatusEQItem.atworstPatStatusCount = gt.atworstPatStatusCount;
+
+                            monthlyPayStatusEQItem.NegitiveItemsCount = gt.atlate90Count.StringToInt(0)
+                                + gt.atlate60Count.StringToInt(0) + gt.atlate30Count.StringToInt(0);
+                            try
+                            {
+                                monthlyPayStatusEQItem.monthlyPayStatusEQ = new List<MonthlyPayStatu>();
+                                var monthPayStatusEQ = gt.PayStatusHistory.MonthlyPayStatus;
+                                monthlyPayStatusEQItem.monthlyPayStatusEQ = monthPayStatusEQ;
+                                for (int j = 0; j < monthPayStatusEQ.Count; j++)
+                                {
+                                    monthlyPayStatusHistory = new MonthlyPayStatusHistory();
+                                    monthlyPayStatusHistory.Agency = monthlyPayStatusEQItem.Agency;
+                                    monthlyPayStatusHistory.Bank = monthlyPayStatusEQItem.Bank;
+                                    monthlyPayStatusHistory.AccountNo = monthlyPayStatusEQItem.AccountNo;
+                                    monthlyPayStatusHistory.atdate = monthPayStatusEQ[j].atdate;
+                                    monthlyPayStatusHistory.atstatus = monthPayStatusEQ[j].atstatus;
+                                    monthlyPayStatusHistoryList.Add(monthlyPayStatusHistory);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                string msg = ex.Message;
+                            }
+                        }
+                        monthlyPayStatusEQ.Add(monthlyPayStatusEQItem);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string msg = ex.Message;
+                }
+
+
+
+
+                MonthlyPayStatus monthlyPayStatusTUItem = new MonthlyPayStatus();
+                try
+                {
+                    for (int i = 0; i < transunion.Count; i++)
+                    {
+                        monthlyPayStatusTUItem = new MonthlyPayStatus();
+                        monthlyPayStatusTUItem.Agency = transunion[i].atbureau;
+                        monthlyPayStatusTUItem.Bank = transunion[i].atcreditorName;
+                        monthlyPayStatusTUItem.AccountNo = transunion[i].ataccountNumber;
+                        GrantedTrade gt = transunion[i].GrantedTrade;
+                        if (gt != null)
+                        {
+                            monthlyPayStatusTUItem.atmonthsReviewed = gt.atmonthsReviewed;
+                            monthlyPayStatusTUItem.atmonthlyPayment = gt.atmonthlyPayment;
+                            monthlyPayStatusTUItem.atlate90Count = gt.atlate90Count;
+                            monthlyPayStatusTUItem.atlate60Count = gt.atlate60Count;
+                            monthlyPayStatusTUItem.atlate30Count = gt.atlate30Count;
+                            monthlyPayStatusTUItem.atdateLastPayment = gt.atdateLastPayment;
+                            monthlyPayStatusTUItem.attermMonths = gt.attermMonths;
+                            monthlyPayStatusTUItem.atcollateral = gt.atcollateral;
+                            monthlyPayStatusTUItem.atamountPastDue = gt.atamountPastDue;
+                            monthlyPayStatusTUItem.atworstPatStatusCount = gt.atworstPatStatusCount;
+                            monthlyPayStatusTUItem.NegitiveItemsCount = gt.atlate90Count.StringToInt(0)
+                               + gt.atlate60Count.StringToInt(0) + gt.atlate30Count.StringToInt(0);
+                            try
+                            {
+                                monthlyPayStatusTUItem.monthlyPayStatusTU = new List<MonthlyPayStatu>();
+                                var monthPayStatusTU = gt.PayStatusHistory != null ? gt.PayStatusHistory.MonthlyPayStatus : new List<MonthlyPayStatu>();
+                                monthlyPayStatusTUItem.monthlyPayStatusTU = monthPayStatusTU;
+                                for (int j = 0; j < monthPayStatusTU.Count; j++)
+                                {
+                                    monthlyPayStatusHistory = new MonthlyPayStatusHistory();
+                                    monthlyPayStatusHistory.Agency = monthlyPayStatusTUItem.Agency;
+                                    monthlyPayStatusHistory.Bank = monthlyPayStatusTUItem.Bank;
+                                    monthlyPayStatusHistory.AccountNo = monthlyPayStatusTUItem.AccountNo;
+                                    monthlyPayStatusHistory.atdate = monthPayStatusTU[j].atdate;
+                                    monthlyPayStatusHistory.atstatus = monthPayStatusTU[j].atstatus;
+                                    monthlyPayStatusHistoryList.Add(monthlyPayStatusHistory);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                string msg = ex.Message;
+                            }
+                        }
+
+
+                        monthlyPayStatusTU.Add(monthlyPayStatusTUItem);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string msg = ex.Message;
+                }
+
+
+
+                MonthlyPayStatus monthlyPayStatusEXItem = new MonthlyPayStatus();
+                try
+                {
+                    for (int i = 0; i < experian.Count; i++)
+                    {
+                        monthlyPayStatusEXItem = new MonthlyPayStatus();
+                        monthlyPayStatusEXItem.Agency = experian[i].atbureau;
+                        monthlyPayStatusEXItem.Bank = experian[i].atcreditorName;
+                        monthlyPayStatusEXItem.AccountNo = experian[i].ataccountNumber;
+                        GrantedTrade gt = experian[i].GrantedTrade;
+                        if (gt != null)
+                        {
+                            monthlyPayStatusEXItem.atmonthsReviewed = gt.atmonthsReviewed;
+                            monthlyPayStatusEXItem.atmonthlyPayment = gt.atmonthlyPayment;
+                            monthlyPayStatusEXItem.atlate90Count = gt.atlate90Count;
+                            monthlyPayStatusEXItem.atlate60Count = gt.atlate60Count;
+                            monthlyPayStatusEXItem.atlate30Count = gt.atlate30Count;
+                            monthlyPayStatusEXItem.atdateLastPayment = gt.atdateLastPayment;
+                            monthlyPayStatusEXItem.attermMonths = gt.attermMonths;
+                            monthlyPayStatusEXItem.atcollateral = gt.atcollateral;
+                            monthlyPayStatusEXItem.atamountPastDue = gt.atamountPastDue;
+                            monthlyPayStatusEXItem.atworstPatStatusCount = gt.atworstPatStatusCount;
+                            monthlyPayStatusEXItem.NegitiveItemsCount = gt.atlate90Count.StringToInt(0)
+                               + gt.atlate60Count.StringToInt(0) + gt.atlate30Count.StringToInt(0);
+                            try
+                            {
+                                monthlyPayStatusEXItem.monthlyPayStatusEX = new List<MonthlyPayStatu>();
+                                var monthPayStatusEX = gt.PayStatusHistory.MonthlyPayStatus;
+                                monthlyPayStatusEXItem.monthlyPayStatusEX = monthPayStatusEX;
+                                for (int j = 0; j < monthPayStatusEX.Count; j++)
+                                {
+                                    monthlyPayStatusHistory = new MonthlyPayStatusHistory();
+                                    monthlyPayStatusHistory.Agency = monthlyPayStatusEXItem.Agency;
+                                    monthlyPayStatusHistory.Bank = monthlyPayStatusEXItem.Bank;
+                                    monthlyPayStatusHistory.AccountNo = monthlyPayStatusEXItem.AccountNo;
+                                    monthlyPayStatusHistory.atdate = monthPayStatusEX[j].atdate;
+                                    monthlyPayStatusHistory.atstatus = monthPayStatusEX[j].atstatus;
+                                    monthlyPayStatusHistoryList.Add(monthlyPayStatusHistory);
+                                }
+
+                            }
+                            catch (Exception ex)
+                            {
+                                string msg = ex.Message;
+                            }
+                        }
+                        monthlyPayStatusEX.Add(monthlyPayStatusEXItem);
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string msg = ex.Message;
+                }
+
+
+                cr.monthlyPayStatusEQ = monthlyPayStatusEQ;
+                cr.monthlyPayStatusEX = monthlyPayStatusEX;
+                cr.monthlyPayStatusTU = monthlyPayStatusTU;
+                cr.monthlyPayStatusHistoryList = monthlyPayStatusHistoryList;
+
+                try
+                {
+                    InquiryPartition.AddRange(rootObj.BundleComponents.BundleComponent[6].TrueLinkCreditReportType.InquiryPartition);
+                    cr.inquiries = InquiryPartition;
+                }
+                catch (Exception ex)
+                {
+
+                    string msg = ex.Message;
+                }
+
             }
             catch (Exception ex)
             {

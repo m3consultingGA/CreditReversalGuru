@@ -1,0 +1,180 @@
+﻿@using CreditReversal.Models
+@model dynamic
+
+@{
+    ViewBag.Title = "ClientPRChallengeform";
+    Layout = "";
+    //var Agency = Session["Agency"];
+    dynamic values = Session["values"];
+    dynamic clientModel = Session["ClientAddress"];
+    List<PublicRecord> Inquires = Model.clientcredit;
+
+
+
+
+    var Toaddress1 = string.Empty;
+    var Toaddress2 = string.Empty;
+    var Toaddress3 = string.Empty;
+    if (values[5] == "Experian")
+    {
+        Toaddress1 = System.Configuration.ConfigurationManager.AppSettings["EXADDRESS1"];
+        Toaddress2 = System.Configuration.ConfigurationManager.AppSettings["EXADDRESS2"];
+        Toaddress3 = System.Configuration.ConfigurationManager.AppSettings["EXADDRESS3"];
+    }
+    if (values[5] == "TransUnion")
+    {
+        Toaddress1 = System.Configuration.ConfigurationManager.AppSettings["TUADDRESS1"];
+        Toaddress2 = System.Configuration.ConfigurationManager.AppSettings["TUADDRESS2"];
+        Toaddress3 = System.Configuration.ConfigurationManager.AppSettings["TUADDRESS3"];
+    }
+    if (values[5] == "Equifax")
+    {
+        Toaddress1 = System.Configuration.ConfigurationManager.AppSettings["EQADDRESS1"];
+        Toaddress2 = System.Configuration.ConfigurationManager.AppSettings["EQADDRESS2"];
+        Toaddress3 = System.Configuration.ConfigurationManager.AppSettings["EQADDRESS3"];
+    }
+    <title> Challenge</title>
+    <html>
+
+
+
+
+
+    <body>
+        <table>
+            <tr>
+                <td>
+                    <span style="color:#eee;font-family:Helvetica;font-size:4px;">---F---</span><br />
+
+                    @values[0] @values[1]<br />
+                    @clientModel.Address1<br />
+                    @clientModel.City, @clientModel.State @clientModel.ZipCode
+                </td>
+            </tr>
+            <tr><td style="padding-top:55px;"></td></tr>
+
+            @*Address2*@
+
+            <tr>
+                <td>
+                    @*To Address<br />
+                    Equifax Information Services LLC<br />
+                    P.O. Box 740256<br />
+                    Atlanta, GA 30348*@
+                    @*To Address<br />*@
+                    @Toaddress1<br />
+                    @Toaddress2<br />
+                    @Toaddress3<br />
+
+
+                </td>
+            </tr>
+        </table><br /><br /><br /><br /><br /><br /><br /><br />
+
+
+
+
+        <table style="border:1px solid #000;width:670px;">
+            <tr>
+                <td style="        width: 20px;
+        text-align: left
+">
+                    Name:
+                </td>
+                <td style="text-align:left">@values[0] @values[1]</td>
+            </tr>
+            <tr>
+                <td style="width:20px;">SSN:</td>
+                <td style="text-align:left">@values[4]</td>
+            </tr>
+            <tr>
+                <td style="width:20px;">Date:</td>
+                <td style="text-align:left">@values[2]</td>
+            </tr>
+            <tr>
+                <td style="width:20px;">Agency:</td>
+                <td style="text-align:left">@values[5]</td>
+            </tr>
+
+        </table>
+
+        <div class="row" style="padding-top:20px;">
+            <table style="text-align: justify;
+        line-height: 20px;
+        width: 670px;">
+                <tr>
+                    <td>
+                        <p style="word-wrap:break-word; font-weight:bold">
+                            DISCLAIMER: THE WRITTEN CORRESPONDENCE ENCLOSED WITHIN IS INTENDED ONLY FOR THE ENTITY TO
+                            WHICH IT IS ADDRESSED AND/OR SPECIFIED. THE CORRESPONDENCE WILL BE USED FOR THE SOLE
+                            PURPOSES OF INVESTIGATING AND RECTIFYING ERRONEOUS AND OBSOLETE ERRORS FOUND WITHIN MY
+                            CONSUMER REPORT. UPON INVESTIGATION, CONCLUSION, AND ANYTIME THEREAFTER, PLEASE DO NOT
+                            DISCLOSE OR TRANSMIT COMMUNICATIONS TO ANY INDIVIDUAL, OUTSIDE ENTITY, OR THIRD PARTY TO
+                            WHOM DOES NOT APPLY.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="row" style="padding-top:20px;">
+            <table style="text-align: justify;
+        line-height: 20px;
+        width: 670px;">
+                <tr>
+                    <td>
+                        <p style="word-wrap:break-word;">
+
+
+                            To whom it may concern; <br />
+                            I have thoroughly reviewed my credit report and I would like to inform you of the following inaccuracies it contains, see
+                            detailed information below. I am requesting, under the provision of the Fair Credit Reporting Act (FCRA), 15 USC
+                            Section 1681, that you investigate the following accounts.
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="row" style="padding-top:20px;">
+            @{
+                <table style="border:1px solid #000;width:670px;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;width:150px;">Account Name</th>
+                            @*<th style="text-align:left;width:150px;">Type of Business</th>*@
+                            <th style="text-align:left;width:50px;">Account Type</th>
+                            <th style="text-align:left;width:200px;">Comments </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            for (int i = 0; i < Inquires.Count; i++)
+                            {
+                                string str = " Once investigation has been completed, please remove all notations that this account is still being disputed.";
+                                <tr>
+                                    <td style="width:150px;" valign="top">@Inquires[i].atcourtName</td>
+                                    @*<td style="width:150px;" valign="top">@Inquires[i].AccountType</td>*@
+                                    <td style="width:50px;" valign="top">@Inquires[i].AccountType </td>
+                                    <td style="width:200px;text-align:justify;" valign="top">@Inquires[i].ChallengeText @str</td>
+                                </tr>
+
+                            }
+                        }
+                    </tbody>
+                </table>
+            }
+            <br />
+            <br />  <br />  <br />  <br />
+            <table style="width:670px;position:fixed;">
+                <tr>
+                    <td>Date <br />  @{ <div>@DateTime.Now.ToShortDateString()</div> }</td>
+                    <td style="text-align:right">Signature</td>
+                </tr>
+            </table>
+
+        </div>
+    </body>
+
+</html>
+}
+<br />

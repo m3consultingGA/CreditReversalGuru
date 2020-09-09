@@ -559,6 +559,13 @@ namespace CreditReversal.DAL
                     + " and convert(varchar, cri.ChallengeText) = convert(varchar, b.ChallengeText) "
                     + " and c.ClientId =" + clientid + " and cri.RoundType ='" + round + "' and cri.Agency ='" + agency + "' ";
                 }
+                else if (mode == "PR")
+                {
+                    sql = "Select Count(*) as itemscount from CreditReportItemChallenges cri, publicrecords cr,  "
+                    + " CreditReport c,ChallengeMaster b where cr.publicrecordid=cri.publicrecordid and c.CreditReportId=cr.CreditReportId "
+                    + " and convert(varchar, cri.ChallengeText) = convert(varchar, b.ChallengeText) "
+                    + " and c.ClientId =" + clientid + " and cri.RoundType ='" + round + "' and cri.Agency ='" + agency + "' ";
+                }
                 else
                 {
                     sql = "Select Count(*) as itemscount from CreditReportItemChallenges cri, CreditReportItems cr,  "

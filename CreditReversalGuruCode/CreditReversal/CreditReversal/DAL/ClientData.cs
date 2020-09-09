@@ -679,13 +679,31 @@ namespace CreditReversal.DAL
             { }
             return sno;
         }
-        public int getsnofromitems(string id, string round)
+        public int getsnofromitems(string id, string round,string type)
         {
             int sno = 0;
             try
             {
+                if(type == "AH")
+                {
+                    sql = "Select max(sno) from CreditReportItemChallenges where ClientId =" + id
+                        //+ " and RoundType = '" + round + "' and CredRepItemsId > 0 ";
+                        + " and CredRepItemsId > 0 ";
+                }
+                else if (type == "INQ")
+                {
+                    sql = "Select max(sno) from CreditReportItemChallenges where ClientId =" + id
+                        //+ " and RoundType = '" + round + "' and CreditInqId > 0 ";
+                        + "  and CreditInqId > 0 ";
+                }
+                else if (type == "PR")
+                {
+                    sql = "Select max(sno) from CreditReportItemChallenges where ClientId =" + id
+                        //+ " and RoundType = '" + round + "' and PublicRecordId > 0 ";
+                        + " and PublicRecordId > 0 ";
+                }
 
-                sql = "Select max(sno) from CreditReportItemChallenges where ClientId =" + id + " and RoundType = '" + round + "' ";
+                
                 try
                 {
                     sno = utils.ExecuteScalar(sql, true).ConvertObjectToIntIfNotNull();
@@ -707,7 +725,8 @@ namespace CreditReversal.DAL
             { }
             return sno;
         }
-        public string AddCreditReport(List<AccountHistory> credit, List<Inquires> inquires, List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string round = "")
+        public string AddCreditReport(List<AccountHistory> credit, List<Inquires> inquires, 
+            List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string round = "",List<PublicRecord> publicRecords=null)
         {
             string ReportId = ""; string sql = string.Empty; string roundtype = string.Empty;
             List<AccountHistory> AccountHistory = new List<AccountHistory>();
@@ -716,6 +735,7 @@ namespace CreditReversal.DAL
             int i = 0;
             long res = 0;
             List<Inquires> Inquires = new List<Inquires>();
+            List<PublicRecord> PublicRecords = new List<PublicRecord>();
             try
             {
 
@@ -761,6 +781,12 @@ namespace CreditReversal.DAL
                         AddCreditReportItems(AccountHistory, id, agencyname[i], roundtype, sno);
                         Inquires = inquires.Where(x => x.CreditBureau.ToUpper() == agencyname[i]).ToList();
                         AddCreditInquiries(Inquires, id, AgentId, roundtype, sno);
+
+                        if (publicRecords != null)
+                        {
+                            PublicRecords = publicRecords.Where(x => x.atbureau.ToUpper() == agencyname[i]).ToList();
+                            AddPublicRecords(PublicRecords, id, AgentId, roundtype, sno);
+                        }
                     }
                 }
                 ReportId = res.ToString();
@@ -774,7 +800,7 @@ namespace CreditReversal.DAL
             return ReportId;
         }
 
-        public string RefreshCreditReport(List<AccountHistory> credit, List<Inquires> inquires, List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string round = "")
+        public string RefreshCreditReport(List<AccountHistory> credit, List<Inquires> inquires, List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string round = "", List<PublicRecord> publicRecords =null)
         {
             string ReportId = ""; string sql = string.Empty; string roundtype = string.Empty;
             List<AccountHistory> AccountHistory = new List<AccountHistory>();
@@ -783,6 +809,7 @@ namespace CreditReversal.DAL
             int i = 0;
             long res = 0;
             List<Inquires> Inquires = new List<Inquires>();
+            List<PublicRecord> PublicRecords = new List<PublicRecord>();
 
             int sno = getsno(clientId);
 
@@ -803,9 +830,13 @@ namespace CreditReversal.DAL
                     utils.ExecuteString(sql, true);
 
                     sql = "delete from CreditInquiries Where CreditReportId in "
-                    //+ "  (select CredRepItemsId from CreditReportItems where CredReportId in "
                     + " (Select CreditReportId from CreditReport where  ClientId =" + clientId + " and RoundType = '" + round + "') ";
                     utils.ExecuteString(sql, true);
+
+                    sql = "delete from PublicRecords Where CreditReportId in "
+                 + " (Select CreditReportId from CreditReport where  ClientId =" + clientId + " and RoundType = '" + round + "') ";
+                    utils.ExecuteString(sql, true);
+
                     sql = "delete from PaymentHistory Where   ClientId =" + clientId + " and RoundType = '" + round + "' ";
                     utils.ExecuteString(sql, true);
                     //sql = "delete from CreditReportFiles Where   ClientId =" + clientId + " and RoundType = '" + round + "' ";
@@ -874,9 +905,13 @@ namespace CreditReversal.DAL
 
                         Inquires = inquires.Where(x => x.CreditBureau.ToUpper() == agencyname[i]).ToList();
                         AddCreditInquiries(Inquires, id, AgentId, round, sno);
+
+                        if(publicRecords != null)
+                        {
+                            PublicRecords = publicRecords.Where(x => x.atbureau.ToUpper() == agencyname[i]).ToList();
+                            AddPublicRecords(PublicRecords, id, AgentId, round, sno);
+                        }
                     }
-
-
                 }
                 ReportId = res.ToString();
                 long result = InsertPaymentHistory(round, clientId.StringToLong(0), monthlyPayStatusHistoryDetails, sno);
@@ -885,82 +920,7 @@ namespace CreditReversal.DAL
 
             return ReportId;
         }
-        public string RefreshCreditReportBKUP(List<AccountHistory> credit, List<Inquires> inquires, List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string round = "")
-        {
-            string ReportId = ""; string sql = string.Empty; string roundtype = string.Empty;
-            List<AccountHistory> AccountHistory = new List<AccountHistory>();
-            string AgentId = HttpContext.Current.Session["UserId"].ToString();
-            string[] agencyname = { "EQUIFAX", "EXPERIAN", "TRANSUNION" };
-            int i = 0;
-            long res = 0;
-            List<Inquires> Inquires = new List<Inquires>();
-
-            int sno = getsno(clientId);
-
-            try
-            {
-                if (mode == "reset")
-                {
-                    sql = "delete from CreditReportItemChallenges Where CredRepItemsId in "
-                      + " (select CredRepItemsId from CreditReportItems where CredReportId in "
-                     + " (Select CreditReportId from CreditReport where ClientId =" + clientId + " and RoundType = '" + round + "')) ";
-                    utils.ExecuteString(sql, true);
-                    sql = "delete from CreditReportItemChallenges Where CreditInqId in "
-                     + " (select CreditInqId from CreditInquiries where CredReportId in "
-                    + " (Select CreditReportId from CreditReport where ClientId =" + clientId + " and RoundType = '" + round + "')) ";
-                    utils.ExecuteString(sql, true);
-                    sql = "delete from CreditReportItems Where CredReportId in "
-                     + " (Select CreditReportId from CreditReport where  ClientId =" + clientId + " and RoundType = '" + round + "') ";
-                    utils.ExecuteString(sql, true);
-
-                    sql = "delete from CreditInquiries Where CreditReportId in "
-                    //+ "  (select CredRepItemsId from CreditReportItems where CredReportId in "
-                    + " (Select CreditReportId from CreditReport where  ClientId =" + clientId + " and RoundType = '" + round + "') ";
-                    utils.ExecuteString(sql, true);
-
-                    sql = "delete from PaymentHistory Where   ClientId =" + clientId + " and RoundType = '" + round + "' ";
-                    utils.ExecuteString(sql, true);
-                    sql = "delete from CreditReportFiles Where   ClientId =" + clientId + " and RoundType = '" + round + "' ";
-                    utils.ExecuteString(sql, true);
-                    //sql = "delete from CreditReport where  ClientId =" + clientId + " and RoundType = '" + round + "'";
-                    //utils.ExecuteString(sql, true);
-
-
-                }
-                //sql = "Select Count(CreditReportId) from CreditReport where AgencyName='EQUIFAX' and ClientId=" + clientId;
-                //int count = utils.ExecuteScalar(sql, true).ConvertObjectToIntIfNotNull();
-
-                for (i = 0; i < 3; i++)
-                {
-                    sql = "select CreditReportId from  CreditReport where ClientId=@ClientId and RoundType=@RoundType and AgencyName=@AgencyName";
-
-                    SqlCommand cmd = new SqlCommand();
-                    cmd.CommandText = sql;
-                    cmd.Parameters.AddWithValue("@ClientId", clientId);
-                    cmd.Parameters.AddWithValue("@AgencyName", agencyname[i]);
-                    cmd.Parameters.AddWithValue("@RoundType", round);
-                    cmd.CommandText = sql;
-                    res = Convert.ToInt64(utils.ExecuteScalarCommand(cmd, true));
-                    int id = (int)res;
-
-                    if (id != 0)
-                    {
-                        AccountHistory = credit.Where(x => x.Agency.ToUpper() == agencyname[i]).ToList();
-                        AddCreditReportItems(AccountHistory, id, agencyname[i], round, sno);
-
-                        Inquires = inquires.Where(x => x.CreditBureau.ToUpper() == agencyname[i]).ToList();
-                        AddCreditInquiries(Inquires, id, AgentId, round, sno);
-                    }
-
-
-                }
-                ReportId = res.ToString();
-                long result = InsertPaymentHistory(round, clientId.StringToLong(0), monthlyPayStatusHistoryDetails, sno);
-            }
-            catch (Exception ex) { ex.insertTrace(""); }
-
-            return ReportId;
-        }
+        
         public long InsertPaymentHistory(string round, long clientid, List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, int sno)
         {
             long res = 0;
@@ -1093,6 +1053,35 @@ namespace CreditReversal.DAL
             return status;
         }
 
+        public bool AddPublicRecords(List<PublicRecord> publicRecords, int id, string AgentId, string round, int sno)
+        {
+            bool status = false;
+            int count = publicRecords.Count();
+            try
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    string sql = "Insert Into PublicRecords (CreditReportId,CreditorName,TypeOfPR,DateOfPR, "
+                        + " Agency,CreatedDate,CreatedBy,RoundType,sno) values (@CreditReportId,@CreditorName,@TypeOfPR,@DateOfPR, "
+                        + " @Agency,GETDATE(),@CreatedBy,@RoundType," + sno + ")";
+
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Parameters.AddWithValue("@CreditReportId", id);
+                    cmd.Parameters.AddWithValue("@CreditorName", string.IsNullOrEmpty(publicRecords[i].atcourtName) ? "" : publicRecords[i].atcourtName);
+                    cmd.Parameters.AddWithValue("@TypeOfPR", string.IsNullOrEmpty(publicRecords[i].AccountType) ? "" : publicRecords[i].AccountType);
+                    cmd.Parameters.AddWithValue("@DateOfPR", string.IsNullOrEmpty(publicRecords[i].atdateFiled) ? "" : publicRecords[i].atdateFiled);
+                    cmd.Parameters.AddWithValue("@Agency", string.IsNullOrEmpty(publicRecords[i].atbureau) ? "" : publicRecords[i].atbureau);
+                    cmd.Parameters.AddWithValue("@CreatedBy", AgentId);
+                    cmd.Parameters.AddWithValue("@RoundType", round);
+                    cmd.CommandText = sql;
+                    utils.ExecuteInsertCommand(cmd, true);
+                    status = true;
+                }
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return status;
+        }
+
         public string checkLastDateReport(string clientId)
         {
             string status = string.Empty;
@@ -1197,6 +1186,33 @@ namespace CreditReversal.DAL
             }
             catch (Exception ex) { ex.insertTrace(""); }
             return inquires;
+        }
+
+        public List<PublicRecord> GetPublicRecords(string id)
+        {
+            DataTable dt = new DataTable();
+            List<PublicRecord> publicRecords = new List<PublicRecord>();
+            try
+            {
+                string sql = "Select * from publicrecords where PublicRecordId=" + id;
+                dt = utils.GetDataTable(sql, true);
+                if (dt.Rows.Count > 0)
+                {
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        publicRecords.Add(new PublicRecord
+                        {
+                            PublicRecordId = row["PublicRecordId"].ToString(),
+                            atcourtName = row["CreditorName"].ToString(),
+                            atbureau = row["Agency"].ToString(),
+                            atdateFiled = row["DateofPR"].ToString(),
+                            AccountType = row["TypeOfPR"].ToString(),
+                        });
+                    }
+                }
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return publicRecords;
         }
     }
 

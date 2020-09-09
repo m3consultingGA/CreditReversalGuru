@@ -10,7 +10,9 @@ namespace CreditReversal.Models
         public List<AccountHistory> AccHistory { get; set; }
         public List<Inquires> inquiryDetails { get; set; }
         public List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails { get; set; }
+        public List<PublicRecord> PublicRecords { get; set; }
     }
+    
     public class CreditReport
     {
         public List<TradeLine> Equifax { get; set; }
@@ -21,6 +23,7 @@ namespace CreditReversal.Models
         public List<MonthlyPayStatus> monthlyPayStatusTU { get; set; }
         public List<MonthlyPayStatus> monthlyPayStatusEX { get; set; }
         public List<MonthlyPayStatusHistory> monthlyPayStatusHistoryList { get; set; }
+        public List<PublicRecord> PublicRecords { get; set; }
     }
     public class MonthlyPayStatusHistory
     {

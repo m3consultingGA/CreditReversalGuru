@@ -2565,6 +2565,7 @@
     <Content Include="documents\Client--AddClient.png" />
     <Content Include="documents\Client--Authorization-Keys.png" />
     <Content Include="documents\Client--ClientDB.jpg" />
+    <Content Include="documents\CreditReportData09082020.txt" />
     <Content Include="EmailTemplates\template1.html" />
     <Content Include="ExtDLL\AuthorizeNet.dll" />
     <Content Include="ExtDLL\Persits.PDF.dll" />
@@ -3235,6 +3236,7 @@
     <Content Include="Views\Admin\AccountType.cshtml" />
     <Content Include="Views\Admin\ChallengeOrders.cshtml" />
     <Content Include="Views\Dashboard\AgentClients.cshtml" />
+    <Content Include="Views\Client\ClientPRChallengeform.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

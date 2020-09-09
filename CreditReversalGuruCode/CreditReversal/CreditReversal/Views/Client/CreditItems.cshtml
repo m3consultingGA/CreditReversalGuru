@@ -148,8 +148,8 @@
                                 <tr>
                                     <th width="20%"></th>
                                     @*<th width="23%" style="text-align:center;background-color:#DAB96A;color:#fff;">TransUnion</th>
-                                        <th width="23%" style="text-align:center;background-color:#98BDC5;color:#fff;">Experian</th>
-                                        <th width="23%" style="text-align:center;background-color:#CBD06C;color:#fff;">Equifax</th>*@
+                            <th width="23%" style="text-align:center;background-color:#98BDC5;color:#fff;">Experian</th>
+                            <th width="23%" style="text-align:center;background-color:#CBD06C;color:#fff;">Equifax</th>*@
 
                                     <th width="23%" style="text-align:center;background-color:#00A6CA;color:#fff;">TransUnion</th>
                                     <th width="23%" style="text-align:center;background-color:#93267D;color:#fff;">Experian</th>
@@ -304,6 +304,10 @@
                                                         {
                                                             strTUValue1 = "CHARGEOFF";
                                                         }
+                                                        if (strTUValue1.ToUpper().Contains("INSTALLMENT"))
+                                                        {
+                                                            strTUValue1 = "INSTALLMENT";
+                                                        }
                                                     }
 
                                                     if (!string.IsNullOrEmpty(strEXValue1))
@@ -332,6 +336,10 @@
                                                         {
                                                             strEXValue1 = "CHARGEOFF";
                                                         }
+                                                        if (strEXValue1.ToUpper().Contains("INSTALLMENT"))
+                                                        {
+                                                            strEXValue1 = "INSTALLMENT";
+                                                        }
                                                     }
 
                                                     if (!string.IsNullOrEmpty(strEQValue1))
@@ -359,6 +367,10 @@
                                                         if (strEQValue1.ToUpper().Contains("CHARGE"))
                                                         {
                                                             strEQValue1 = "CHARGEOFF";
+                                                        }
+                                                        if (strEQValue1.ToUpper().Contains("INSTALLMENT"))
+                                                        {
+                                                            strEQValue1 = "INSTALLMENT";
                                                         }
                                                     }
 
@@ -504,8 +516,8 @@
                                                                         <label id="lblroundEQnew_@j" style="font-size:12px;">@roundeq</label>
                                                                     </span>
                                                                     @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
-                                                                        aria-describedby="sizing-addon1" id="txtAccountTypeEQ_@j" onkeydown="AutoFillAccountTypeEQ(@j)"
-                                                                        name="txtAccountTypeEQ_@j" style="height:43px;">*@
+                                                            aria-describedby="sizing-addon1" id="txtAccountTypeEQ_@j" onkeydown="AutoFillAccountTypeEQ(@j)"
+                                                            name="txtAccountTypeEQ_@j" style="height:43px;">*@
 
                                                                     <textarea class="form-control custom-control" style="resize:both;" rows="2" id="txtAccountTypeEQ_@j" onkeydown="AutoFillAccountTypeEQ(@j)"
                                                                               name="txtAccountTypeEQ_@j" placeholder="Select account type or enter own challenge text">@strEQValue1</textarea>
@@ -540,8 +552,8 @@
                                                                             <label id="lblroundEQ_@j" hidden>@strEQ[0]-@strEQ[1]</label>
                                                                         </span>
                                                                         @*<input type="text" id="txtAccountTypeEQ_@j" class="form-control" aria-describedby="sizing-addon1"
-                                                                            placeholder="Select account type or enter own challenge text" name="txtAccountTypeEQ_@j"
-                                                                            onkeydown="AutoFillAccountTypeEQ(@j);" style="height:43px;" />*@
+                                                                placeholder="Select account type or enter own challenge text" name="txtAccountTypeEQ_@j"
+                                                                onkeydown="AutoFillAccountTypeEQ(@j);" style="height:43px;" />*@
 
                                                                         <textarea style="resize:both;" class="form-control custom-control" rows="2" id="txtAccountTypeEQ_@j" onkeydown="AutoFillAccountTypeEQ(@j)"
                                                                                   name="txtAccountTypeEQ_@j" placeholder="Select account type or enter own challenge text">@strEQValue1</textarea>
@@ -701,7 +713,280 @@
                 </div>
 
 
+                @if (ViewBag.PublicRecords != null)
+                {
 
+                    <div class="row" style="padding-bottom:12px;">
+                        <span class="pull-left"><h5>Public Records</h5></span>
+                        @if (role.ToUpper() != "CLIENT")
+                        {
+                            <span class="pull-right">
+                                <button class="btn btn-secondary" id="AddPublicRecChallenge">Create Challenge for Public Records</button>
+                            </span>
+                        }
+                    </div>
+
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th width="20%"></th>
+                                        <th width="23%" style="text-align:center;background-color:#00A6CA;color:#fff;">TransUnion</th>
+                                        <th width="23%" style="text-align:center;background-color:#93267D;color:#fff;">Experian</th>
+                                        <th width="23%" style="text-align:center;background-color:#981e32;color:#fff;">Equifax</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (ViewBag.PublicRecords != null)
+                                    {
+                                        var i = 0;
+                                        var j = 0;
+                                        foreach (var item in ViewBag.PublicRecords)
+                                        {
+                                            <tr>
+                                                @if (role.ToUpper() != "CLIENT" && item.Heading != "PublicRecordId" && item.Heading != "Challenge Status")
+                                                {
+                                                    //displaying all headings except creditreportid for agent
+                                                    <td class="tdClass">@item.Heading</td>
+                                                }
+                                                else
+                                                {
+                                                    //displaying all headings except Challenge and creditreportid for client
+                                                    if (item.Heading != "Challenge" && item.Heading != "PublicRecordId" && item.Heading != "Challenge Status")
+                                                    {
+                                                        <td class="tdClass">@item.Heading</td>
+                                                    }
+                                                }
+                                                @if (i == 0)
+                                                {
+
+                                                    //bank name bold color
+                                                    <td style="font-weight:600">@item.TRANSUNION</td>
+                                                    <td style="font-weight:600">@item.EXPERIAN</td>
+                                                    <td style="font-weight:600">@item.EQUIFAX</td>
+                                                }
+                                                else
+                                                {
+
+                                                    if (i == 4)
+                                                    {
+                                                        if (role.ToUpper() != "CLIENT")
+                                                        {
+
+                                                            //transunion challenge text dropdown
+
+                                                            if (item.TRANSUNION == "" || item.TRANSUNION == "-")
+                                                            {
+                                                                string roundtu = "Round-1";
+                                                                <td>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkPRTRANS_@j" checked>
+                                                                            <label id="lblroundPRTUnew_@j" style="font-size:12px;">@roundtu</label>
+                                                                        </span>
+
+
+                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSPRChallenge_@j" onkeydown="AutoFillPRAccountTypeTU(@j)"
+                                                                                  name="TRANSPRChallenge_@j" placeholder="Select account type or enter own challenge text">BANKRUPTCY</textarea>
+                                                                    </div>
+                                                                </td>
+                                                            }
+                                                            else if (!string.IsNullOrEmpty(@item.TRANSUNION))
+                                                            {
+                                                                <td>
+                                                                    @{
+                                                                        string challengetextTU = @item.TRANSUNION;
+                                                                        string[] strTU = challengetextTU.Split('-');
+                                                                        string roundTU = "";
+                                                                    }
+                                                                    @if (strTU[1] == "1")
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strTU[1]) + 1;
+                                                                        roundTU = "Round-" + rd;
+                                                                    }
+                                                                    else if (Convert.ToInt32(strTU[1]) > 1)
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strTU[1]) + 1;
+                                                                        roundTU = "Round-" + rd;
+                                                                    }
+
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkPRTRANS_@j" checked>
+                                                                            <label id="lblroundPRTUnew_@j" style="font-size:12px;">@roundTU</label>
+                                                                        </span>
+                                                                        
+                                                                    <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSPRChallenge_@j" onkeydown="AutoFillPRAccountTypeTU(@j)"
+                                                                              name="TRANSPRChallenge_@j" placeholder="Select account type or enter own challenge text">BANKRUPTCY</textarea>
+                                                                    </div>
+                                                                    <label id="lblroundPRTU_@j" hidden>@strTU[0]-@strTU[1]</label>
+
+                                                                </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+
+                                                            //EXPERIAN challenge text dropdown
+
+                                                            if (item.EXPERIAN == "" || item.EXPERIAN == "-")
+                                                            {
+                                                                string roundex = "Round-1";
+                                                                <td>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkPREXPE_@j" checked>
+                                                                            <label id="lblroundPREXnew_@j" style="font-size:12px;">@roundex</label>
+                                                                        </span>
+                                                                     <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEPRChallenge_@j" onkeydown="AutoFillPRAccountTypeEX(@j)"
+                                                                              name="EXPEPRChallenge_@j" placeholder="Select account type or enter own challenge text">BANKRUPTCY</textarea>
+                                                                    </div>
+                                                                </td>
+
+                                                            }
+                                                            else if (!string.IsNullOrEmpty(@item.EXPERIAN))
+                                                            {
+                                                                <td>
+                                                                    @{
+                                                                        string challengetextEX = @item.EXPERIAN;
+                                                                        string[] strEX = challengetextEX.Split('-');
+                                                                        string roundEX = "";
+                                                                    }
+                                                                    @if (strEX[1] == "1")
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strEX[1]) + 1;
+                                                                        roundEX = "Round-" + rd;
+                                                                    }
+                                                                    else if (Convert.ToInt32(strEX[1]) > 1)
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strEX[1]) + 1;
+                                                                        roundEX = "Round-" + rd;
+                                                                    }
+
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkPREXPE_@j" checked>
+                                                                            <label id="lblroundPREXnew_@j" style="font-size:12px;">@roundEX</label>
+                                                                        </span>
+                                                                        
+                                                                    <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEPRChallenge_@j" onkeydown="AutoFillPRAccountTypeEX(@j)"
+                                                                              name="EXPEPRChallenge_@j" placeholder="Select account type or enter own challenge text">BANKRUPTCY</textarea>
+                                                                    </div>
+                                                                    <label id="lblroundPREX_@j" hidden>@strEX[0]-@strEX[1]</label>
+                                                                </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                            //EQUIFAX challenge text dropdown
+
+                                                            if (item.EQUIFAX == "" || item.EQUIFAX == "-")
+                                                            {
+                                                                string roundeq = "Round-1";
+                                                                <td>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkPREQUI_@j" checked>
+                                                                            <label id="lblroundPREQnew_@j" style="font-size:12px;">@roundeq</label>
+                                                                        </span>
+                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIPRChallenge_@j" onkeydown="AutoFillPRAccountTypeEQ(@j)"
+                                                                                  name="EQUIPRChallenge_@j" placeholder="Select account type or enter own challenge text">BANKRUPTCY</textarea>
+                                                                    </div>
+                                                                </td>
+                                                            }
+                                                            else if (!string.IsNullOrEmpty(@item.EQUIFAX))
+                                                            {
+                                                                <td>
+                                                                    @{
+                                                                        string challengetextEQ = @item.EQUIFAX;
+                                                                        string[] strEQ = challengetextEQ.Split('-');
+                                                                        string roundEQ = "";
+                                                                    }
+
+                                                                    @if (strEQ[1] == "1")
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strEQ[1]) + 1;
+                                                                        roundEQ = "Round-" + rd;
+                                                                    }
+                                                                    else if (Convert.ToInt32(strEQ[1]) > 1)
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strEQ[1]) + 1;
+                                                                        roundEQ = "Round-" + rd;
+                                                                    }
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkPREQUI_@j" checked> 
+                                                                            <label id="lblroundPREQnew_@j" style="font-size:12px;">@roundEQ</label>
+                                                                        </span>
+                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIPRChallenge_@j" onkeydown="AutoFillPRAccountTypeEQ(@j)"
+                                                                                  name="EQUIPRChallenge_@j" placeholder="Select account type or enter own challenge text">BANKRUPTCY</textarea>
+                                                                    </div>
+                                                                    <label id="lblroundPREQ_@j" hidden>@strEQ[0]-@strEQ[1]</label>
+
+
+                                                                </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (item.Heading != "PublicRecordId" && item.Heading != "Challenge Status")
+                                                        {
+                                                            <td>@item.TRANSUNION</td>
+                                                            <td>@item.EXPERIAN</td>
+                                                            <td>@item.EQUIFAX</td>
+                                                        }
+                                                    }
+
+                                                }
+                                            </tr>
+
+                                            i++;
+                                            j++;
+                                            if (i == 6)
+                                            {
+                                                <lable id="hdnEXPECreditPRId_@j" hidden>@item.EXPERIAN</lable>
+                                                <lable id="hdnEQUICreditPRId_@j" hidden>@item.EQUIFAX</lable>
+                                                <lable id="hdnTRANSCreditPRId_@j" hidden>@item.TRANSUNION</lable>
+                                            }
+
+                                            if (i == 6)
+                                            {
+                                                <tr>
+                                                    <td> </td>
+                                                    <td> </td>
+                                                    <td> </td>
+                                                    <td> </td>
+                                                </tr>
+                                                i = 0;
+                                            }
+
+                                        }
+                                    }
+                                    @if (role.ToUpper() != "CLIENT")
+                                    {
+                                        <tr>
+                                            <td> </td>
+                                            <td> </td>
+                                            <td> </td>
+                                            <td> <button class="btn btn-secondary pull-right" id="AddPublicRecChallenge1">Create Challenge for Public Records</button></td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+
+                }
 
                 @if (ViewBag.Inquires != null)
                 {
@@ -723,8 +1008,8 @@
                                     <tr>
                                         <th width="20%"></th>
                                         @*<th width="23%" style="text-align:center;background-color:#DAB96A;color:#fff;">TransUnion</th>
-                                            <th width="23%" style="text-align:center;background-color:#98BDC5;color:#fff;">Experian</th>
-                                            <th width="23%" style="text-align:center;background-color:#CBD06C;color:#fff;">Equifax</th>*@
+                                <th width="23%" style="text-align:center;background-color:#98BDC5;color:#fff;">Experian</th>
+                                <th width="23%" style="text-align:center;background-color:#CBD06C;color:#fff;">Equifax</th>*@
 
                                         <th width="23%" style="text-align:center;background-color:#00A6CA;color:#fff;">TransUnion</th>
                                         <th width="23%" style="text-align:center;background-color:#93267D;color:#fff;">Experian</th>
@@ -740,229 +1025,229 @@
 
                                         foreach (var item in ViewBag.Inquires)
                                         {
-                                    <tr>
+                                            <tr>
 
-                                        @if (role.ToUpper() != "CLIENT" && item.Heading != "CreditInqId" && item.Heading != "Challenge Status")
-                                        {
-                                            //displaying all headings except creditreportid for agent
-                                            <td class="tdClass">@item.Heading</td>
-                                        }
-                                        else
-                                        {
-                                            //displaying all headings except Challenge and creditreportid for client
-                                            if (item.Heading != "Challenge" && item.Heading != "CreditInqId" && item.Heading != "Challenge Status")
-                                            {
-                                                <td class="tdClass">@item.Heading</td>
-                                            }
-                                        }
-                                        @if (i == 0)
-                                        {
-
-                                            //bank name bold color
-                                            <td style="font-weight:600">@item.TRANSUNION</td>
-                                            <td style="font-weight:600">@item.EXPERIAN</td>
-                                            <td style="font-weight:600">@item.EQUIFAX</td>
-                                        }
-                                        else
-                                        {
-
-                                            if (i == 4)
-                                            {
-                                                if (role.ToUpper() != "CLIENT")
+                                                @if (role.ToUpper() != "CLIENT" && item.Heading != "CreditInqId" && item.Heading != "Challenge Status")
                                                 {
-
-                                                    //transunion challenge text dropdown
-
-                                                    if (item.TRANSUNION == "" || item.TRANSUNION == "-")
+                                                    //displaying all headings except creditreportid for agent
+                                                    <td class="tdClass">@item.Heading</td>
+                                                }
+                                                else
+                                                {
+                                                    //displaying all headings except Challenge and creditreportid for client
+                                                    if (item.Heading != "Challenge" && item.Heading != "CreditInqId" && item.Heading != "Challenge Status")
                                                     {
-                                                        string roundtu = "Round-1";
-                                                        <td>
-                                                            <div class="input-group">
-                                                                <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" checked>
-                                                                    <label id="lblroundITUnew_@j" style="font-size:12px;">@roundtu</label>
-                                                                </span>
-
-
-                                                                <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
-                                                                          name="TRANSInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
-                                                            </div>
-                                                        </td>
-                                                    }
-                                                    else if (!string.IsNullOrEmpty(@item.TRANSUNION))
-                                                    {
-                                                        <td>
-                                                            @{
-                                                                string challengetextTU = @item.TRANSUNION;
-                                                                string[] strTU = challengetextTU.Split('-');
-                                                                string roundTU = "";
-                                                            }
-                                                            @if (strTU[1] == "1")
-                                                            {
-                                                                int rd = Convert.ToInt32(strTU[1]) + 1;
-                                                                roundTU = "Round-" + rd;
-                                                            }
-                                                            else if (Convert.ToInt32(strTU[1]) > 1)
-                                                            {
-                                                                int rd = Convert.ToInt32(strTU[1]) + 1;
-                                                                roundTU = "Round-" + rd;
-                                                            }
-
-                                                            <div class="input-group">
-                                                                <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" checked>
-                                                                    <label id="lblroundITUnew_@j" style="font-size:12px;">@roundTU</label>
-                                                                </span>
-                                                                @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
-                                id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
-                                name="TRChallenge" style="height:43px;" />*@
-
-                                                            <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
-                                                                      name="TRANSInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
-                                                            </div>
-                                                            <label id="lblroundITU_@j" hidden>@strTU[0]-@strTU[1]</label>
-
-                                                        </td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td></td>
-                                                    }
-
-                                                    //EXPERIAN challenge text dropdown
-
-                                                    if (item.EXPERIAN == "" || item.EXPERIAN == "-")
-                                                    {
-                                                        string roundex = "Round-1";
-                                                        <td>
-                                                            <div class="input-group">
-                                                                <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" checked>
-                                                                    <label id="lblroundITUnew_@j" style="font-size:12px;">@roundex</label>
-                                                                </span>
-                                                                @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
-                                aria-describedby="sizing-addon1" id="EXPEInquiriesChallenge_@j"
-                                onkeydown="AutoFillInquiriesAccountTypeEX(@j)" name="TRChallenge" style="height:43px;">*@
-
-                                                            <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
-                                                                      name="EXPEInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
-                                                            </div>
-                                                        </td>
-
-                                                    }
-                                                    else if (!string.IsNullOrEmpty(@item.EXPERIAN))
-                                                    {
-                                                        <td>
-                                                            @{
-                                                                string challengetextEX = @item.EXPERIAN;
-                                                                string[] strEX = challengetextEX.Split('-');
-                                                                string roundEX = "";
-                                                            }
-                                                            @if (strEX[1] == "1")
-                                                            {
-                                                                int rd = Convert.ToInt32(strEX[1]) + 1;
-                                                                roundEX = "Round-" + rd;
-                                                            }
-                                                            else if (Convert.ToInt32(strEX[1]) > 1)
-                                                            {
-                                                                int rd = Convert.ToInt32(strEX[1]) + 1;
-                                                                roundEX = "Round-" + rd;
-                                                            }
-
-                                                            <div class="input-group">
-                                                                <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" checked>
-                                                                    <label id="lblroundIEXnew_@j" style="font-size:12px;">@roundEX</label>
-                                                                </span>
-                                                                @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
-                                id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
-                                name="TRChallenge" style="height:43px;" />*@
-
-
-                                                            <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
-                                                                      name="EXPEInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
-                                                            </div>
-                                                            <label id="lblroundIEX_@j" hidden>@strEX[0]-@strEX[1]</label>
-                                                        </td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td></td>
-                                                    }
-                                                    //EQUIFAX challenge text dropdown
-
-                                                    if (item.EQUIFAX == "" || item.EQUIFAX == "-")
-                                                    {
-                                                        string roundeq = "Round-1";
-                                                        <td>
-                                                            <div class="input-group">
-                                                                <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" checked>
-                                                                    <label id="lblroundIEQnew_@j" style="font-size:12px;">@roundeq</label>
-                                                                </span>
-                                                                @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
-                                aria-describedby="sizing-addon1" id="EQUIInquiriesChallenge_@j"
-                                onkeydown="AutoFillInquiriesAccountTypeEQ(@j)" name="TRChallenge" style="height:43px;">*@
-
-                                                            <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
-                                                                      name="EQUIInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
-                                                            </div>
-                                                        </td>
-                                                    }
-                                                    else if (!string.IsNullOrEmpty(@item.EQUIFAX))
-                                                    {
-                                                        <td>
-                                                            @{
-                                                                string challengetextEQ = @item.EQUIFAX;
-                                                                string[] strEQ = challengetextEQ.Split('-');
-                                                                string roundEQ = "";
-                                                            }
-
-                                                            @if (strEQ[1] == "1")
-                                                            {
-                                                                int rd = Convert.ToInt32(strEQ[1]) + 1;
-                                                                roundEQ = "Round-" + rd;
-                                                            }
-                                                            else if (Convert.ToInt32(strEQ[1]) > 1)
-                                                            {
-                                                                int rd = Convert.ToInt32(strEQ[1]) + 1;
-                                                                roundEQ = "Round-" + rd;
-                                                            }
-                                                            <div class="input-group">
-                                                                <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                    <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" checked>  <label id="lblroundIEQnew_@j" style="font-size:12px;">@roundEQ</label>
-                                                                </span>
-                                                                @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
-                                id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
-                                name="TRChallenge" style="height:43px;" />*@
-
-                                                            <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
-                                                                      name="EQUIInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
-                                                            </div>
-                                                            <label id="lblroundIEQ_@j" hidden>@strEQ[0]-@strEQ[1]</label>
-
-
-                                                        </td>
-                                                    }
-                                                    else
-                                                    {
-                                                        <td></td>
+                                                        <td class="tdClass">@item.Heading</td>
                                                     }
                                                 }
-
-                                            }
-                                            else
-                                            {
-                                                if (item.Heading != "CreditInqId" && item.Heading != "Challenge Status")
+                                                @if (i == 0)
                                                 {
-                                                    <td>@item.TRANSUNION</td>
-                                                    <td>@item.EXPERIAN</td>
-                                                    <td>@item.EQUIFAX</td>
-                                                }
-                                            }
 
-                                        }
-                                    </tr>
+                                                    //bank name bold color
+                                                    <td style="font-weight:600">@item.TRANSUNION</td>
+                                                    <td style="font-weight:600">@item.EXPERIAN</td>
+                                                    <td style="font-weight:600">@item.EQUIFAX</td>
+                                                }
+                                                else
+                                                {
+
+                                                    if (i == 4)
+                                                    {
+                                                        if (role.ToUpper() != "CLIENT")
+                                                        {
+
+                                                            //transunion challenge text dropdown
+
+                                                            if (item.TRANSUNION == "" || item.TRANSUNION == "-")
+                                                            {
+                                                                string roundtu = "Round-1";
+                                                                <td>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" checked>
+                                                                            <label id="lblroundITUnew_@j" style="font-size:12px;">@roundtu</label>
+                                                                        </span>
+
+
+                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
+                                                                                  name="TRANSInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
+                                                                    </div>
+                                                                </td>
+                                                            }
+                                                            else if (!string.IsNullOrEmpty(@item.TRANSUNION))
+                                                            {
+                                                                <td>
+                                                                    @{
+                                                                        string challengetextTU = @item.TRANSUNION;
+                                                                        string[] strTU = challengetextTU.Split('-');
+                                                                        string roundTU = "";
+                                                                    }
+                                                                    @if (strTU[1] == "1")
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strTU[1]) + 1;
+                                                                        roundTU = "Round-" + rd;
+                                                                    }
+                                                                    else if (Convert.ToInt32(strTU[1]) > 1)
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strTU[1]) + 1;
+                                                                        roundTU = "Round-" + rd;
+                                                                    }
+
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" checked>
+                                                                            <label id="lblroundITUnew_@j" style="font-size:12px;">@roundTU</label>
+                                                                        </span>
+                                                                        @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
+                                                                id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
+                                                                name="TRChallenge" style="height:43px;" />*@
+
+                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
+                                                                                  name="TRANSInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
+                                                                    </div>
+                                                                    <label id="lblroundITU_@j" hidden>@strTU[0]-@strTU[1]</label>
+
+                                                                </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+
+                                                            //EXPERIAN challenge text dropdown
+
+                                                            if (item.EXPERIAN == "" || item.EXPERIAN == "-")
+                                                            {
+                                                                string roundex = "Round-1";
+                                                                <td>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" checked>
+                                                                            <label id="lblroundIEXnew_@j" style="font-size:12px;">@roundex</label>
+                                                                        </span>
+                                                                        @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
+                                                                aria-describedby="sizing-addon1" id="EXPEInquiriesChallenge_@j"
+                                                                onkeydown="AutoFillInquiriesAccountTypeEX(@j)" name="TRChallenge" style="height:43px;">*@
+
+                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
+                                                                                  name="EXPEInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
+                                                                    </div>
+                                                                </td>
+
+                                                            }
+                                                            else if (!string.IsNullOrEmpty(@item.EXPERIAN))
+                                                            {
+                                                                <td>
+                                                                    @{
+                                                                        string challengetextEX = @item.EXPERIAN;
+                                                                        string[] strEX = challengetextEX.Split('-');
+                                                                        string roundEX = "";
+                                                                    }
+                                                                    @if (strEX[1] == "1")
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strEX[1]) + 1;
+                                                                        roundEX = "Round-" + rd;
+                                                                    }
+                                                                    else if (Convert.ToInt32(strEX[1]) > 1)
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strEX[1]) + 1;
+                                                                        roundEX = "Round-" + rd;
+                                                                    }
+
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" checked>
+                                                                            <label id="lblroundIEXnew_@j" style="font-size:12px;">@roundEX</label>
+                                                                        </span>
+                                                                        @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
+                                                                id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
+                                                                name="TRChallenge" style="height:43px;" />*@
+
+
+                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
+                                                                                  name="EXPEInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
+                                                                    </div>
+                                                                    <label id="lblroundIEX_@j" hidden>@strEX[0]-@strEX[1]</label>
+                                                                </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                            //EQUIFAX challenge text dropdown
+
+                                                            if (item.EQUIFAX == "" || item.EQUIFAX == "-")
+                                                            {
+                                                                string roundeq = "Round-1";
+                                                                <td>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" checked>
+                                                                            <label id="lblroundIEQnew_@j" style="font-size:12px;">@roundeq</label>
+                                                                        </span>
+                                                                        @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
+                                                                aria-describedby="sizing-addon1" id="EQUIInquiriesChallenge_@j"
+                                                                onkeydown="AutoFillInquiriesAccountTypeEQ(@j)" name="TRChallenge" style="height:43px;">*@
+
+                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
+                                                                                  name="EQUIInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
+                                                                    </div>
+                                                                </td>
+                                                            }
+                                                            else if (!string.IsNullOrEmpty(@item.EQUIFAX))
+                                                            {
+                                                                <td>
+                                                                    @{
+                                                                        string challengetextEQ = @item.EQUIFAX;
+                                                                        string[] strEQ = challengetextEQ.Split('-');
+                                                                        string roundEQ = "";
+                                                                    }
+
+                                                                    @if (strEQ[1] == "1")
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strEQ[1]) + 1;
+                                                                        roundEQ = "Round-" + rd;
+                                                                    }
+                                                                    else if (Convert.ToInt32(strEQ[1]) > 1)
+                                                                    {
+                                                                        int rd = Convert.ToInt32(strEQ[1]) + 1;
+                                                                        roundEQ = "Round-" + rd;
+                                                                    }
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-addon btn btn-default" id="sizing-addon1">
+                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" checked>  <label id="lblroundIEQnew_@j" style="font-size:12px;">@roundEQ</label>
+                                                                        </span>
+                                                                        @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
+                                                                id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
+                                                                name="TRChallenge" style="height:43px;" />*@
+
+                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
+                                                                                  name="EQUIInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
+                                                                    </div>
+                                                                    <label id="lblroundIEQ_@j" hidden>@strEQ[0]-@strEQ[1]</label>
+
+
+                                                                </td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td></td>
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (item.Heading != "CreditInqId" && item.Heading != "Challenge Status")
+                                                        {
+                                                            <td>@item.TRANSUNION</td>
+                                                            <td>@item.EXPERIAN</td>
+                                                            <td>@item.EQUIFAX</td>
+                                                        }
+                                                    }
+
+                                                }
+                                            </tr>
 
                                             i++;
                                             j++;
@@ -1488,7 +1773,7 @@
                           //  window.location.reload();
                             if (role == "agentadmin")
                             {
-                                
+
 								window.location.href = "/dashboard/agent";
 								//window.location.href = "/Agent/Challenges?ClientId="+ Id;
                             }
@@ -1525,7 +1810,7 @@
             }
         });
         } catch (e) {
-            
+
         }
     }
 
@@ -1628,9 +1913,9 @@
                 var hdnEQUICreditInqId = $("#hdnEQUICreditInqId_" + k).text();
 
 
-                var lblroundITU_ = $("#lblroundITU_" + j).text();
-                var lblroundEX_ = $("#lblroundIEX_" + j).text();
-                var lblroundEQ_ = $("#lblroundIEQ_" + j).text();
+                var lblroundITU_ = $("#lblroundITUnew_" + j).text();
+                var lblroundEX_ = $("#lblroundIEXnew_" + j).text();
+                var lblroundEQ_ = $("#lblroundIEQnew_" + j).text();
 
 
 
@@ -2064,96 +2349,6 @@
 
 
     });
-    //$("#AddChallenge").click(function () {
-
-    //    ////debugger;
-    //    var values = new Array();
-    //    var cha = new Array();
-    //    var status = true;
-    //    var Id = getUrlParameter('ClientId');
-    //    var countchecked = $("table input[type=checkbox]:checked").length;
-
-    //    if (countchecked == 0) {
-    //        Swal.fire("Warning", "please select at least one checkbox", "warning");
-    //        return false;
-    //    }
-
-
-    //    //if (cha == 0) {
-    //    //    Swal.fire("!Warning", "please check at least one checkbox", "warning");
-    //    //    return false;
-    //    //}
-    //    $(":input[name='case[]']:checked").each(function (i) {
-
-    //        ////debugger;
-    //        var data = $(this).parents('tr:eq(0)');
-    //        var td = $(data).find('td:eq(8)').find('input').val();
-
-    //        if (td == "" || td == undefined) {
-    //            Swal.fire("Warning", "Please select challenge", "warning");
-    //            $(data).find('td:eq(8)').find('input').focus();
-    //            return false;
-    //        }
-    //        ////debugger;
-    //        values.push({
-    //            'MerchantName': $(data).find('td:eq(3)').text(),
-    //            'AccountId': $(data).find('td:eq(4)').text(),
-    //            'OpenDate': $(data).find('td:eq(5)').text(),
-    //            'CurrentBalance': $(data).find('td:eq(6)').text(),
-    //            'HighestBalance': $(data).find('td:eq(7)').text(),
-    //            'Challenge': $(data).find('td:eq(8)').find('input').val(),
-    //            'CredRepItemsId': $(data).find('td:eq(9)').text(),
-    //        });
-
-    //    });
-
-
-    //    ////debugger;
-    //    console.log(values);
-
-    //    for (var i = 0; i < values.length; i++) {
-    //        cha[i] = values[i].Challenge;
-    //    }
-
-    //    ////debugger;
-    //    var res = 0;
-    //    if (countchecked == cha.length) {
-    //        $(".loader1").show();
-    //        $("#overlay").show();
-    //            $.ajax({
-    //                method: "POST",
-    //                url: "/Client/ClientChallengeform",
-    //                dataType: "json",
-    //                data: { credit: values, Id: Id },
-    //                success: function (data) {
-    //                    if (data == true) {
-    //                        Swal.fire({
-    //                            title: "Success!",
-    //                            text: "Challenge created successfully.!",
-    //                            type: 'success',
-
-
-    //                        }).then(function () {
-    //                            if (from == "db") {
-    //                                window.location.href = "/dashboard/agent";
-    //                            } else {
-    //                                window.location.href = "/Client/CreditItems?ClientId=" + Id;
-    //                            }
-    //                        })
-    //                    }
-    //                    else {
-    //                        $(".loader1").hide();
-    //                        $("#overlay").hide();
-    //                    }
-    //                }
-    //            });
-
-    //        //i = 0;
-
-    //    }
-
-
-    //});
 
     $("#PullCreditItems").on("click", function () {
 
@@ -2276,10 +2471,6 @@
         });
 
     });
-
-
-
-
     //account history
     function disableChallengetxtAH() {
         debugger;
@@ -2311,7 +2502,6 @@
             }
 
     }
-
     //inquiries
     function disableChallengetxtINQ() {
         debugger;
@@ -2345,8 +2535,6 @@
         }
 
     }
-
-
     //enabel checkbox
     function EnableCheckBox(id)
     {
@@ -2357,12 +2545,6 @@
             $("#" + id).attr('disabled', 'disabled');
         }
     }
-
-
-
-
-    //
-
     //text box AutoFillAccountType experien
     function AutoFillAccountTypeEX(id)
     {
@@ -2392,9 +2574,6 @@
             });
 
     }
-
-    //
-
      //text box AutoFillAccountType Tu
     function AutoFillAccountTypeTU(id)
     {
@@ -2422,9 +2601,6 @@
             });
 
     }
-
-    //
-
       //text box AutoFillAccountType Tu
     function AutoFillAccountTypeEQ(id)
     {
@@ -2452,10 +2628,6 @@
             });
 
     }
-
-    //
-
-
     //inquires
       //text box AutoFillAccountType Tu
     function AutoFillInquiriesAccountTypeTU(id)
@@ -2484,9 +2656,6 @@
             });
 
     }
-
-    //ex
-
     function AutoFillInquiriesAccountTypeEX(id) {
           var localAccountTypes = [];
          var items=@Html.Raw(Json.Encode(ViewBag.AllAccountTypes));
@@ -2512,10 +2681,6 @@
         });
 
     }
-
-
-     //eq
-
     function AutoFillInquiriesAccountTypeEQ(id) {
           var localAccountTypes = [];
          var items=@Html.Raw(Json.Encode(ViewBag.AllAccountTypes));
@@ -2539,6 +2704,323 @@
                     //$("#lblChallengeTextTU_"+id).val(i.item.val);
                 },
                 minLength: 1
+        });
+
+    }
+
+    //PublicRecords - Autofill
+    function AutoFillPRAccountTypeTU(id)
+    {
+         var localAccountTypes = [];
+         var items=@Html.Raw(Json.Encode(ViewBag.AllAccountTypes));
+        var Accounttype = $("#TRANSPRChallenge_" + id).val();
+        debugger;
+            $("#TRANSPRChallenge_"+id).autocomplete({
+                source: function (request, response) {
+                    for (i = 0; i < items.length; i++) {
+                        var stritem = items[i].toUpperCase();
+                        var tre = stritem.match(Accounttype.toUpperCase());
+                        if (tre != null) {
+                           localAccountTypes.push(stritem);
+                        }
+                    }
+                    response($.map(localAccountTypes, function (item) {
+                        return item
+                    }))
+                },
+                select: function (e, i) {
+                    //$("#lblChallengeTextTU_"+id).val(i.item.val);
+                },
+                minLength: 1
+            });
+
+    }
+    function AutoFillPRAccountTypeEX(id) {
+          var localAccountTypes = [];
+         var items=@Html.Raw(Json.Encode(ViewBag.AllAccountTypes));
+        var Accounttype = $("#EXPEPRChallenge_" + id).val();
+        debugger;
+        $("#EXPEPRChallenge_" + id).autocomplete({
+            source: function (request, response) {
+                    for (i = 0; i < items.length; i++) {
+                       var stritem = items[i].toUpperCase();
+                        var tre = stritem.match(Accounttype.toUpperCase());
+                        if (tre != null) {
+                           localAccountTypes.push(stritem);
+                        }
+                    }
+                    response($.map(localAccountTypes, function (item) {
+                        return item
+                    }))
+                },
+                select: function (e, i) {
+                    //$("#lblChallengeTextTU_"+id).val(i.item.val);
+                },
+                minLength: 1
+        });
+
+    }
+    function AutoFillPRAccountTypeEQ(id) {
+          var localAccountTypes = [];
+         var items=@Html.Raw(Json.Encode(ViewBag.AllAccountTypes));
+        var Accounttype = $("#EQUIPRChallenge_" + id).val();
+        debugger;
+        $("#EQUIPRChallenge_" + id).autocomplete({
+             source: function (request, response) {
+                    for (i = 0; i < items.length; i++) {
+                       var stritem = items[i].toUpperCase();
+                        var tre = stritem.match(Accounttype.toUpperCase());
+                        if (tre != null) {
+                           localAccountTypes.push(stritem);
+                        }
+                    }
+                    response($.map(localAccountTypes, function (item) {
+                        return item
+                    }))
+
+                },
+                select: function (e, i) {
+                    //$("#lblChallengeTextTU_"+id).val(i.item.val);
+                },
+                minLength: 1
+        });
+
+    }
+
+    $("#AddPublicRecChallenge").click(function () {
+          var items=@Html.Raw(Json.Encode(ViewBag.PublicRecords));
+                var i = 0;
+                var AllItemsChecked = true;
+                for (var i = 0; i < items.length; i++) {
+                    var c = i + 4;
+                    if ($("#chkPREXPE_" + c).prop("checked") == false) {
+                        AllItemsChecked = false;
+                        break;
+                    }
+                    if ($("#chkPRTRANS_" + c).prop("checked") == false) {
+                        AllItemsChecked = false;
+                        break;
+                    }
+                    if ($("#chkPREQUI_" + c).prop("checked") == false) {
+                        AllItemsChecked = false;
+                        break;
+                    }
+                }
+            if (AllItemsChecked == false) {
+                Swal.fire({
+                    title: 'Some public records are not selected. Are you sure you want to create challenge for selected records?',
+                    text: "This action is irreversible",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, create challenge!'
+                }).then(function (isConfirm) {
+                    if (isConfirm.value == true) {
+                        createChallengeForPR();
+                    }
+                });
+            }
+            else { createChallengeForPR();}
+
+    });
+    $("#AddPublicRecChallenge1").click(function () {
+          var items=@Html.Raw(Json.Encode(ViewBag.PublicRecords));
+                var i = 0;
+                var AllItemsChecked = true;
+                for (var i = 0; i < items.length; i++) {
+                    var c = i + 4;
+                    if ($("#chkPREXPE_" + c).prop("checked") == false) {
+                        AllItemsChecked = false;
+                        break;
+                    }
+                    if ($("#chkPRTRANS_" + c).prop("checked") == false) {
+                        AllItemsChecked = false;
+                        break;
+                    }
+                    if ($("#chkPREQUI_" + c).prop("checked") == false) {
+                        AllItemsChecked = false;
+                        break;
+                    }
+                }
+            if (AllItemsChecked == false) {
+                Swal.fire({
+                    title: 'Some public records are not selected. Are you sure you want to create challenge for selected records?',
+                    text: "This action is irreversible",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, create challenge!'
+                }).then(function (isConfirm) {
+                    if (isConfirm.value == true) {
+                        createChallengeForPR();
+                    }
+                });
+            }
+            else { createChallengeForPR();}
+
+    });
+
+    function createChallengeForPR() {
+            var items=@Html.Raw(Json.Encode(ViewBag.PublicRecords));
+            var i = 0;
+
+            var AllAgenciesvalues = new Array();
+
+            for (var i = 0; i < items.length; i++) {
+
+                var j = i + 4;
+                //Reading  Inquiries challenge text from Inquiries table
+
+
+                var TRANSAccountType = $("#TRANSPRChallenge_" + j).val();
+                var EXPEAccountType = $("#EXPEPRChallenge_" + j).val();
+                var EQUIAccountType = $("#EQUIPRChallenge_" + j).val();
+
+                //Reading  CreditInqId from  Inquiries table
+               var k = i + 6;
+
+
+                var hdnTRANSCreditInqId = $("#hdnTRANSCreditPRId_" + k).text();
+                var hdnEXPECreditInqId = $("#hdnEXPECreditPRId_" + k).text();
+                var hdnEQUICreditInqId = $("#hdnEQUICreditPRId_" + k).text();
+
+
+                var lblroundPRTU_ = $("#lblroundPRTUnew_" + j).text();
+                var lblroundPREX_ = $("#lblroundPREXnew_" + j).text();
+                var lblroundPREQ_ = $("#lblroundPREQnew_" + j).text();
+
+
+
+                  var AllAccountTypes =@Html.Raw(Json.Encode(ViewBag.AllAccountTypes));
+                //TU
+                 var flag = false;
+                 if (hdnTRANSCreditInqId != ""  && $("#chkPRTRANS_" + j).prop("checked") == true) {
+
+                     if (TRANSAccountType != "") {
+                                  AllAgenciesvalues.push({
+
+                                    'PublicRecordId': hdnTRANSCreditInqId,
+                                    'AccountType': TRANSAccountType,
+                                    'RoundType': lblroundPRTU_,
+                                });
+                                flag = true;
+
+                        }
+                        else {
+                            $("#TRANSPRChallenge_" + j).focus();
+                            Swal.fire("Warning!", "Please select Account Type !", 'warning');
+                            return false;
+                        }
+                }
+                 var flag = false;
+                 if (hdnEXPECreditInqId != ""  && $("#chkPREXPE_" + j).prop("checked") == true) {
+
+                     if (EXPEAccountType != "") {
+                         AllAgenciesvalues.push({
+
+                             'PublicRecordId': hdnEXPECreditInqId,
+                             'AccountType': EXPEAccountType,
+                             'RoundType': lblroundPREX_,
+                         });
+                         flag = true;
+                     }
+                     else {
+                         $("#EXPEPRChallenge_" + j).focus();
+                         Swal.fire("Warning!", "Please select Account Type !", 'warning');
+                         return false;
+                     }
+                }
+                 var flag = false;
+                 if (hdnEQUICreditInqId != ""  && $("#chkPREQUI_" + j).prop("checked") == true) {
+                     if (EQUIAccountType != "") {
+                         AllAgenciesvalues.push({
+
+                             'PublicRecordId': hdnEQUICreditInqId,
+                             'AccountType': EQUIAccountType,
+                             'RoundType': lblroundPREQ_,
+                         });
+                         flag = true;
+                     }
+                     else {
+                         $("#EQUIPRChallenge_" + j).focus();
+                         Swal.fire("Warning!", "Please select Account Type !", 'warning');
+                         return false;
+                     }
+                }
+        }
+        debugger;
+        if (AllAgenciesvalues.length == 0)
+        {
+            debugger
+                Swal.fire("Warning!", "Please select challenge !", 'warning');
+                return false;
+            }
+
+            var values = new Array();
+            var Id = getUrlParameter('ClientId');
+
+            values.push(@Html.Raw(Json.Encode(ViewBag.AgentName)));
+            values.push(@Html.Raw(Json.Encode(ViewBag.Cname)));
+            values.push(@Html.Raw(Json.Encode(ViewBag.DateReportPulls)));
+            values.push(@Html.Raw(Json.Encode(ViewBag.Round)));
+
+        $(".loader1").show();
+        $("#overlay").show();
+            //debugger;
+        $.ajax({
+            method: "POST",
+            url: "/Client/ClientChallengePRform",
+            dataType: "json",
+            data: { credit: AllAgenciesvalues, Id: Id, values: values },
+            success: function (data) {
+                debugger;
+                if (data == "1") {
+                    $(".loader1").hide();
+                    $("#overlay").hide();
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Challenge letter(s) generated successfully.",
+                        type: 'success',
+                    }).then(function () {
+                        if (from == "db")
+                        {
+                            window.location.reload();
+                            if (role == "agentadmin")
+                            {
+                               // window.location.href = "/Agent/Challenges?ClientId="+ Id;
+								window.location.href = "/dashboard/agent";
+                            }
+                            else if (role == "agentstaff") {
+                                window.location.href = "/dashboard/staff";
+                                //window.location.href = "/Agent/Challenges?ClientId="+ Id;
+							}
+                        }
+                        else
+                        {
+                           window.location.href = "/Client/CreditItems?ClientId=" + Id;
+                        }
+                    })
+                }
+                else {
+                    if (data != "" && data != "1" && data != "0") {
+                        Swal.fire("Success!", "Challenge letter(s) generated successfully.", 'success');
+                        var files = data.split('^');
+                        for (var i = 0; i < files.length; i++) {
+                         window.open('/Documents/Challenge/' + files[i], "_blank");
+                            //var url = '/Documents/Challenge/' + files[i]
+                            //var link = document.createElement('a');
+                            //document.body.appendChild(link);
+                            //link.href = url;
+                            //link.click();
+                        }
+                    }
+                    $(".loader1").hide();
+                    $("#overlay").hide();
+                    location.reload();
+                }
+            }
         });
 
     }

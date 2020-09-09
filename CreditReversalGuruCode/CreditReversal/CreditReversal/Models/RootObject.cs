@@ -646,7 +646,15 @@ namespace CreditReversal.Models
     }
 
     public class PublicRecord
-    {
+    {public string RoundType { get; set; }
+        public string Heading { get; set; }
+        public string EQUIFAX { get; set; }
+        public string TRANSUNION { get; set; }
+        public string EXPERIAN { get; set; }
+        public string PublicRecordId { get; set; }
+        public string ChallengeText { get; set; }
+        public string ChallengeStatus { get; set; }
+        public string AccountType { get; set; }
         public string atcourtName { get; set; }
         public string atdateFiled { get; set; }
         public string atreferenceNumber { get; set; }
@@ -883,7 +891,7 @@ namespace CreditReversal.Models
         public object Tradeline { get; set; }
 
 
-       
+
     }
 
     public class TrueLinkCreditReportType
@@ -892,7 +900,7 @@ namespace CreditReversal.Models
         public string atDeceasedIndicator { get; set; }
         public Borrower Borrower { get; set; }
         public List<InquiryPartition> InquiryPartition { get; set; }
-        public List<Message> Message { get; set; }
+        //public List<Message> Message { get; set; }
         public PulblicRecordPartition PulblicRecordPartition { get; set; }
         public SafetyCheckPassed SafetyCheckPassed { get; set; }
         public SB168Frozen SB168Frozen { get; set; }
