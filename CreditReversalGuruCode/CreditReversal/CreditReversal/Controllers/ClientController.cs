@@ -161,11 +161,11 @@ namespace CreditReversal.Controllers
                 if (checkIncInq)
                 {
                     List<Inquires> Inquires = functions.GetCreditReportInquiresAgent(Convert.ToInt32(ClientId), null, role);
-                    ViewBag.Inquires = Inquires;
+                    ViewBag.Inquires = Inquires.Count == 0 ? null : Inquires;
                 }
 
                 List<PublicRecord> publicRecords = functions.GetCreditReportPublicRecordsAgent(Convert.ToInt32(ClientId), null, role);
-                ViewBag.PublicRecords = publicRecords;
+                ViewBag.PublicRecords =  publicRecords.Count == 0 ? null : publicRecords;
             }
             catch (Exception ex) { ex.insertTrace(""); }
             return View();

@@ -1899,7 +1899,9 @@ namespace CreditReversal.BLL
                 { }
 
                 sql = " Select  max(a.sno) from CreditReportItemChallenges a,CreditReportItems b, CreditReport c   where "
-                    + " a.CredRepItemsId=b.CredRepItemsId and b.CredReportId=c.CreditReportId and c.ClientID=" + id;
+                    //+ " a.CredRepItemsId=b.CredRepItemsId and b.CredReportId=c.CreditReportId and c.ClientID=" + id;
+                + " a.AccountId=b.AccountId and a.Agency=b.Agency and a.CredRepItemsId > 0 and a.ClientID=c.ClientID and b.CredReportId=c.CreditReportId and c.ClientID=" + id;
+                //+ "  b.CredReportId=c.CreditReportId and c.ClientID=" + id;
                 long val = 0;
                 try
                 {
@@ -1950,7 +1952,8 @@ namespace CreditReversal.BLL
                     + "+'~'+ Convert(varchar,US.CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Equifax' "
                     + " group by PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
                       " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId " +
-                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + val +
+                     " join CreditReportItemChallenges CRI ON CRI.AccountId = US.AccountId    and CRI.Agency=US.Agency   and CRI.ClientID=" + id
+                     + " and CRI.CredRepItemsId > 0 and CRI.sno =" + val +
                      " where US.Agency='EQUIFAX' and us.sno=" + sno;
                 }
                 else
@@ -1985,7 +1988,8 @@ namespace CreditReversal.BLL
                     + " Convert(varchar,US.CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='Experian' group by  "
                     + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
                     " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId " +
-                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + val
+                     " join CreditReportItemChallenges CRI ON CRI.AccountId = US.AccountId  and CRI.Agency=US.Agency    and CRI.ClientID=" + id
+                     + " and CRI.CredRepItemsId > 0 and CRI.sno =" + val
                     + " where US.Agency='EXPERIAN' and us.sno=" + sno
                     + " and CR.ClientId='" + id + "'" + addnagitiveitems;
                 }
@@ -2018,7 +2022,8 @@ namespace CreditReversal.BLL
                     + " Convert(varchar,US.CredRepItemsId) +'~'+ Convert(varchar,negativeitems) +'~'+ " + payhistory + " and a.Agency='TransUnion' group by "
                     + " PayHistoryId, PHStatus order by PayHistoryId asc),'') +'~'+ '~')" +
                     " FROM CreditReportItems US join CreditReport cr on US.CredReportId=cr.CreditReportId " +
-                     " join CreditReportItemChallenges CRI ON CRI.CredRepItemsId = US.CredRepItemsId and CRI.sno =" + val
+                     " join CreditReportItemChallenges CRI ON CRI.AccountId = US.AccountId   and CRI.Agency=US.Agency   and CRI.ClientID=" + id
+                     + " and CRI.CredRepItemsId > 0 and CRI.sno =" + val
                     + " where US.Agency='TRANSUNION' and us.sno=" + sno
                     + " and CR.ClientId='" + id + "'" + addnagitiveitems;
                 }
@@ -2053,7 +2058,8 @@ namespace CreditReversal.BLL
                 {
                     sql = "select distinct cr.accountId from CreditReportItems cr join  CreditReport c on cr.CredReportId=c.CreditReportId"
                     + " and AccountId !='-' and ClientId =" + id + " and cr.sno=" + sno
-                    + " join CreditReportItemChallenges cri on cri.CredRepItemsId = cr.CredRepItemsId and cri.sno =" + val;
+                    + " join CreditReportItemChallenges cri on cri.AccountId = cr.AccountId    and CRI.Agency=cr.Agency    and CRI.ClientID=" + id
+                    + " and CRI.CredRepItemsId > 0 and cri.sno =" + val;
                 }
                 else
                 {
@@ -2734,7 +2740,9 @@ namespace CreditReversal.BLL
                 { }
 
                 sql = " Select max(a.sno) from CreditReportItemChallenges a,PublicRecords b, CreditReport c   where "
-                    + "  a.PublicRecordId=b.PublicRecordId and b.CreditReportId=c.CreditReportId and c.ClientID=" + id;
+                    //+ "  a.PublicRecordId=b.PublicRecordId and b.CreditReportId=c.CreditReportId and c.ClientID=" + id;
+                    + "  a.MerchantName=b.CreditorName and UPPER(a.agency)=UPPER(b.agency)  and a.ClientID=" + id
+                    + " and a.PublicRecordId > 0  and b.CreditReportId=c.CreditReportId and c.ClientID=" + id;
                 long val = 0;
                 try
                 {
@@ -2757,7 +2765,8 @@ namespace CreditReversal.BLL
                 + " DateOfInquiry=US.DateOfPR order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.PublicRecordId))" +
                 " FROM" +
                 " PublicRecords US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
-                "  join CreditReportItemChallenges cri ON US.PublicRecordId=CRI.PublicRecordId and cri.sno =" + val +
+                "  join CreditReportItemChallenges cri ON cri.MerchantName=US.CreditorName and UPPER(cri.agency)=UPPER(US.agency)  and CRI.ClientID=" + id
+                + " and CRI.PublicRecordId > 0  and cri.sno =" + val +
                 " where US.Agency = 'EQUIFAX' and CR.ClientId = '" + id + "' and us.sno=" + sno
                 + " FOR XML PATH('')), 1, 1, '')) " +
                 " as 'EQUIFAX',";
@@ -2785,7 +2794,8 @@ namespace CreditReversal.BLL
                 + " DateOfInquiry=US.DateOfPR order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.PublicRecordId))" +
                 " FROM" +
                 " PublicRecords US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
-                "  join CreditReportItemChallenges cri ON US.PublicRecordId=CRI.PublicRecordId and cri.sno =" + val +
+                "  join CreditReportItemChallenges cri ON cri.MerchantName=US.CreditorName and UPPER(cri.agency)=UPPER(US.agency)   and CRI.ClientID=" + id
+                + " and CRI.PublicRecordId > 0  and cri.sno =" + val +
                 " where US.Agency = 'EXPERIAN' and CR.ClientId = '" + id + "' and us.sno=" + sno
                + " FOR XML PATH('')), 1, 1, '')" +
                 " as 'EXPERIAN',";
@@ -2814,7 +2824,8 @@ namespace CreditReversal.BLL
                 + " DateOfInquiry=US.DateOfPR order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.PublicRecordId))" +
                 " FROM" +
                 " PublicRecords US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
-                "  join CreditReportItemChallenges cri ON US.PublicRecordId=CRI.PublicRecordId and cri.sno =" + val +
+                "  join CreditReportItemChallenges cri ON cri.MerchantName=US.CreditorName and UPPER(cri.agency)=UPPER(US.agency)   and CRI.ClientID=" + id
+                + " and CRI.PublicRecordId > 0  and cri.sno =" + val +
                 "  where US.Agency = 'TRANSUNION' and CR.ClientId = '" + id + "' and us.sno=" + sno +
                 " FOR XML PATH('')), 1, 1, '')" +
                 " as 'TRANSUNION'";
@@ -2838,7 +2849,9 @@ namespace CreditReversal.BLL
                 dt = utilities.GetDataTable(sql);
                 sql = "";
                 sql = "select distinct CreditorName from PublicRecords ci join  CreditReport c on ci.CreditReportId=c.CreditReportId "
-                    + " and ClientId =" + id + " and ci.sno=" + sno + " left join CreditReportItemChallenges cri on cri.PublicRecordId = ci.PublicRecordId and cri.sno =" + sno;
+                    + " and ClientId =" + id + " and ci.sno=" + sno + " left join "
+                    + " CreditReportItemChallenges cri on  cri.MerchantName=ci.CreditorName and UPPER(cri.agency)=UPPER(ci.agency)   and CRI.ClientID=" + id
+                    + " and CRI.PublicRecordId > 0   and cri.sno =" + sno;
 
                 dt1 = utilities.GetDataTable(sql);
 
@@ -3251,7 +3264,8 @@ namespace CreditReversal.BLL
                 { }
 
                 sql = " Select max(a.sno) from CreditReportItemChallenges a,CreditInquiries b, CreditReport c   where "
-                    + "  a.CreditInqId=b.CreditInqId and b.CreditReportId=c.CreditReportId and c.ClientID=" + id;
+                    + "   a.MerchantName=b.CreditorName and UPPER(a.agency)=UPPER(b.agency) and a.CreditInqId > 0  and a.ClientID=" + id
+                    + " and b.CreditReportId=c.CreditReportId and c.ClientID=" + id;
                 long val = 0;
                 try
                 {
@@ -3274,7 +3288,8 @@ namespace CreditReversal.BLL
                 + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
                 " FROM" +
                 " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
-                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + val +
+                "  join CreditReportItemChallenges cri ON   CRI.MerchantName=US.CreditorName and UPPER(CRI.agency)=UPPER(US.agency)  and CRI.ClientID=" + id
+                + " and US.CreditInqId > 0 and cri.sno =" + val +
                 " where US.Agency = 'EQUIFAX' and CR.ClientId = '" + id + "' and us.sno=" + sno
                 + " FOR XML PATH('')), 1, 1, '')) " +
                 " as 'EQUIFAX',";
@@ -3302,7 +3317,8 @@ namespace CreditReversal.BLL
                 + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
                 " FROM" +
                 " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
-                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + val +
+                "  join CreditReportItemChallenges cri ON   CRI.MerchantName=US.CreditorName and UPPER(CRI.agency)=UPPER(US.agency)  and CRI.ClientID=" + id
+                + " and US.CreditInqId > 0 and cri.sno =" + val +
                 " where US.Agency = 'EXPERIAN' and CR.ClientId = '" + id + "' and us.sno=" + sno
                + " FOR XML PATH('')), 1, 1, '')" +
                 " as 'EXPERIAN',";
@@ -3331,7 +3347,8 @@ namespace CreditReversal.BLL
                 + " DateOfInquiry=US.DateOfInquiry order by CrdRepItemChallengeId desc))), '-') + '~' + Convert(varchar, US.CreditInqId))" +
                 " FROM" +
                 " CreditInquiries US join CreditReport cr on US.CreditReportId = cr.CreditReportId " +
-                "  join CreditReportItemChallenges cri ON US.CreditInqId=CRI.CreditInqId and cri.sno =" + val +
+                "  join CreditReportItemChallenges cri ON   CRI.MerchantName=US.CreditorName and UPPER(CRI.agency)=UPPER(US.agency)  and CRI.ClientID=" + id
+                + " and US.CreditInqId > 0 and cri.sno =" + val +
                 "  where US.Agency = 'TRANSUNION' and CR.ClientId = '" + id + "' and us.sno=" + sno +
                 " FOR XML PATH('')), 1, 1, '')" +
                 " as 'TRANSUNION'";
@@ -3360,7 +3377,9 @@ namespace CreditReversal.BLL
 
                
                 sql = "select distinct CreditorName from CreditInquiries ci join  CreditReport c on ci.CreditReportId=c.CreditReportId "
-                    + " and ClientId =" + id + " and ci.sno=" + sno + " left join CreditReportItemChallenges cri on cri.CreditInqId = ci.CreditInqId and cri.sno =" + sno;
+                    + " and ClientId =" + id + " and ci.sno=" + sno + " left join CreditReportItemChallenges cri on  "
+                    + " CRI.MerchantName=CI.CreditorName and UPPER(CRI.agency)=UPPER(CI.agency)  and CRI.ClientID=" + id
+                    + " and CI.CreditInqId > 0 and cri.sno =" + sno;
 
                 dt1 = utilities.GetDataTable(sql);
 

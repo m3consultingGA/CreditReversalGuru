@@ -587,11 +587,16 @@ namespace CreditReversal.Controllers
             List<CreditReportFiles> creditreport = new List<CreditReportFiles>();
             List<CreditReportFiles> creditreportAH = new List<CreditReportFiles>();
             List<CreditReportFiles> creditreportINQ = new List<CreditReportFiles>();
+            List<CreditReportFiles> creditreportPR = new List<CreditReportFiles>();
             if (ClientId != "")
             {
+                //PublicRe //Account-
                 creditreport = agentfunction.GetChallenges(ClientId);
-                creditreportAH = creditreport.Where(x => x.mode != "Inquires").ToList();
+                creditreportAH = creditreport.Where(x => x.mode == "Account-").ToList();
                 ViewBag.creditreportfile = creditreportAH;
+
+                creditreportPR = creditreport.Where(x => x.mode == "PublicRe").ToList();
+                ViewBag.creditreportfilePR = creditreportPR;
 
                 int AgentClientId = sessionData.GetAgentClientId();
                 Agent agent = new Agent();
