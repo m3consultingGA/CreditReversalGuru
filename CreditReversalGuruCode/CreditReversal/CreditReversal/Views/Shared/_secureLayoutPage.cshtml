@@ -181,6 +181,43 @@
             <div class="pull-left">Copyright &copy;@DateTime.Now.Year Credit Reversal Guru.</div>
         </div>
     </div>
+    <div class="modal" id="divPopupTimeOut">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title text-secondary">Session Expire!</h4>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body text-center">
+                    <h5>
+                        You will be loggedout in
+                        <span id="CountDownHolder" class="text-danger"></span> seconds
+                    </h5>
+                    <h5>Do you want to stay signed in?</h5>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-sm" onclick="SessionTimeout.sendKeepAlive();">Yes,Keep me signed in</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="SessionTimeout.hidePopup();">No,Sign me out</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    @functions {
+        public int PopupShowDelay
+        {
+            get
+            {
+                return 100 * (Convert.ToInt32(FormsAuthentication.Timeout.TotalSeconds));
+            }
+        }
+    }
     <script src="~/Content/js/bootstrap.min.js" type="text/javascript"></script>
 
     <script src="~/Content/js/jquery.dataTables.min.js" type="text/javascript"></script>
@@ -206,11 +243,90 @@
     <script src="~/Content/js/mvpready-core.js" type="text/javascript"></script>
     <script src="~/Content/js/mvpready-helpers.js" type="text/javascript"></script>
     <script src="~/Content/js/mvpready-admin.js" type="text/javascript"></script>
-
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@8" type="text/javascript"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js" type="text/javascript"></script>
 
+    <script type="text/javascript">
+        $(function () {
+            setInterval(KeepSessionAlive, 10000);
+        });
+        function KeepSessionAlive() {
+            $.post("/Dashboard/KeepSessionAlive", null, function () {
+                console.log("Session is alive and kicking!");
+            });
+        }
+    </script>
+    @*<script type="text/javascript">
+
+        var loginUrl='@Url.Action("Login", "Home")';
+        var extendMethodUrl='@Url.Action("ExtendSession","Dashboard")';
+            $(document).ready(function () {
+                SessionTimeout.schedulePopup();
+            });
+
+            window.SessionTimeout = (function () {
+
+                var _timeLeft, _popupTimer, _countDownTimer;
+                var stopTimers = function() {
+                    window.clearTimeout(_popupTimer);
+                    window.clearTimeout(_countDownTimer);
+                };
+                var updateCountDown = function () {
+                    debugger
+                    var min = Math.floor(_timeLeft / 60);
+                    var sec = _timeLeft % 60;
+                    if(sec < 10)
+                        sec = "0" + sec;
+
+                    document.getElementById("CountDownHolder").innerHTML = min + ":" + sec;
+
+                    if(_timeLeft > 0) {
+                        _timeLeft--;
+                        _countDownTimer = window.setTimeout(updateCountDown, 1000);
+                    } else  {
+                        document.location = loginUrl;
+                    }
+                };
+                var showPopup = function() {
+                $("#divPopupTimeOut").show();
+                    _timeLeft = 10;
+                    updateCountDown();
+                };
+                var schedulePopup = function() {
+                $("#divPopupTimeOut").hide();
+                    stopTimers();
+                    _popupTimer = window.setTimeout(showPopup, @PopupShowDelay);
+                };
+                var hidePopup = function () {
+                    document.location = loginUrl;
+                $("#divPopupTimeOut").hide();
+                };
+                var sendKeepAlive = function() {
+                    stopTimers();
+                    $("#divPopupTimeOut").hide();
+                    $.ajax({
+                        type: "GET",
+                        url: extendMethodUrl,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function successFunc(response) {
+
+                            SessionTimeout.schedulePopup();
+                        },
+                        error:function(){
+                        }
+                    });
+                };
+                return {
+                    schedulePopup: schedulePopup,
+                    sendKeepAlive: sendKeepAlive,
+                    hidePopup:hidePopup,
+                    stopTimers:stopTimers,
+                };
+
+            })();
+
+        </script>*@
 </body>
 </html>

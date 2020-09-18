@@ -97,67 +97,7 @@
                         </table>
                     </div>
                 </div>
-                <br />
-                @if (ViewBag.creditreportfilePR != null)
-                {
-                    <h2> Public Records </h2>
-                    <div class="row m-2 p-2">
-                        <div class="table-responsive">
-                            <table id="tblChallengePR" class="table table-bordered">
-                                <thead>
-                                    <tr class="trTable">
-                                        @*<th>Client </th>*@
-                                        <th>Round Type</th>
-                                        <th>File Name</th>
-                                        <th @dispPrint>Actions</th>
-                                    </tr>
-                                </thead>
-                                @{
-                                    string path1 = string.Empty;
-                                }
-                                @if (ViewBag.creditreportfilePR != null && ViewBag.creditreportfilePR.Count > 0)
-                                {
-                                    <tbody>
-                                        @{
-                                            int i = 0;
-                                        }
-
-                                        @foreach (var item in ViewBag.creditreportfilePR)
-                                        {
-                                            <tr>
-
-                                                <td> @item.RoundType </td>
-                                                <td> @item.CAgency - @item.RoundType </td>
-
-                                                @{
-                                                    string file = item.CRFilename;
-
-                                                    path1 = file.Replace(" ", "");
-                                                }
-
-                                                <td @dispPrint>
-                                                    @*@if (item.isAutoChallenges == 0)
-                                            {
-                                                <a href = "~/documents/Challenge/@path1" target = "_blank" class="btn btn-danger btn-xs"> Print</a>
-                                            }*@
-                                                    <a href="~/documents/Challenge/@path1" target="_blank" class="btn btn-danger btn-xs"> Print</a>
-                                                </td>
-
-                                            </tr>
-                                            i++;
-
-                                        }
-                                    </tbody>
-                                }
-                                else
-                                {
-                                    <td colspan="3" style="text-align:center"><strong> No Challenges for Public Records. </strong></td>
-                                }
-
-                            </table>
-                        </div>
-                    </div>
-                }
+              
                 <br />
                 @if (ViewBag.creditreportfileInq != null)
                 {

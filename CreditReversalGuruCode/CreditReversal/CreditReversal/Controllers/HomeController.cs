@@ -50,91 +50,13 @@ namespace CreditReversal.Controllers
         // GET: Home
         public ActionResult Index()
         {
+            //sbrowser sbrowser = new sbrowser();
+            //sbrowser.pullcredit("", "", "", "");
+
             //string str = common.Encrypt("rH8s~B-^}@jHp+4<");
             return View();
         }
-        [HttpPost]
-        public ActionResult Index(string UserName, string Password)
-        {
-            try
-            {
-
-                DataRow row = functions.Login(UserName, Password);
-                string role = "";
-                if (row != null)
-                {
-                    role = row["UserRole"].ToString();
-                    Session["UserId"] = row["UserId"];
-                    Session["UserName"] = row["UserName"];
-                    Session["Name"] = row["UserName"];
-                    Session["EmailAddress"] = row["EmailAddress"];
-                    Session["UserRole"] = row["UserRole"];
-                    Session["Status"] = row["Status"];
-                    Session["CreatedBy"] = row["CreatedBy"];
-                    Session["CreatedDate"] = row["CreatedDate"];
-                    Session["AgentClientId"] = row["AgentClientId"];
-                    if (row["UserRole"].ToString() == "agentadmin")
-                    {
-                        Session["AgentId"] = row["AgentClientId"];
-                        AgentFunction agentFunction = new AgentFunction();
-                        Agent agent = agentFunction.GetAgent(row["AgentClientId"].ConvertObjectToIntIfNotNull())[0];
-                        if (agent != null)
-                        {
-                            Session["AgentType"] = agent.TypeOfComp;
-                            Session["Name"] = agent.FirstName + " " + agent.LastName;
-                        }
-
-                    }
-                    else if (row["UserRole"].ToString() == "agentstaff")
-                    {
-                        AgentFunction agentFunction = new AgentFunction();
-                        AgentStaff agentStaff = agentFunction.GetStaff(null, Session["AgentClientId"].ToString())[0];
-                        if (agentStaff != null)
-                        {
-                            Session["Name"] = agentStaff.FirstName + " " + agentStaff.LastName;
-                        }
-                        Session["StaffId"] = row["AgentClientId"];
-                    }
-                    else if (row["UserRole"].ToString() == "client")
-                    {
-                        ClientFunction clientFunction = new ClientFunction();
-                        ClientModel clientModel = clientFunction.GetClients(null, null, Session["AgentClientId"].ToString())[0];
-                        if (clientModel != null)
-                        {
-                            Session["Name"] = clientModel.FirstName + " " + clientModel.LastName;
-                        }
-                        Session["ClientId"] = row["AgentClientId"];
-                    }
-
-                    switch (role)
-                    {
-                        case "client":
-                            return RedirectToAction("Client", "Dashboard");
-
-                        case "agentstaff":
-                            return RedirectToAction("AgentStaff", "Dashboard");
-
-                        case "agentadmin":
-                            return RedirectToAction("Agent", "Dashboard");
-
-                        case "admin":
-                            return RedirectToAction("Admin", "Dashboard");
-                        case "investor":                            return RedirectToAction("Admin", "Dashboard");
-                    }
-                }
-                else
-                {
-                    TempData["LoginError"] = "Invalid username or password";
-                    return RedirectToAction("Index", "Home"); //TODO Changed Home page
-                    //Response.Redirect("/Account/SignIn");
-                }
-            }
-            catch (Exception ex)
-            {
-                ex.insertTrace("");
-            }
-            return View();
-        }
+        
         public ActionResult HowItWorks()
         {
             //SendMails();
@@ -398,6 +320,94 @@ namespace CreditReversal.Controllers
 
             //var html = new System.Net.WebClient().DownloadString("https://www.identityiq.com/login.aspx");
             System.IO.File.WriteAllText(Server.MapPath("~/Content/sample2.html"), result);
+            return View();
+        }
+
+        public ActionResult Login()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Login(string UserName, string Password)
+        {
+            try
+            {
+
+                DataRow row = functions.Login(UserName, Password);
+                string role = "";
+                if (row != null)
+                {
+                    role = row["UserRole"].ToString();
+                    Session["UserId"] = row["UserId"];
+                    Session["UserName"] = row["UserName"];
+                    Session["Name"] = row["UserName"];
+                    Session["EmailAddress"] = row["EmailAddress"];
+                    Session["UserRole"] = row["UserRole"];
+                    Session["Status"] = row["Status"];
+                    Session["CreatedBy"] = row["CreatedBy"];
+                    Session["CreatedDate"] = row["CreatedDate"];
+                    Session["AgentClientId"] = row["AgentClientId"];
+                    if (row["UserRole"].ToString() == "agentadmin")
+                    {
+                        Session["AgentId"] = row["AgentClientId"];
+                        AgentFunction agentFunction = new AgentFunction();
+                        Agent agent = agentFunction.GetAgent(row["AgentClientId"].ConvertObjectToIntIfNotNull())[0];
+                        if (agent != null)
+                        {
+                            Session["AgentType"] = agent.TypeOfComp;
+                            Session["Name"] = agent.FirstName + " " + agent.LastName;
+                        }
+
+                    }
+                    else if (row["UserRole"].ToString() == "agentstaff")
+                    {
+                        AgentFunction agentFunction = new AgentFunction();
+                        AgentStaff agentStaff = agentFunction.GetStaff(null, Session["AgentClientId"].ToString())[0];
+                        if (agentStaff != null)
+                        {
+                            Session["Name"] = agentStaff.FirstName + " " + agentStaff.LastName;
+                        }
+                        Session["StaffId"] = row["AgentClientId"];
+                    }
+                    else if (row["UserRole"].ToString() == "client")
+                    {
+                        ClientFunction clientFunction = new ClientFunction();
+                        ClientModel clientModel = clientFunction.GetClients(null, null, Session["AgentClientId"].ToString())[0];
+                        if (clientModel != null)
+                        {
+                            Session["Name"] = clientModel.FirstName + " " + clientModel.LastName;
+                        }
+                        Session["ClientId"] = row["AgentClientId"];
+                    }
+
+                    switch (role)
+                    {
+                        case "client":
+                            return RedirectToAction("Client", "Dashboard");
+
+                        case "agentstaff":
+                            return RedirectToAction("AgentStaff", "Dashboard");
+
+                        case "agentadmin":
+                            return RedirectToAction("Agent", "Dashboard");
+
+                        case "admin":
+                            return RedirectToAction("Admin", "Dashboard");
+                        case "investor":
+                            return RedirectToAction("Admin", "Dashboard");
+                    }
+                }
+                else
+                {
+                    TempData["LoginError"] = "Invalid username or password";
+                    return RedirectToAction("Index", "Home"); //TODO Changed Home page
+                    //Response.Redirect("/Account/SignIn");
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.insertTrace("");
+            }
             return View();
         }
     }

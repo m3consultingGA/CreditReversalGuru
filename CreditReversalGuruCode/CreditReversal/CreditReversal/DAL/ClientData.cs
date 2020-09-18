@@ -791,6 +791,7 @@ namespace CreditReversal.DAL
                 }
                 ReportId = res.ToString();
                 long result = InsertPaymentHistory(roundtype, clientId.StringToLong(0), monthlyPayStatusHistoryDetails, sno);
+                UpdateCreditReportItems(clientId);
             }
             catch (Exception ex)
             {
@@ -798,6 +799,20 @@ namespace CreditReversal.DAL
             }
 
             return ReportId;
+        }
+        public long UpdateCreditReportItems(string clientid)
+        {
+            long res = 0;
+            try
+            {
+                SqlCommand cmdCR = new SqlCommand("sp_updateCreditReportItems");
+                cmdCR.CommandType = CommandType.StoredProcedure;
+                cmdCR.Parameters.AddWithValue("@ClientId", clientid);
+               res = utils.ExecuteInsertCommand(cmdCR, true);
+            }
+            catch (Exception ex)
+            {}
+            return res;
         }
 
         public string RefreshCreditReport(List<AccountHistory> credit, List<Inquires> inquires, List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string round = "", List<PublicRecord> publicRecords =null)
@@ -915,6 +930,8 @@ namespace CreditReversal.DAL
                 }
                 ReportId = res.ToString();
                 long result = InsertPaymentHistory(round, clientId.StringToLong(0), monthlyPayStatusHistoryDetails, sno);
+
+                UpdateCreditReportItems(clientId);
             }
             catch (Exception ex) { ex.insertTrace(""); }
 
@@ -979,38 +996,38 @@ namespace CreditReversal.DAL
                 {
                     string sql = "Insert Into CreditReportItems(CredReportId,MerchantName,AccountId,OpenDate,"
                         + " CurrentBalance,HighestBalance,Status,MonthlyPayment,LastReported,Agency,CreatedBy, "
-                        + " CreatedDate,negativeitems,RoundType,sno,AccountType,AccountTypeDetails,AccountCondition,AccountComments) values(@CredReportId,@MerchantName,@AccountId,"
+                        + " CreatedDate,negativeitems,RoundType,sno,AccountType,AccountTypeDetails,AccountCondition, "
+                        + "AccountComments,DispMerchantName,isNegativeItem,ArgumentName) values(@CredReportId,@MerchantName,@AccountId, "
                         + " @OpenDate,@CurrentBalance,@HighestBalance,@Status,@MonthlyPayment,@LastReported,@Agency, "
-                        + " @CreatedBy,getdate(),@negativeitems,@RoundType," + sno + ",@AccountType,@AccountTypeDetails,@AccountCondition,@AccountComments)";
+                        + " @CreatedBy,getdate(),@negativeitems,@RoundType," + sno + ",@AccountType,@AccountTypeDetails, "
+                        + " @AccountCondition,@AccountComments,@DispMerchantName,@isNegativeItem,@ArgumentName)";
                     SqlCommand cmd = new SqlCommand();
                     cmd.CommandText = sql;
+                    cmd.Parameters.AddWithValue("@isNegativeItem", credit[i].isNegativeItem);
+                    cmd.Parameters.AddWithValue("@ArgumentName", string.IsNullOrEmpty(credit[i].ArgumentName) ? "" : credit[i].ArgumentName);
+                    cmd.Parameters.AddWithValue("@DispMerchantName", string.IsNullOrEmpty(credit[i].DispMerchantName) ? "" : credit[i].DispMerchantName);
                     cmd.Parameters.AddWithValue("@AccountComments", string.IsNullOrEmpty(credit[i].AccountComments) ? "" : credit[i].AccountComments);
                     cmd.Parameters.AddWithValue("@AccountCondition", string.IsNullOrEmpty(credit[i].AccountCondition) ? "" : credit[i].AccountCondition);
                     cmd.Parameters.AddWithValue("@CredReportId", Id);
                     cmd.Parameters.AddWithValue("@Agency", agency);
-                    cmd.Parameters.AddWithValue("@MerchantName", credit[i].Bank);
-                    cmd.Parameters.AddWithValue("@AccountId", credit[i].Account);
-                    cmd.Parameters.AddWithValue("@OpenDate", credit[i].DateOpened);
-                    cmd.Parameters.AddWithValue("@CurrentBalance", credit[i].Balance);
-                    cmd.Parameters.AddWithValue("@HighestBalance", credit[i].HighCredit);
-                    cmd.Parameters.AddWithValue("@MonthlyPayment", credit[i].MonthlyPayment);
-                    cmd.Parameters.AddWithValue("@LastReported", credit[i].LastReported);
+                    cmd.Parameters.AddWithValue("@MerchantName", string.IsNullOrEmpty(credit[i].Bank) ? "" : credit[i].Bank);
+                    cmd.Parameters.AddWithValue("@AccountId", string.IsNullOrEmpty(credit[i].Account) ? "" : credit[i].Account);
+                    cmd.Parameters.AddWithValue("@OpenDate", string.IsNullOrEmpty(credit[i].DateOpened) ? "" : credit[i].DateOpened );
+                    cmd.Parameters.AddWithValue("@CurrentBalance", string.IsNullOrEmpty(credit[i].Balance) ? "" : credit[i].Balance);
+                    cmd.Parameters.AddWithValue("@HighestBalance", string.IsNullOrEmpty(credit[i].HighCredit) ? "" : credit[i].HighCredit);
+                    cmd.Parameters.AddWithValue("@MonthlyPayment", string.IsNullOrEmpty(credit[i].MonthlyPayment) ? "" : credit[i].MonthlyPayment);
+                    cmd.Parameters.AddWithValue("@LastReported", string.IsNullOrEmpty(credit[i].LastReported) ? "" : credit[i].LastReported);
                     cmd.Parameters.AddWithValue("@CreatedBy", AgentId);
                     cmd.Parameters.AddWithValue("@negativeitems", (credit[i].PaymentStatus == "Coll/Chargeoff" ? 1 : credit[i].negativeitems));
                     cmd.Parameters.AddWithValue("@RoundType", round);
-                    cmd.Parameters.AddWithValue("@AccountType", credit[i].AccountType);
-                    cmd.Parameters.AddWithValue("@AccountTypeDetails", credit[i].AccountTypeDetail);
-                    //if (agency == "TRANSUNION")
-                    //{
-                    //    cmd.Parameters.AddWithValue("@Status", "Delinquent");
-                    //}
-                    //else
-                    //{
+                    cmd.Parameters.AddWithValue("@AccountType", string.IsNullOrEmpty(credit[i].AccountType) ? "" : credit[i].AccountType);
+                    cmd.Parameters.AddWithValue("@AccountTypeDetails", string.IsNullOrEmpty(credit[i].AccountTypeDetail) ? "" : credit[i].AccountTypeDetail);
                     cmd.Parameters.AddWithValue("@Status", credit[i].PaymentStatus);
-                    //  }
-                    //
-
-                    utils.ExecuteInsertCommand(cmd, true);
+                    long res = utils.ExecuteInsertCommand(cmd, true);
+                    if(res == 0)
+                    {
+                        string msg = "";
+                    }
                     status = true;
 
                 }
@@ -1038,10 +1055,10 @@ namespace CreditReversal.DAL
 
                     SqlCommand cmd = new SqlCommand();
                     cmd.Parameters.AddWithValue("@CreditReportId", id);
-                    cmd.Parameters.AddWithValue("@CreditorName", inquires[i].CreditorName);
-                    cmd.Parameters.AddWithValue("@TypeOfBusiness", inquires[i].TypeofBusiness);
-                    cmd.Parameters.AddWithValue("@DateOfInquiry", inquires[i].Dateofinquiry);
-                    cmd.Parameters.AddWithValue("@Agency", inquires[i].CreditBureau);
+                    cmd.Parameters.AddWithValue("@CreditorName", string.IsNullOrEmpty(inquires[i].CreditorName) ? "" : inquires[i].CreditorName);
+                    cmd.Parameters.AddWithValue("@TypeOfBusiness", string.IsNullOrEmpty(inquires[i].TypeofBusiness) ? "" : inquires[i].TypeofBusiness);
+                    cmd.Parameters.AddWithValue("@DateOfInquiry", string.IsNullOrEmpty(inquires[i].Dateofinquiry) ? "" : inquires[i].Dateofinquiry);
+                    cmd.Parameters.AddWithValue("@Agency", string.IsNullOrEmpty(inquires[i].CreditBureau) ? "" : inquires[i].CreditBureau);
                     cmd.Parameters.AddWithValue("@CreatedBy", AgentId);
                     cmd.Parameters.AddWithValue("@RoundType", round);
                     cmd.CommandText = sql;
@@ -1148,6 +1165,7 @@ namespace CreditReversal.DAL
                         {
                             CredRepItemsId = Convert.ToInt32(row["CredRepItemsId"].ToString()),
                             MerchantName = row["MerchantName"].ToString(),
+                            DispMerchantName = row["DispMerchantName"].ToString(),
                             AccountId = row["AccountId"].ToString(),
                             OpenDate = row["OpenDate"].ToString(),
                             CurrentBalance = row["CurrentBalance"].ToString(),

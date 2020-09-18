@@ -595,8 +595,8 @@ namespace CreditReversal.Controllers
                 creditreportAH = creditreport.Where(x => x.mode == "Account-").ToList();
                 ViewBag.creditreportfile = creditreportAH;
 
-                creditreportPR = creditreport.Where(x => x.mode == "PublicRe").ToList();
-                ViewBag.creditreportfilePR = creditreportPR;
+                //creditreportPR = creditreport.Where(x => x.mode == "PublicRe").ToList();
+                //ViewBag.creditreportfilePR = creditreportPR;
 
                 int AgentClientId = sessionData.GetAgentClientId();
                 Agent agent = new Agent();

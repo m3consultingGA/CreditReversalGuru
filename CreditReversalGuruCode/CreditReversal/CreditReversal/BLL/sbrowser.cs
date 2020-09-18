@@ -7,6 +7,7 @@ using System.Linq;
 using System.Web;
 using CreditReversal.Utilities;
 using CreditReversal.DAL;
+using System.Data.SqlClient;
 
 namespace CreditReversal.BLL
 {
@@ -54,22 +55,9 @@ namespace CreditReversal.BLL
                 html2 = html2.Replace(", \"", " , ");
                 var data = JsonConvert.DeserializeObject<dynamic>(html2);
                 browser.Close();
-                DBUtilities utilities = new DBUtilities();
-                SessionData sessionData = new SessionData();
-                try
-                {
-                    string jsondata = html2;
-                    jsondata = jsondata.Replace("'", "\"");
-                    string sql = "Insert into CreditReportData(ClientId,AgentId,JsonData) "
-                    + " Values( " + clientid + ", " + sessionData.GetUserID() + ",'" + jsondata + "')";
-                    utilities.ExecuteString(sql, true);
-                }
-                catch (Exception)
-                { }
 
-               // string html2 = System.IO.File.ReadAllText(@"E:\\CreditReportData09082020.txt");
-
-                ////need to comment
+                //need to comment
+                //string html2 = System.IO.File.ReadAllText(@"E:\\CreditReportData-Sep142020.txt");
                 //html2 = html2.Replace("JSON_CALLBACK(", "");
                 //html2 = html2.TrimEnd(')', ' ');
                 //html2 = html2.Replace("$", "dollar");
@@ -77,6 +65,24 @@ namespace CreditReversal.BLL
                 //html2 = html2.Replace("{ \"", " { ");
                 //html2 = html2.Replace("\" :", " : ");
                 //html2 = html2.Replace(", \"", " , ");
+
+                DBUtilities utilities = new DBUtilities();
+                SessionData sessionData = new SessionData();
+                try
+                {
+                    string jsondata = html2;
+                    jsondata = jsondata.Replace("'", "\"");
+                    string sql = "Insert into CreditReportData(ClientId,AgentId,JsonData) "
+                    + " Values(@ClientId,@AgentId,@JsonData)";
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.CommandText = sql;
+                    cmd.Parameters.AddWithValue("@ClientId", clientid);
+                    cmd.Parameters.AddWithValue("@AgentId", sessionData.GetUserID());
+                    cmd.Parameters.AddWithValue("@JsonData", jsondata);
+                    utilities.ExecuteInsertCommand(cmd, true);
+                }
+                catch (Exception)
+                { }
 
                 RootObject rootObj = JsonConvert.DeserializeObject<RootObject>(html2);
                 //TU  EQ  EXP

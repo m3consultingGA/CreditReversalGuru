@@ -7,6 +7,7 @@ using CreditReversal.DAL;
 using CreditReversal.Utilities;
 using System.Data;
 using System.Data.SqlClient;
+using Newtonsoft.Json;
 
 namespace CreditReversal.BLL
 {
@@ -465,8 +466,8 @@ namespace CreditReversal.BLL
 
             return ds;
         }
-        public string RefreshCreditReport(List<AccountHistory> credit, List<Inquires> inquires, 
-            List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string round = "",List<PublicRecord> publicRecords=null)
+        public string RefreshCreditReport(List<AccountHistory> credit, List<Inquires> inquires,
+            List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string round = "", List<PublicRecord> publicRecords = null)
         {
             string ReportId = "";
             //object res = 0;
@@ -490,8 +491,8 @@ namespace CreditReversal.BLL
             return ReportId;
         }
 
-        public string AddCreditReport(List<AccountHistory> credit, List<Inquires> inquires, 
-            List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string from = "",List<PublicRecord> publicRecords=null)
+        public string AddCreditReport(List<AccountHistory> credit, List<Inquires> inquires,
+            List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails, string clientId, string mode = "", string from = "", List<PublicRecord> publicRecords = null)
         {
             string ReportId = "";
             //object res = 0;
@@ -511,7 +512,7 @@ namespace CreditReversal.BLL
                 {
                     if (round[0] != "Third Round")
                     {
-                        ReportId = cd.AddCreditReport(credit, inquires, monthlyPayStatusHistoryDetails, clientId, mode,"", publicRecords);
+                        ReportId = cd.AddCreditReport(credit, inquires, monthlyPayStatusHistoryDetails, clientId, mode, "", publicRecords);
                         DBUtilities dBUtilities = new DBUtilities();
                         string sql = "UPDATE CreditReportData set CreditReportId=" + ReportId + " Where CreditReportId is null";
                         dBUtilities.ExecuteString(sql, true);
@@ -549,20 +550,20 @@ namespace CreditReversal.BLL
                     //   PrevNo = PrevNo + 3;
                     AccountType = "Education Deferment";
                 }
-                if(credit.AccountType.ToUpper() == "MEDICAL" )
+                if (credit.AccountType.ToUpper() == "MEDICAL")
                 {
                     decimal balamt = -1.00m;
                     string bal = creditReportItems.CurrentBalance;
                     var opendate = creditReportItems.OpenDate.MMDDYYStringToDateTime("MM/dd/yyyy");
                     var year = DateTime.Now.Year - opendate.Year;
                     bal = bal.Replace("$", "");
-                     balamt = Convert.ToDecimal(bal);
-                    if(balamt == 0 && year < 2)
+                    balamt = Convert.ToDecimal(bal);
+                    if (balamt == 0 && year < 2)
                     {
                         AccountType = "Medical Zero Balance";
-                   //     PrevNo = PrevNo + 3;
+                        //     PrevNo = PrevNo + 3;
                     }
-                    if(year >= 2)
+                    if (year >= 2)
                     {
                         AccountType = "Medical Outdated";
                         //  PrevNo = PrevNo + 5;
@@ -594,13 +595,14 @@ namespace CreditReversal.BLL
                 }
 
                 sql = "Insert Into CreditReportItemChallenges (CredRepItemsId,ChallengeText,Status,MerchantName,AccountId, "
-                    + " Agency,RoundType,sno,clientid,LoanStatus,PastDueDays) "
+                    + " Agency,RoundType,sno,clientid,LoanStatus,PastDueDays,DateOfInquiry) "
                     + " values(@CredRepItemsId,@ChallengeText,@Status,@MerchantName,@AccountId,@Agency,@RoundType,"
-                    + sno + "," + clientid + ",@LoanStatus,@PastDueDays)";
+                    + sno + "," + clientid + ",@LoanStatus,@PastDueDays,@DateOfInquiry)";
                 SqlCommand cmd = new SqlCommand();
                 cmd.CommandText = sql;
+                cmd.Parameters.AddWithValue("@DateOfInquiry", string.IsNullOrEmpty(creditReportItems.OpenDate) ? "" : creditReportItems.OpenDate);
                 cmd.Parameters.AddWithValue("@CredRepItemsId", credit.CredRepItemsId);
-                cmd.Parameters.AddWithValue("@LoanStatus", (credit.LoanStatus != null ? credit.LoanStatus : ""));
+                cmd.Parameters.AddWithValue("@LoanStatus", string.IsNullOrEmpty(credit.LoanStatus) ? "" : credit.LoanStatus);
                 cmd.Parameters.AddWithValue("@PastDueDays", credit.PastDueDays);
 
                 credit.Challenge = ChallengeText.ToString();
@@ -609,13 +611,12 @@ namespace CreditReversal.BLL
                     creditReportItems.RoundType = "Round-" + sno;
                 }
                 else if (sno > 1) { creditReportItems.RoundType = "Round-" + sno; }
-
-                cmd.Parameters.AddWithValue("@ChallengeText", credit.Challenge);
-                cmd.Parameters.AddWithValue("@Status", creditReportItems.Status);
-                cmd.Parameters.AddWithValue("@MerchantName", creditReportItems.MerchantName);
-                cmd.Parameters.AddWithValue("@AccountId", creditReportItems.AccountId);
-                cmd.Parameters.AddWithValue("@Agency", creditReportItems.Agency);
-                cmd.Parameters.AddWithValue("@RoundType", creditReportItems.RoundType);
+                cmd.Parameters.AddWithValue("@ChallengeText", string.IsNullOrEmpty(credit.Challenge) ? "" : credit.Challenge);
+                cmd.Parameters.AddWithValue("@Status", string.IsNullOrEmpty(creditReportItems.Status) ? "" : creditReportItems.Status);
+                cmd.Parameters.AddWithValue("@MerchantName", string.IsNullOrEmpty(creditReportItems.MerchantName) ? creditReportItems.DispMerchantName : creditReportItems.MerchantName);
+                cmd.Parameters.AddWithValue("@AccountId", string.IsNullOrEmpty(creditReportItems.AccountId) ? "" : creditReportItems.AccountId);
+                cmd.Parameters.AddWithValue("@Agency", string.IsNullOrEmpty(creditReportItems.Agency) ? "" : creditReportItems.Agency);
+                cmd.Parameters.AddWithValue("@RoundType", string.IsNullOrEmpty(creditReportItems.RoundType) ? "" : creditReportItems.RoundType);
 
                 utilities.ExecuteInsertCommand(cmd, true);
             }
@@ -677,15 +678,13 @@ namespace CreditReversal.BLL
                     publicRecord.RoundType = "Round-" + sno;
                 }
                 else if (sno > 1) { publicRecord.RoundType = "Round-" + sno; }
-
-
                 cmd.Parameters.AddWithValue("@PublicRecordId", publicRecord.PublicRecordId);
-                cmd.Parameters.AddWithValue("@ChallengeText", publicRecord.ChallengeText);
+                cmd.Parameters.AddWithValue("@ChallengeText", string.IsNullOrEmpty(publicRecord.ChallengeText) ? "" : publicRecord.ChallengeText);
                 cmd.Parameters.AddWithValue("@Status", "");
-                cmd.Parameters.AddWithValue("@MerchantName", cinquires.atcourtName);
-                cmd.Parameters.AddWithValue("@Agency", cinquires.atbureau);
+                cmd.Parameters.AddWithValue("@MerchantName", string.IsNullOrEmpty(cinquires.atcourtName) ? "" : cinquires.atcourtName);
+                cmd.Parameters.AddWithValue("@Agency", string.IsNullOrEmpty(cinquires.atbureau) ? "" : cinquires.atbureau);
                 cmd.Parameters.AddWithValue("@RoundType", publicRecord.RoundType);
-                cmd.Parameters.AddWithValue("@DateOfInquiry", cinquires.atdateFiled);
+                cmd.Parameters.AddWithValue("@DateOfInquiry", string.IsNullOrEmpty(cinquires.atdateFiled) ? "" : cinquires.atdateFiled);
                 utilities.ExecuteInsertCommand(cmd, true);
             }
             catch (Exception ex) { ex.insertTrace(""); }
@@ -705,8 +704,6 @@ namespace CreditReversal.BLL
                         prevno++;
                     }
                 }
-                //
-
                 string sql2 = "Select AccTypeId from AccountTypes where AccountType = '" + Inquires.AccountType + "'";
                 object AccountTypeId = utilities.ExecuteScalar(sql2, true);
                 if (AccountTypeId != null && sno != 0)
@@ -748,13 +745,13 @@ namespace CreditReversal.BLL
                 else if (sno > 1) { Inquires.RoundType = "Round-" + sno; }
 
 
-                cmd.Parameters.AddWithValue("@CreditInqId", Inquires.CreditInqId);
+                cmd.Parameters.AddWithValue("@CreditInqId", string.IsNullOrEmpty(Inquires.CreditInqId) ? "0" : Inquires.CreditInqId);
                 cmd.Parameters.AddWithValue("@ChallengeText", Inquires.ChallengeText);
                 cmd.Parameters.AddWithValue("@Status", "");
-                cmd.Parameters.AddWithValue("@MerchantName", cinquires.CreditorName);
-                cmd.Parameters.AddWithValue("@Agency", cinquires.CreditBureau);
+                cmd.Parameters.AddWithValue("@MerchantName", string.IsNullOrEmpty(cinquires.CreditorName) ? "" : cinquires.CreditorName);
+                cmd.Parameters.AddWithValue("@Agency", string.IsNullOrEmpty(cinquires.CreditBureau) ? "" : cinquires.CreditBureau);
                 cmd.Parameters.AddWithValue("@RoundType", Inquires.RoundType);
-                cmd.Parameters.AddWithValue("@DateOfInquiry", cinquires.Dateofinquiry);
+                cmd.Parameters.AddWithValue("@DateOfInquiry", string.IsNullOrEmpty(cinquires.Dateofinquiry) ? "" : cinquires.Dateofinquiry);
                 utilities.ExecuteInsertCommand(cmd, true);
             }
             catch (Exception ex) { ex.insertTrace(""); }
@@ -873,6 +870,510 @@ namespace CreditReversal.BLL
             }
             catch (Exception ex) { ex.insertTrace(""); }
             return agent;
+        }
+
+        public CreditReportData GetCreditReportItemsbyReading(IdentityIQInfo IdentityIQInfo)
+        {
+            List<AccountHistory> accountHistories = new List<AccountHistory>();
+            List<Inquires> inquires = new List<Inquires>();
+            List<PublicRecord> publicRecords = new List<PublicRecord>();
+            CreditReportData creditReportData = new CreditReportData();
+
+
+            try
+            {
+                sbrowser sb = new sbrowser();
+                //string username = "georgecole622@msn.com";
+                //string Password = "211665gc";
+                //string SecurityAnswer = "4344";
+                string username = IdentityIQInfo.UserName;
+                string Password = IdentityIQInfo.Password;
+                string SecurityAnswer = IdentityIQInfo.Answer;
+
+                CreditReport cr = sb.pullcredit(username, Password, SecurityAnswer, IdentityIQInfo.ClientId.ToString());
+
+
+                List<MonthlyPayStatus> monthlyPayStatusEQ = new List<MonthlyPayStatus>();
+                List<MonthlyPayStatus> monthlyPayStatusTU = new List<MonthlyPayStatus>();
+                List<MonthlyPayStatus> monthlyPayStatusEX = new List<MonthlyPayStatus>();
+                monthlyPayStatusEQ = cr.monthlyPayStatusEQ;
+                monthlyPayStatusEX = cr.monthlyPayStatusEX;
+                monthlyPayStatusTU = cr.monthlyPayStatusTU;
+
+
+
+                string date = "";
+                string[] strr;
+                string year = "";
+                string month = "";
+                string dat = "";
+                string FormatedDate = "";
+                try
+                {
+                    foreach (var ach in cr.TransUnion)
+                    {
+                        DateTime aDate = DateTime.Now;
+                        AccountHistory ah = new AccountHistory();
+                        ah.DispMerchantName = ah.Bank = ach.atcreditorName.Replace("&", " And ");
+
+                        if (ach.CollectionTrade != null)
+                        {
+                            ah.DispMerchantName = !string.IsNullOrEmpty(ach.CollectionTrade.atoriginalCreditor) ? (ach.atcreditorName
+                                 + " (Original Creditor: " + ach.CollectionTrade.atoriginalCreditor.Replace("&", " And ") + ")") : ach.atcreditorName;
+                        }
+                        ah.Bank = string.IsNullOrEmpty(ach.atcreditorName) ? ah.DispMerchantName : ach.atcreditorName.Replace("&", " And ");
+                        ah.Account = ach.ataccountNumber;
+                        ah.AccountStatus = ach.OpenClosed.atabbreviation;
+                        var remark = ach.Remark;
+                        if (remark != null)
+                        {
+                            try
+                            {
+                                try
+                                {
+                                    var data1 = JsonConvert.DeserializeObject<Remark>(remark.ToString());
+                                    if (data1 != null)
+                                    {
+                                        ah.AccountComments = data1.RemarkCode.atdescription;
+                                    }
+                                }
+                                catch (Exception)
+                                { }
+
+                                if (string.IsNullOrEmpty(ah.AccountComments))
+                                {
+                                    var data = JsonConvert.DeserializeObject<List<Remark>>(remark.ToString());
+                                    if (data != null)
+                                    {
+                                        string remDesc = string.Empty;
+                                        for (int i = 0; i < data.Count; i++)
+                                        {
+                                            if (string.IsNullOrEmpty(remDesc))
+                                            {
+                                                remDesc = data[i].RemarkCode.atdescription;
+                                            }
+                                            else
+                                            {
+                                                remDesc = remDesc + ", " + data[i].RemarkCode.atdescription;
+                                            }
+
+                                        }
+                                        ah.AccountComments = remDesc;
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            { }
+                        }
+                        ah.Agency = ach.atbureau;
+                        ah.AccountCondition = ach.AccountCondition.atdescription;
+                        try
+                        {
+                            ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
+                            ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+                        }
+                        catch (Exception)
+                        {
+                            ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
+                            ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
+                        }
+                        if (ah.AccountType == "Unknown")
+                        {
+                            ah.AccountType = ach.AccountCondition.atdescription;
+                            ah.AccountTypeDetail = ach.AccountCondition.atdescription;
+                        }
+                        //Date formating
+                        date = ach.atdateOpened;
+                        strr = date.Split('-');
+                        year = strr[0];
+                        month = strr[1];
+                        dat = strr[2];
+                        FormatedDate = month + "/" + dat + "/" + year;
+                        ah.DateOpened = FormatedDate;
+
+                        double balance = Convert.ToDouble(ach.atcurrentBalance);
+                        string bal = balance.DoubleToStringIfNotNull();
+                        ah.Balance = "$" + bal;
+
+                        double HighCredit = Convert.ToDouble(ach.athighBalance);
+                        string HighCre = HighCredit.DoubleToStringIfNotNull();
+                        ah.HighCredit = "$" + HighCre;
+
+                        GrantedTrade gt = ach.GrantedTrade;
+                        double MonthlyPayment = 0;
+                        if (gt != null)
+                        {
+                            MonthlyPayment = Convert.ToDouble(ach.GrantedTrade.atmonthlyPayment);
+                        }
+
+                        string MonthlyPay = MonthlyPayment.DoubleToStringIfNotNull();
+                        ah.MonthlyPayment = "$" + MonthlyPay;
+
+                        date = ach.atdateReported;
+                        strr = date.Split('-');
+                        year = strr[0];
+                        month = strr[1];
+                        dat = strr[2];
+                        FormatedDate = month + "/" + dat + "/" + year;
+                        ah.LastReported = FormatedDate;
+                        ah.PaymentStatus = ach.PayStatus.atdescription;
+                        var payStatus = monthlyPayStatusTU.FirstOrDefault(x => x.AccountNo == ach.ataccountNumber);
+                        ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
+                        accountHistories.Add(ah);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    string msg = ex.Message;
+                }
+                try
+                {
+                    foreach (var ach in cr.Experian)
+                    {
+                        string BankName = string.Empty;
+                        var trData = cr.TransUnion;
+                        if (trData.Count > 0)
+                        {
+                            var trBank = trData.FirstOrDefault(x => x.ataccountNumber.Trim() == ach.ataccountNumber.Trim());
+                            if (trBank != null)
+                            {
+                                if (!string.IsNullOrEmpty(trBank.atcreditorName))
+                                    BankName = trBank.atcreditorName.Replace("&", " And ");
+                                if (trBank.CollectionTrade != null)
+                                {
+                                    BankName = !string.IsNullOrEmpty(trBank.CollectionTrade.atoriginalCreditor) ? (trBank.atcreditorName
+                                    + " (Original Creditor: " + trBank.CollectionTrade.atoriginalCreditor.Replace("&", " And ") + ")") : trBank.atcreditorName;
+                                }
+                            }
+                        }
+                        DateTime aDate = DateTime.Now;
+                        AccountHistory ah = new AccountHistory();
+                        if (string.IsNullOrEmpty(BankName))
+                        {
+                            ah.DispMerchantName = ach.atcreditorName.Replace("&", " And ");
+                            if (ach.CollectionTrade != null)
+                            {
+                                ah.DispMerchantName = !string.IsNullOrEmpty(ach.CollectionTrade.atoriginalCreditor) ? (ach.atcreditorName
+                                 + " (Original Creditor: " + ach.CollectionTrade.atoriginalCreditor.Replace("&", " And ") + ")") : ach.atcreditorName;
+                            }
+                        }
+                        else
+                        {
+                            ah.DispMerchantName = BankName;
+                        }
+
+                        ah.Bank = string.IsNullOrEmpty(ach.atcreditorName) ? ah.DispMerchantName : ach.atcreditorName.Replace("&", " And ");
+                        ah.Account = ach.ataccountNumber;
+                        ah.AccountStatus = ach.OpenClosed.atabbreviation;
+                        var remark = ach.Remark;
+                        if (remark != null)
+                        {
+                            try
+                            {
+                                try
+                                {
+                                    var data1 = JsonConvert.DeserializeObject<Remark>(remark.ToString());
+                                    if (data1 != null)
+                                    {
+                                        ah.AccountComments = data1.RemarkCode.atdescription;
+                                    }
+                                }
+                                catch (Exception)
+                                { }
+
+                                if (string.IsNullOrEmpty(ah.AccountComments))
+                                {
+                                    var data = JsonConvert.DeserializeObject<List<Remark>>(remark.ToString());
+                                    if (data != null)
+                                    {
+                                        string remDesc = string.Empty;
+                                        for (int i = 0; i < data.Count; i++)
+                                        {
+                                            if (string.IsNullOrEmpty(remDesc))
+                                            {
+                                                remDesc = data[i].RemarkCode.atdescription;
+                                            }
+                                            else
+                                            {
+                                                remDesc = remDesc + ", " + data[i].RemarkCode.atdescription;
+                                            }
+
+                                        }
+                                        ah.AccountComments = remDesc;
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            { }
+                        }
+                        ah.AccountCondition = ach.AccountCondition.atdescription;
+                        ah.Agency = ach.atbureau;
+                        try
+                        {
+                            ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
+                            ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+                        }
+                        catch (Exception)
+                        {
+                            ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
+                            ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
+                        }
+                        if (ah.AccountType == "Unknown")
+                        {
+                            ah.AccountType = ach.AccountCondition.atdescription;
+                            ah.AccountTypeDetail = ach.AccountCondition.atdescription;
+                        }
+                        //Date formating
+                        date = ach.atdateOpened;
+                        strr = date.Split('-');
+                        year = strr[0];
+                        month = strr[1];
+                        dat = strr[2];
+                        FormatedDate = month + "/" + dat + "/" + year;
+                        ah.DateOpened = FormatedDate;
+
+                        double balance = Convert.ToDouble(ach.atcurrentBalance);
+                        string bal = balance.DoubleToStringIfNotNull();
+                        ah.Balance = "$" + bal;
+
+                        double HighCredit = Convert.ToDouble(ach.athighBalance);
+                        string HighCre = HighCredit.DoubleToStringIfNotNull();
+                        ah.HighCredit = "$" + HighCre;
+
+                        GrantedTrade gt = ach.GrantedTrade;
+                        double MonthlyPayment = 0;
+                        if (gt != null)
+                        {
+                            MonthlyPayment = Convert.ToDouble(ach.GrantedTrade.atmonthlyPayment);
+                        }
+                        string MonthlyPay = MonthlyPayment.DoubleToStringIfNotNull();
+                        ah.MonthlyPayment = "$" + MonthlyPay;
+
+                        date = ach.atdateReported;
+                        strr = date.Split('-');
+                        year = strr[0];
+                        month = strr[1];
+                        dat = strr[2];
+                        FormatedDate = month + "/" + dat + "/" + year;
+                        ah.LastReported = FormatedDate;
+                        ah.PaymentStatus = ach.PayStatus.atdescription;
+                        var payStatus = monthlyPayStatusEX.FirstOrDefault(x => x.AccountNo == ach.ataccountNumber);
+                        ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
+                        accountHistories.Add(ah);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+
+                    string msg = ex.Message;
+                }
+                try
+                {
+                    foreach (var ach in cr.Equifax)
+                    {
+                        string BankName = string.Empty;
+                        var trData = cr.TransUnion;
+                        if (trData.Count > 0)
+                        {
+                            var trBank = trData.FirstOrDefault(x => x.ataccountNumber.Trim() == ach.ataccountNumber.Trim());
+                            if (trBank != null)
+                            {
+                                if (!string.IsNullOrEmpty(trBank.atcreditorName))
+                                    BankName = trBank.atcreditorName.Replace("&", " And ");
+                                if (trBank.CollectionTrade != null)
+                                {
+                                    BankName = !string.IsNullOrEmpty(trBank.CollectionTrade.atoriginalCreditor) ? (trBank.atcreditorName
+                                   + " (Original Creditor: " + trBank.CollectionTrade.atoriginalCreditor.Replace("&", " And ") + ")") : trBank.atcreditorName;
+                                }
+                            }
+                        }
+                        if (string.IsNullOrEmpty(BankName))
+                        {
+                            var exData = cr.Experian;
+                            var exBank = exData.FirstOrDefault(x => x.ataccountNumber.Trim() == ach.ataccountNumber.Trim());
+                            if (exBank != null)
+                            {
+                                if (!string.IsNullOrEmpty(exBank.atcreditorName))
+                                    BankName = exBank.atcreditorName.Replace("&", " And ");
+                                if (exBank.CollectionTrade != null)
+                                {
+                                    BankName = !string.IsNullOrEmpty(exBank.CollectionTrade.atoriginalCreditor) ? (exBank.atcreditorName
+                                    + " (Original Creditor: " + exBank.CollectionTrade.atoriginalCreditor.Replace("&", " And ") + ")") : exBank.atcreditorName;
+                                }
+                            }
+                        }
+                        
+                        DateTime aDate = DateTime.Now;
+                        AccountHistory ah = new AccountHistory();
+                        if (string.IsNullOrEmpty(BankName))
+                        {
+                            ah.DispMerchantName = ach.atcreditorName.Replace("&", " And ");
+                            if (ach.CollectionTrade != null)
+                            {
+                                ah.DispMerchantName = !string.IsNullOrEmpty(ach.CollectionTrade.atoriginalCreditor) ? (ach.atcreditorName
+                                    + " (Original Creditor: " + ach.CollectionTrade.atoriginalCreditor.Replace("&", " And ") + ")") : ach.atcreditorName;
+                            }
+                        }
+                        else
+                        {
+                            ah.DispMerchantName = BankName;
+                        }
+                        ah.Bank = string.IsNullOrEmpty(ach.atcreditorName) ? ah.DispMerchantName : ach.atcreditorName.Replace("&", " And ");
+
+                        ah.Account = ach.ataccountNumber;
+                        ah.AccountStatus = ach.OpenClosed.atabbreviation;
+                        ah.AccountCondition = ach.AccountCondition.atdescription;
+                        var remark = ach.Remark;
+                        if (remark != null)
+                        {
+                            try
+                            {
+                                try
+                                {
+                                    var data1 = JsonConvert.DeserializeObject<Remark>(remark.ToString());
+                                    if (data1 != null)
+                                    {
+                                        ah.AccountComments = data1.RemarkCode.atdescription;
+                                    }
+                                }
+                                catch (Exception)
+                                {}
+
+                                if (string.IsNullOrEmpty(ah.AccountComments))
+                                {
+                                    var data = JsonConvert.DeserializeObject<List<Remark>>(remark.ToString());
+                                    if (data != null)
+                                    {
+                                        string remDesc = string.Empty;
+                                        for (int i = 0; i < data.Count; i++)
+                                        {
+                                            if (string.IsNullOrEmpty(remDesc))
+                                            {
+                                                remDesc = data[i].RemarkCode.atdescription;
+                                            }
+                                            else
+                                            {
+                                                remDesc = remDesc + ", " + data[i].RemarkCode.atdescription;
+                                            }
+
+                                        }
+                                        ah.AccountComments = remDesc;
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            { }
+                        }
+                        ah.Agency = ach.atbureau;
+                        try
+                        {
+                            ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
+                            ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+
+                        }
+                        catch (Exception)
+                        {
+                            ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
+                            ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
+                        }
+                        if (ah.AccountType == "Unknown")
+                        {
+                            ah.AccountType = ach.AccountCondition.atdescription;
+                            ah.AccountTypeDetail = ach.AccountCondition.atdescription;
+                        }
+                        //Date formating
+                        date = ach.atdateOpened;
+                        strr = date.Split('-');
+                        year = strr[0];
+                        month = strr[1];
+                        dat = strr[2];
+                        FormatedDate = month + "/" + dat + "/" + year;
+                        ah.DateOpened = FormatedDate;
+
+                        double balance = Convert.ToDouble(ach.atcurrentBalance);
+                        string bal = balance.DoubleToStringIfNotNull();
+                        ah.Balance = "$" + bal;
+
+                        double HighCredit = Convert.ToDouble(ach.athighBalance);
+                        string HighCre = HighCredit.DoubleToStringIfNotNull();
+                        ah.HighCredit = "$" + HighCre;
+
+                        GrantedTrade gt = ach.GrantedTrade;
+                        double MonthlyPayment = 0;
+                        if (gt != null)
+                        {
+                            MonthlyPayment = Convert.ToDouble(ach.GrantedTrade.atmonthlyPayment);
+                        }
+                        string MonthlyPay = MonthlyPayment.DoubleToStringIfNotNull();
+                        ah.MonthlyPayment = "$" + MonthlyPay;
+
+                        date = ach.atdateReported;
+                        strr = date.Split('-');
+
+                        year = strr[0];
+                        month = strr[1];
+                        dat = strr[2];
+                        FormatedDate = month + "/" + dat + "/" + year;
+                        ah.LastReported = FormatedDate;
+                        ah.PaymentStatus = ach.PayStatus.atdescription;
+                        var payStatus = monthlyPayStatusEQ.FirstOrDefault(x => x.AccountNo == ach.ataccountNumber);
+                        ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
+                        accountHistories.Add(ah);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    string msg = ex.Message;
+                }
+                try
+                {
+                    foreach (var ach in cr.inquiries)
+                    {
+
+                        Inquires inquires1 = new Inquires();
+                        inquires1.CreditBureau = ach.Inquiry.atbureau;
+                        inquires1.CreditorName = ach.Inquiry.atsubscriberName;
+                        inquires1.Dateofinquiry = ach.Inquiry.atinquiryDate;
+                        inquires1.TypeofBusiness = ach.Inquiry.IndustryCode.atabbreviation;
+                        inquires.Add(inquires1);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    string msg = ex.Message;
+                }
+                try
+                {
+                    foreach (var ach in cr.PublicRecords)
+                    {
+                        PublicRecord publicRecord = new PublicRecord();
+                        publicRecord.atcourtName = ach.atcourtName;
+                        publicRecord.AccountType = ach.Type.atdescription;
+                        publicRecord.atdateFiled = ach.atdateFiled;
+                        publicRecord.atbureau = ach.atbureau;
+                        publicRecords.Add(publicRecord);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    string msg = ex.Message;
+                }
+
+                creditReportData.AccHistory = accountHistories;
+                creditReportData.inquiryDetails = inquires;
+                creditReportData.monthlyPayStatusHistoryDetails = cr.monthlyPayStatusHistoryList;
+                creditReportData.PublicRecords = publicRecords;
+            }
+            catch (Exception ex)
+            {
+                string msg = ex.Message;
+            }
+            return creditReportData;
         }
     }
 }

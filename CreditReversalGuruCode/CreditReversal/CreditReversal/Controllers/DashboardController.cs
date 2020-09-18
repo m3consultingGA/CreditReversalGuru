@@ -18,6 +18,10 @@ namespace CreditReversal.Controllers
         private DashboardFunctions functions = new DashboardFunctions();
         ClientFunction cfunction = new ClientFunction();
         ClientData CData = new ClientData();
+        public JsonResult KeepSessionAlive()
+        {
+            return new JsonResult { Data = "Success" };
+        }
         // GET: Dashboard
         public ActionResult Index()
         {

@@ -3237,6 +3237,7 @@
     <Content Include="Views\Admin\ChallengeOrders.cshtml" />
     <Content Include="Views\Dashboard\AgentClients.cshtml" />
     <Content Include="Views\Client\ClientPRChallengeform.cshtml" />
+    <Content Include="Views\Home\Login.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

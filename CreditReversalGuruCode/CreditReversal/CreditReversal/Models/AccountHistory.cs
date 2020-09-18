@@ -43,5 +43,10 @@ namespace CreditReversal.Models
         public int negativeitems { get; set; }
         public string LoanStatus { get; set; }
         public string PastDueDays { get; set; }
+        public int isNegativeItem { get; set; }
+        public string ArgumentName { get; set; }
+        public string DispMerchantName { get; set; }
     }
+
+    
 }

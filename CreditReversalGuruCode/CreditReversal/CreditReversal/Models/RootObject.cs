@@ -1106,6 +1106,7 @@ namespace CreditReversal.Models
         public string atbureau { get; set; }
         public AccountCondition AccountCondition { get; set; }
         public AccountDesignator AccountDesignator { get; set; }
+        public CollectionTrade CollectionTrade { get; set; }
         public DisputeFlag DisputeFlag { get; set; }
         public GrantedTrade GrantedTrade { get; set; }
         public IndustryCode IndustryCode { get; set; }
@@ -1114,6 +1115,11 @@ namespace CreditReversal.Models
         public object Remark { get; set; }
         public Source Source { get; set; }
         public VerificationIndicator VerificationIndicator { get; set; }
+    }
+    public class CollectionTrade
+    {
+        public string atoriginalCreditor { get; set; }
+        
     }
 
     public class ChildModel

@@ -7,6 +7,7 @@ namespace CreditReversal.Models
 {
     public class CreditReportItems
     {
+        public string DispMerchantName { get; set; }
         public string LoanStatus { get; set; }
         public int PastDueDays { get; set; }
         public string ChallengeText { get; set; }

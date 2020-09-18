@@ -3,250 +3,85 @@
     ViewBag.Title = "Home";
     Layout = "~/Views/Shared/_PublicLayoutPage.cshtml";
 }
-<title>SignIn</title>
-<br class="xs-80" />
-<div class="account-wrapper">
-    <div class="account-body">
-        <h3>Welcome back to Credit Reversal Guru.</h3>
-        <h5>Please sign in to get access.</h5>
-        <form class="form account-form" method="POST" action="/Home/Index">
-            @*//TODO Changed Home page*@
-            <div class="form-group">
-                <label for="login-username" class="placeholder-hidden">Username</label>
-                <input type="text" class="form-control" id="login-username" name="UserName" placeholder="Username" tabindex="1" required>
-            </div> <!-- /.form-group -->
-            <div class="form-group">
-                <label for="login-password" class="placeholder-hidden">Password</label>
-                <input type="password" class="form-control" id="login-password" name="Password" placeholder="Password" tabindex="2" required>
-            </div> <!-- /.form-group -->
-            <div class="form-group clearfix">
-                <div class="pull-left">
-                    <label class="checkbox-inline">
-                        <input type="checkbox" class="checkbox" value="" tabindex="3"> <small>Remember me</small>
-                    </label>
+<div class="container">
+    <div style="padding-top:40px;">
+        <div class="portlet-body" style="padding-bottom:30px;font-size:14px;">
+            <div class="row">
+                <div class="col-md-12 text-center" style="padding:30px;">
+                    <h5>
+                        Credit Reversal Guru is offering<br />
+                        a home-based Business from the convenience<br />
+                        of your kitchen table!<br />
+
+                    </h5>
                 </div>
-                <div class="pull-right">
-                    <small><a data-toggle="modal" data-target="#EmailModal" style="cursor:pointer">Forgot Password?</a></small>
-                    @*<a data-toggle="modal" data-target="#EmailModal">Forgot Password?</a>*@
-                </div>
-
-            </div> <!-- /.form-group -->
-
-
-            <div class="form-group">
-                <button type="submit" id="btnsubmit" class="btn btn-primary btn-block btn-lg" tabindex="4">
-                    Sign in &nbsp; <i class="fa fa-play-circle"></i>
-                </button>
-            </div> <!-- /.form-group -->
-        </form>
-    </div> <!-- /.account-body -->
-    <div class="account-footer">
-        <p>
-            Don't have an agent account? &nbsp;
-            <a href="/Account/Signup" class="">Create an account!</a>
-        </p>
-    </div> <!-- /.account-footer -->
-</div>
-
-
-
-<div class="modal fade" id="EmailModal">
-    <div class="modal-dialog" style="padding-top:150px">
-        <div class="account-wrapper">
-            <div class="account-body">
-                <h3>Forget Password</h3>
-
-                <div class="form-group">
-                    @*<label for="signup-email" class="placeholder-hidden">Email Address</label>*@
-                    <input type="email" class="form-control" id="forgetemail" name="EmailAddress" placeholder="Your Email" tabindex="1" required>
-                    <label id="lblcheckemail"><span style="color:red">Please enter a valid Email Address</span></label><br />
-
-                    <label id="lblexixts"><span style="color:red"> Email Address Doesn't Exit </span></label>
-                </div>
-
-                <div class="form-group">
-                    <button type="submit" id="btnsubmitforget" class="btn btn-primary">
-                        Submit &nbsp; <i class="fa fa-play-circle"></i>
-                    </button>
-                </div>
-
             </div>
+            <div class="row" style="padding-left:40px;padding-top:10px;">
+                <div class="col-md-12 text-left">
+                    <p>
+                        : Arguments are automatically printed, stamped, and mailed to the Credit Bureaus.  So, what does this mean?<br />
+                    </p>
+                    <ul>
+                        <li>No Printer</li>
+                        <li>No Envelopes or Stamps</li>
+                        <li>No Mailing</li>
+                        <li>Paperless Process</li>
+                        <li>Turnkey start-up with minimal overhead cost</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row" style="padding-left:40px;padding-top:10px;">
+                <div class="col-md-12 text-left">
+                    <p>: No Credit Reports to read or understand</p>
+                    <p>: Easy uploading of secured verification documents</p>
+                    <p>: Just push the send button and your clients are on their restoration way!</p>
+                    <p>: 24/7 Access for clients to view their credit reports and results from your business portal</p>
+                    <p>: Your credit restoration business has never been easier</p>
+                    <p>: No experience needed…the software handles the operation for you!</p>
+                    <p>: Ongoing blogs for credit education</p>
+                    <p>: Allow access to our financial education library</p>
+                </div>
+            </div>
+            <div class="row" style="padding-left:40px;padding-top:10px;">
+                <div class="col-md-12 text-left">
+                    <p>
+                        We are Credit Reversal Guru, an elite credit restoration software company with 60 years of combined experience
+                        in the field of credit education, software development, and support.
+                    </p>
+                </div>
+            </div>
+            <div class="row" style="padding-left:40px;padding-top:10px;">
+                <div class="col-md-12 text-left">
+                    <p>
+                        CRG is the only company that have the software intelligence to help <strong>reverse negative tradelines</strong> to ‘paid as agreed zero balance.’
+                        Make no mistake, this will change the industry! Credit reversing is a new concept that only focuses on the FICO scoring system while considering the following factors:
+                    </p>
+                    Factor #1: By reversing negative trade lines to ‘paid as agreed,’ this increases the credit score by 35%.<br />
+
+                    Factor #2: By zeroing out the negative balance, this increases the credit score by 30%.<br />
+
+                    Factor #3: We strive to keep the account and not delete it…another 15%.<br />
+
+                    The last and a very important consideration by FICO, is the type of credit and balance and its worth 10% of the score.<br />
+
+                </div>
+            </div>
+            <div class="row" style="padding-left:40px;padding-top:10px;">
+                <div class="col-md-12 text-left">
+                    <p>
+                        Our job at Credit Reversal Guru is to offer an <strong>elite credit management and reporting software solution</strong> to assist in maximizing FICO scores. Let it be known that FICO and FICO alone controls 98% of the bank’s decision for all types of loans.
+                    </p>
+                </div>
+            </div>
+            <div class="row" style="padding-left:40px;padding-top:10px;">
+                <div class="col-md-12 text-left">
+                    <p>
+                        If you are new to the credit repair industry, our <strong>turnkey system</strong> makes it easy to launch your business in a matter of minutes! If you are a veteran to the industry, our software will <strong>streamline your daily process</strong> allowing you more time to focus on growing your business!  What are you waiting for…<strong>GET STARTED TODAY!</strong>
+                    </p>
+                </div>
+            </div>
+
         </div>
+
     </div>
-
 </div>
-
-
-
-<script src="/Scripts/jquery-1.11.1.js"></script>
-@*<script>
-    $(document).ready(function () {
-
-        $("#lblcheckemail").hide();
-        $("#lblexixts").hide();
-        debugger;
-        var msg =  '@TempData["LoginError"]';
-        if ( msg != '') {
-                Swal.fire("Warning",msg, "warning");
-        }
-
-    });
-   
-
-    $("#btnsubmit").on("click", function () {
-       
-        var email = $("#forgetemail").val();
-
-        if (email !== "") {
-            var reg = /^([A-Za-z0-9_\-\.])+\@@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-            if (reg.test(email) === false) {
-                $("#lblcheckemail").show();
-                $("#lblexixts").hide();
-                $("#forgetemail").val("");
-                return false;
-            }
-        }
-        var mode = 'email';
-        debugger;
-        $.ajax({
-            method: "POST",
-            url: "/Account/EmailExitOrNot",
-            dataType: "json",
-            data: { Email: email, Mode: mode},
-            success: function (data) {
-                debugger;
-                if (data == true) {
-                    Swal.fire({
-                        title: "Success!",
-                        text: "Your Password Sent to Email",
-                        type: 'success',
-
-                    }).then(function () {
-                        window.location.href = "/Account/SignIn";
-                    })
-
-                } else {
-                    $("#lblcheckemail").hide();
-                    $("#lblexixts").show();
-                }
-
-            }
-
-        });
-    });
-
-
-    
-
-</script>*@
-
-
-<script>
-    $(document).ready(function () {
-
-        $("#lblcheckemail").hide();
-        $("#lblexixts").hide();
-
-
-        debugger;
-        var CookieUsername = getCookie("username");
-        var Cookiepassword = getCookie("password");
-        var CookieRemember = getCookie("Rememberme");
-        if (CookieRemember == "checked")
-        {
-            $(".checkbox").prop("checked", true);
-            if (CookieUsername != "") {
-                $("#login-username").val(CookieUsername);
-            }
-            if (Cookiepassword != "") {
-                $("#login-password").val(Cookiepassword);
-            }
-        }
-        else
-        {
-            $(".checkbox").prop("checked", false);
-        }
-
-        var msg =  '@TempData["LoginError"]';
-        if ( msg != '') {
-                Swal.fire("Warning",msg, "warning");
-        }
-    });
-
-    $("#btnsubmit").on("click", function ()
-    {
-        if ($(".checkbox").prop("checked") == true) {
-            document.cookie = "Rememberme=" + "checked";
-            document.cookie = "username=" + $("#login-username").val();
-            document.cookie = "password=" + $("#login-password").val();
-        }
-        else if($(".checkbox").prop("checked") == false)
-        {
-            document.cookie = "Rememberme=" + "unchecked";
-        }
-
-
-    });
-
-    //get cookies data by names
-    function getCookie(cname) {
-        var name = cname + "=";
-        var decodedCookie = decodeURIComponent(document.cookie);
-        var ca = decodedCookie.split(';');
-        for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return "";
-    }
-
-
-    $("#btnsubmitforget").on("click", function () {
-
-        var email = $("#forgetemail").val();
-
-        if (email !== "") {
-            var reg = /^([A-Za-z0-9_\-\.])+\@@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-            if (reg.test(email) === false) {
-                $("#lblcheckemail").show();
-                $("#lblexixts").hide();
-                $("#forgetemail").val("");
-                return false;
-            }
-        }
-        var mode = 'email';
-        debugger;
-        $.ajax({
-            method: "POST",
-            url: "/Account/EmailExitOrNot",
-            dataType: "json",
-            data: { Email: email, Mode: mode },
-            success: function (data) {
-                debugger;
-                if (data == true) {
-                    Swal.fire({
-                        title: "Success!",
-                        text: "Your Password Sent to Email",
-                        type: 'success',
-
-                    }).then(function () {
-                        window.location.href = "/Home/Index"; //TODO Changed Home page
-                    })
-
-                } else {
-                    $("#lblcheckemail").hide();
-                    $("#lblexixts").show();
-                }
-
-            }
-
-        });
-    });
-
-
-</script>
