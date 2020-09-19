@@ -1,2 +1,7 @@
 CreditReversalGuruCode/CreditReversal/CreditReversal/bin/Release/Publish.zip
 *.zip
+*.config
+CreditReversalGuruCode/CreditReversal/.vs/CreditReversal/v16/.suo
+*.user
+*.user
+*.cache
