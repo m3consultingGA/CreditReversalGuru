@@ -17,6 +17,7 @@ namespace CreditReversal.Models
     }
     public class AccountHistory
     {
+        public string TradeLineName { get; set; }
         public string AccountComments { get; set; }
         public string AccountCondition { get; set; }
         public string ChallengeText { get; set; }

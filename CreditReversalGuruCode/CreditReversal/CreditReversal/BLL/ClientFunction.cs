@@ -550,25 +550,25 @@ namespace CreditReversal.BLL
                     //   PrevNo = PrevNo + 3;
                     AccountType = "Education Deferment";
                 }
-                if (credit.AccountType.ToUpper() == "MEDICAL")
-                {
-                    decimal balamt = -1.00m;
-                    string bal = creditReportItems.CurrentBalance;
-                    var opendate = creditReportItems.OpenDate.MMDDYYStringToDateTime("MM/dd/yyyy");
-                    var year = DateTime.Now.Year - opendate.Year;
-                    bal = bal.Replace("$", "");
-                    balamt = Convert.ToDecimal(bal);
-                    if (balamt == 0 && year < 2)
-                    {
-                        AccountType = "Medical Zero Balance";
-                        //     PrevNo = PrevNo + 3;
-                    }
-                    if (year >= 2)
-                    {
-                        AccountType = "Medical Outdated";
-                        //  PrevNo = PrevNo + 5;
-                    }
-                }
+                //if (credit.AccountType.ToUpper() == "MEDICAL")
+                //{
+                //    decimal balamt = -1.00m;
+                //    string bal = creditReportItems.CurrentBalance;
+                //    var opendate = creditReportItems.OpenDate.MMDDYYStringToDateTime("MM/dd/yyyy");
+                //    var year = DateTime.Now.Year - opendate.Year;
+                //    bal = bal.Replace("$", "");
+                //    balamt = Convert.ToDecimal(bal);
+                //    if (balamt == 0 && year < 2)
+                //    {
+                //        AccountType = "Medical Zero Balance";
+                //        //     PrevNo = PrevNo + 3;
+                //    }
+                //    if (year >= 2)
+                //    {
+                //        AccountType = "Medical Outdated";
+                //        //  PrevNo = PrevNo + 5;
+                //    }
+                //}
                 object ChallengeText = "";
                 string sql2 = "Select AccTypeId from AccountTypes where AccountType = '" + AccountType + "'";
                 object AccountTypeId = utilities.ExecuteScalar(sql2, true);
@@ -910,10 +910,11 @@ namespace CreditReversal.BLL
                 string FormatedDate = "";
                 try
                 {
-                    foreach (var ach in cr.TransUnion)
+                    foreach (var ach in cr.TransUnionParsed)
                     {
                         DateTime aDate = DateTime.Now;
                         AccountHistory ah = new AccountHistory();
+                        ah.TradeLineName = ach.commonName;
                         ah.DispMerchantName = ah.Bank = ach.atcreditorName.Replace("&", " And ");
 
                         if (ach.CollectionTrade != null)
@@ -1017,7 +1018,7 @@ namespace CreditReversal.BLL
                         FormatedDate = month + "/" + dat + "/" + year;
                         ah.LastReported = FormatedDate;
                         ah.PaymentStatus = ach.PayStatus.atdescription;
-                        var payStatus = monthlyPayStatusTU.FirstOrDefault(x => x.AccountNo == ach.ataccountNumber);
+                        var payStatus = monthlyPayStatusTU.FirstOrDefault(x => x.commonName == ach.commonName);
                         ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
                         accountHistories.Add(ah);
                     }
@@ -1029,13 +1030,13 @@ namespace CreditReversal.BLL
                 }
                 try
                 {
-                    foreach (var ach in cr.Experian)
+                    foreach (var ach in cr.ExperianParsed)
                     {
                         string BankName = string.Empty;
-                        var trData = cr.TransUnion;
+                        var trData = cr.TransUnionParsed;
                         if (trData.Count > 0)
                         {
-                            var trBank = trData.FirstOrDefault(x => x.ataccountNumber.Trim() == ach.ataccountNumber.Trim());
+                            var trBank = trData.FirstOrDefault(x => x.commonName.Trim() == ach.commonName.Trim());
                             if (trBank != null)
                             {
                                 if (!string.IsNullOrEmpty(trBank.atcreditorName))
@@ -1062,7 +1063,7 @@ namespace CreditReversal.BLL
                         {
                             ah.DispMerchantName = BankName;
                         }
-
+                        ah.TradeLineName = ach.commonName;
                         ah.Bank = string.IsNullOrEmpty(ach.atcreditorName) ? ah.DispMerchantName : ach.atcreditorName.Replace("&", " And ");
                         ah.Account = ach.ataccountNumber;
                         ah.AccountStatus = ach.OpenClosed.atabbreviation;
@@ -1158,7 +1159,7 @@ namespace CreditReversal.BLL
                         FormatedDate = month + "/" + dat + "/" + year;
                         ah.LastReported = FormatedDate;
                         ah.PaymentStatus = ach.PayStatus.atdescription;
-                        var payStatus = monthlyPayStatusEX.FirstOrDefault(x => x.AccountNo == ach.ataccountNumber);
+                        var payStatus = monthlyPayStatusEX.FirstOrDefault(x => x.commonName == ach.commonName);
                         ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
                         accountHistories.Add(ah);
                     }
@@ -1171,13 +1172,13 @@ namespace CreditReversal.BLL
                 }
                 try
                 {
-                    foreach (var ach in cr.Equifax)
+                    foreach (var ach in cr.EquifaxParsed)
                     {
                         string BankName = string.Empty;
-                        var trData = cr.TransUnion;
+                        var trData = cr.TransUnionParsed;
                         if (trData.Count > 0)
                         {
-                            var trBank = trData.FirstOrDefault(x => x.ataccountNumber.Trim() == ach.ataccountNumber.Trim());
+                            var trBank = trData.FirstOrDefault(x => x.commonName.Trim() == ach.commonName.Trim());
                             if (trBank != null)
                             {
                                 if (!string.IsNullOrEmpty(trBank.atcreditorName))
@@ -1191,8 +1192,8 @@ namespace CreditReversal.BLL
                         }
                         if (string.IsNullOrEmpty(BankName))
                         {
-                            var exData = cr.Experian;
-                            var exBank = exData.FirstOrDefault(x => x.ataccountNumber.Trim() == ach.ataccountNumber.Trim());
+                            var exData = cr.ExperianParsed;
+                            var exBank = exData.FirstOrDefault(x => x.commonName.Trim() == ach.commonName.Trim());
                             if (exBank != null)
                             {
                                 if (!string.IsNullOrEmpty(exBank.atcreditorName))
@@ -1220,6 +1221,7 @@ namespace CreditReversal.BLL
                         {
                             ah.DispMerchantName = BankName;
                         }
+                        ah.TradeLineName = ach.commonName;
                         ah.Bank = string.IsNullOrEmpty(ach.atcreditorName) ? ah.DispMerchantName : ach.atcreditorName.Replace("&", " And ");
 
                         ah.Account = ach.ataccountNumber;
@@ -1318,7 +1320,7 @@ namespace CreditReversal.BLL
                         FormatedDate = month + "/" + dat + "/" + year;
                         ah.LastReported = FormatedDate;
                         ah.PaymentStatus = ach.PayStatus.atdescription;
-                        var payStatus = monthlyPayStatusEQ.FirstOrDefault(x => x.AccountNo == ach.ataccountNumber);
+                        var payStatus = monthlyPayStatusEQ.FirstOrDefault(x => x.commonName == ach.commonName);
                         ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
                         accountHistories.Add(ah);
                     }

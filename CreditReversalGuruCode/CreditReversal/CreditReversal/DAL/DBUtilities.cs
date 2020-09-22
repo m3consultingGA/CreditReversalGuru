@@ -62,7 +62,29 @@ namespace CreditReversal.DAL
             return res;
         }
 
-
+        public DataSet GetDataSetSP(SqlCommand sqlCommand)
+        {
+            return GetDataSetSP(sqlCommand, true);
+        }
+        public DataSet GetDataSetSP(SqlCommand sqlCommand, bool closeFlag)
+        {
+            DataSet res = new DataSet();
+            try
+            {
+                if (sqlCon.State != ConnectionState.Open)
+                    OpenDB();
+                SqlDataAdapter da = new SqlDataAdapter(sqlCommand);
+                da.SelectCommand.Connection = sqlCon;
+                da.Fill(res);
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            finally
+            {
+                if (closeFlag)
+                    CloseDB();
+            }
+            return res;
+        }
         public DataTable GetDataTable(string sql)
         {
             return GetDataTable(sql, true);

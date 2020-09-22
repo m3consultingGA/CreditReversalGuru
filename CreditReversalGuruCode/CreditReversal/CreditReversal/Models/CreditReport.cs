@@ -15,6 +15,9 @@ namespace CreditReversal.Models
     
     public class CreditReport
     {
+        public List<TradeLineParsed> EquifaxParsed { get; set; }
+        public List<TradeLineParsed> ExperianParsed { get; set; }
+        public List<TradeLineParsed> TransUnionParsed { get; set; }
         public List<TradeLine> Equifax { get; set; }
         public List<TradeLine> Experian { get; set; }
         public List<TradeLine> TransUnion { get; set; }
@@ -27,6 +30,7 @@ namespace CreditReversal.Models
     }
     public class MonthlyPayStatusHistory
     {
+        public string commonName { get; set; }
         public string Agency { get; set; }
         public string Bank { get; set; }
         public string AccountNo { get; set; }
@@ -35,6 +39,7 @@ namespace CreditReversal.Models
     }
     public class MonthlyPayStatus
     {
+        public string commonName { get; set; }
         public string Agency { get; set; }
         public string Bank { get; set; }
         public string AccountNo { get; set; }

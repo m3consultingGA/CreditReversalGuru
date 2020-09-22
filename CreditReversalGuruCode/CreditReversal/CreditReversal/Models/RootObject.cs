@@ -1089,7 +1089,33 @@ namespace CreditReversal.Models
         public string atsymbol { get; set; }
         public string atrank { get; set; }
     }
-
+    public class TradeLineParsed
+    {
+        public CollectionTrade CollectionTrade { get; set; }
+        public string commonName { get; set; }
+        public string atsubscriberCode { get; set; }
+        public string athighBalance { get; set; }
+        public string atdateVerified { get; set; }
+        public string atdateReported { get; set; }
+        public string atdateOpened { get; set; }
+        public string ataccountNumber { get; set; }
+        public string atdateAccountStatus { get; set; }
+        public string atcurrentBalance { get; set; }
+        public string atcreditorName { get; set; }
+        public string atposition { get; set; }
+        public string atdateClosed { get; set; }
+        public string atbureau { get; set; }
+        public AccountCondition AccountCondition { get; set; }
+        public AccountDesignator AccountDesignator { get; set; }
+        public DisputeFlag DisputeFlag { get; set; }
+        public GrantedTrade GrantedTrade { get; set; }
+        public IndustryCode IndustryCode { get; set; }
+        public OpenClosed OpenClosed { get; set; }
+        public PayStatus PayStatus { get; set; }
+        public object Remark { get; set; }
+        public Source Source { get; set; }
+        public VerificationIndicator VerificationIndicator { get; set; }
+    }
     public class TradeLine
     {
         public string atsubscriberCode { get; set; }

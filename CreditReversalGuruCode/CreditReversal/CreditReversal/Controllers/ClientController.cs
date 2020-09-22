@@ -163,10 +163,11 @@ namespace CreditReversal.Controllers
                 }
                 if (checkIncInq)
                 {
-                    List<Inquires> Inquires = functions.GetCreditReportInquiresAgent(Convert.ToInt32(ClientId), null, role);
-                    ViewBag.Inquires = Inquires.Count == 0 ? null : Inquires;
+                    ViewBag.checkIncInq = "1";
                 }
 
+                List<Inquires> Inquires = functions.GetCreditReportInquiresAgent(Convert.ToInt32(ClientId), null, role);
+                ViewBag.Inquires = Inquires.Count == 0 ? null : Inquires;
                 List<PublicRecord> publicRecords = functions.GetCreditReportPublicRecordsAgent(Convert.ToInt32(ClientId), null, role);
                 ViewBag.PublicRecords =  publicRecords.Count == 0 ? null : publicRecords;
             }
@@ -860,7 +861,7 @@ stringWriter
                 IdentityIQInfo = IQfunction.CheckIdentityIQInfo(clientId);
                 CreditReportData tuple = GetCreditReportItemsbyReading(IdentityIQInfo);
 
-                if (tuple.AccHistory.Count > 0 && tuple.inquiryDetails.Count > 0)
+                if (tuple.AccHistory.Count > 0)
                 {
                     accountHistories = tuple.AccHistory;
                     inquires = tuple.inquiryDetails;
@@ -937,7 +938,7 @@ stringWriter
                     List<PublicRecord> publicRecords = new List<PublicRecord>();
                     CreditReportData tuple = GetCreditReportItemsbyReading(objidentity);
                     //string ds = "";
-                    if (tuple.AccHistory.Count > 0 && tuple.inquiryDetails.Count > 0)
+                    if (tuple.AccHistory.Count > 0)
                     {
                         accountHistories = tuple.AccHistory;
                         inquires = tuple.inquiryDetails;
@@ -1133,12 +1134,13 @@ stringWriter
             { string msg = ex.Message; }
             return Json(status);
         }
-        public JsonResult ClientChallengeform(List<CreditReportItems> credit, int Id, string[] values, List<PublicRecord> publicRecords)
+        public JsonResult ClientChallengeform(List<CreditReportItems> credit, int Id, string[] values, List<PublicRecord> publicRecords,
+            List<Inquires> inquires)
         {
             string status = "0";
             int sno = 0;
-
-            if (credit == null && publicRecords == null)
+            //return Json(status);
+            if (credit == null && publicRecords == null && inquires == null)
             {
                 return Json(status);
             }
@@ -1192,6 +1194,9 @@ stringWriter
                     List<CreditReportItems> EQCreditItems = credite.Where(x => x.Agency.ToUpper() == "EQUIFAX").ToList();
                     List<CreditReportItems> EXCreditItems = credite.Where(x => x.Agency.ToUpper() == "EXPERIAN").ToList();
                     List<CreditReportItems> TUCreditItems = credite.Where(x => x.Agency.ToUpper() == "TRANSUNION").ToList();
+
+                    
+
                     if(publicRecords != null)
                     { 
                     int res = ClientChallengePRform(publicRecords, Id, values);
@@ -1214,6 +1219,30 @@ stringWriter
                             TUCreditItems.AddRange(tuPR);
                         }
                     }
+                    }
+
+                    if (inquires != null)
+                    {
+                        int resInq = ClientChallengeInquiresform(inquires, Id, values);
+                        if (resInq > 0)
+                        {
+                            List<CreditReportItems> Inquires = functions.GetInquiriesChallengesAgentById(inquires, Id);
+                            List<CreditReportItems> eqINQ = Inquires.Where(x => x.Agency.ToUpper() == "EQUIFAX").ToList();
+                            List<CreditReportItems> exINQ = Inquires.Where(x => x.Agency.ToUpper() == "EXPERIAN").ToList();
+                            List<CreditReportItems> tuINQ = Inquires.Where(x => x.Agency.ToUpper() == "TRANSUNION").ToList();
+                            if (eqINQ.Count > 0)
+                            {
+                                EQCreditItems.AddRange(eqINQ);
+                            }
+                            if (exINQ.Count > 0)
+                            {
+                                EXCreditItems.AddRange(exINQ);
+                            }
+                            if (tuINQ.Count > 0)
+                            {
+                                TUCreditItems.AddRange(tuINQ);
+                            }
+                        }
                     }
                     string file1 = "", file2 = "", file3 = "";
                     if (EQCreditItems.Count > 0)
@@ -1623,14 +1652,12 @@ stringWriter
             { }
             return res;
         }
-        public JsonResult ClientChallengeInquiresform(List<Inquires> credit, int Id, string[] values)
+        public int ClientChallengeInquiresform(List<Inquires> credit, int Id, string[] values)
         {
-
+            int res = 0;
             string client = Id.ToString();
             ClientModel clientModel = cfunction.GetClient(client);
             int sno = 0;
-
-            string status = "";
             int count = 0;
             if (credit != null)
             {
@@ -1648,77 +1675,121 @@ stringWriter
                     for (i = 0; i < count; i++)
                     {
                         cfunction.AddReportItemInquiriesChallenges(credit[i], "", sno, Id);
-                        dynamic model = new ExpandoObject();
-                        string AgentId = sessionData.GetAgentId();
-                        string staffId = sessionData.GetStaffId();
-                        string fullname = "";
-
-                        cfunction.AddInquiresChallenge(credit[i], AgentId, staffId);
-                        ViewBag.CreditReportItems = credit[i];
-
-                        model.clientcredit = credit[i];
-
-                        if (Session["Name"] != null)
-                        {
-                            fullname = Session["Name"].ToString();
-                        }
-                        var names = fullname.Split(' ');
-                        string name = names[0];
-                        int clientid = Id;
-                        string Report = credit[i].CreditInqId;
-
+                        //string AgentId = sessionData.GetAgentId();
+                        //string staffId = sessionData.GetStaffId();
+                        //cfunction.AddInquiresChallenge(credit[i], AgentId, staffId);
+                        //ViewBag.CreditReportItems = credit[i];
                     }
                 }
-                List<Inquires> Inquires = functions.GetInquiriesChallengesAgentById(credit, Id);
+                //List<Inquires> Inquires = functions.GetInquiriesChallengesAgentById(credit, Id);
+                //List<Inquires> eqInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EQUIFAX").ToList();
+                //List<Inquires> exInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EXPERIAN").ToList();
+                //List<Inquires> tuInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "TRANSUNION").ToList();
 
-                List<Inquires> eqInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EQUIFAX").ToList();
-                List<Inquires> exInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EXPERIAN").ToList();
-                List<Inquires> tuInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "TRANSUNION").ToList();
-
-                string file1 = "", file2 = "", file3 = "";
-                if (eqInquires.Count > 0)
-                {
-                    file1 = CreateChallengeLettersForInq(eqInquires, Id, values, clientModel, sno);
-                }
-                if (exInquires.Count > 0)
-                {
-                    file2 = CreateChallengeLettersForInq(exInquires, Id, values, clientModel, sno);
-                }
-                if (tuInquires.Count > 0)
-                {
-                    file3 = CreateChallengeLettersForInq(tuInquires, Id, values, clientModel, sno);
-                }
-
-
-                if (string.IsNullOrEmpty(file1) && string.IsNullOrEmpty(file2) && string.IsNullOrEmpty(file3))
-                {
-                    status = "1";
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(file1))
-                    {
-                        status = file1;
-                    }
-                    if (!string.IsNullOrEmpty(file2))
-                    {
-                        status = status + "^" + file2;
-                    }
-                    if (!string.IsNullOrEmpty(file3))
-                    {
-                        status = status + "^" + file3;
-                    }
-                    status = status.TrimStart('^'); status = status.TrimEnd('^');
-                }
-
-
+                res = 1;
             }
             catch (Exception ex)
             {
-                status = "0";
+                res = 0;
             }
-            return Json(status);
+            return res;
         }
+        //public JsonResult ClientChallengeInquiresform(List<Inquires> credit, int Id, string[] values)
+        //{
+
+        //    string client = Id.ToString();
+        //    ClientModel clientModel = cfunction.GetClient(client);
+        //    int sno = 0;
+
+        //    string status = "";
+        //    int count = 0;
+        //    if (credit != null)
+        //    {
+        //        count = credit.Count();
+        //    }
+        //    int i = 0;
+
+        //    try
+        //    {
+        //        ClientData cd = new ClientData();
+
+        //        if (credit != null)
+        //        {
+        //            sno = cd.getsnofromitems(Id.ToString(), credit[0].RoundType, "INQ");
+        //            for (i = 0; i < count; i++)
+        //            {
+        //                cfunction.AddReportItemInquiriesChallenges(credit[i], "", sno, Id);
+        //                dynamic model = new ExpandoObject();
+        //                string AgentId = sessionData.GetAgentId();
+        //                string staffId = sessionData.GetStaffId();
+        //                string fullname = "";
+
+        //                cfunction.AddInquiresChallenge(credit[i], AgentId, staffId);
+        //                ViewBag.CreditReportItems = credit[i];
+
+        //                model.clientcredit = credit[i];
+
+        //                if (Session["Name"] != null)
+        //                {
+        //                    fullname = Session["Name"].ToString();
+        //                }
+        //                var names = fullname.Split(' ');
+        //                string name = names[0];
+        //                int clientid = Id;
+        //                string Report = credit[i].CreditInqId;
+
+        //            }
+        //        }
+        //        List<Inquires> Inquires = functions.GetInquiriesChallengesAgentById(credit, Id);
+
+        //        List<Inquires> eqInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EQUIFAX").ToList();
+        //        List<Inquires> exInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "EXPERIAN").ToList();
+        //        List<Inquires> tuInquires = Inquires.Where(x => x.CreditBureau.ToUpper() == "TRANSUNION").ToList();
+
+        //        string file1 = "", file2 = "", file3 = "";
+        //        if (eqInquires.Count > 0)
+        //        {
+        //            file1 = CreateChallengeLettersForInq(eqInquires, Id, values, clientModel, sno);
+        //        }
+        //        if (exInquires.Count > 0)
+        //        {
+        //            file2 = CreateChallengeLettersForInq(exInquires, Id, values, clientModel, sno);
+        //        }
+        //        if (tuInquires.Count > 0)
+        //        {
+        //            file3 = CreateChallengeLettersForInq(tuInquires, Id, values, clientModel, sno);
+        //        }
+
+
+        //        if (string.IsNullOrEmpty(file1) && string.IsNullOrEmpty(file2) && string.IsNullOrEmpty(file3))
+        //        {
+        //            status = "1";
+        //        }
+        //        else
+        //        {
+        //            if (!string.IsNullOrEmpty(file1))
+        //            {
+        //                status = file1;
+        //            }
+        //            if (!string.IsNullOrEmpty(file2))
+        //            {
+        //                status = status + "^" + file2;
+        //            }
+        //            if (!string.IsNullOrEmpty(file3))
+        //            {
+        //                status = status + "^" + file3;
+        //            }
+        //            status = status.TrimStart('^'); status = status.TrimEnd('^');
+        //        }
+
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        status = "0";
+        //    }
+        //    return Json(status);
+        //}
 
         public string CreateChallengeLettersForInq(List<Inquires> Inquires, int Id, string[] values, ClientModel clientModel, int sno)
         {

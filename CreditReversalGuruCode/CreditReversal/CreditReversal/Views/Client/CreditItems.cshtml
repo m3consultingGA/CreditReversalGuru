@@ -4,7 +4,7 @@
 
     ViewBag.Title = "Credit Items";
     Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
-    string from = null, role = null;
+    string from = null, role = null; string dispInq = "";
     if (Request["from"] != null)
     {
         from = "db";
@@ -12,6 +12,10 @@
     if (Session["UserRole"] != null)
     {
         role = Session["UserRole"].ToString();
+    }
+    if (ViewBag.checkIncInq == null)
+    {
+        dispInq = "disabled";
     }
 }
 <style>
@@ -70,6 +74,7 @@
 {
     <input type="hidden" id="hdnCreditRepItemId" value="@ViewBag.CreditRepItemId" />
 }
+<input type="hidden" id="hdncheckIncInq" value="@ViewBag.checkIncInq" />
 <div class="page-header">
     <h3 class="page-title">Credit Items</h3>
     <div style="padding-bottom:10px;">
@@ -365,17 +370,17 @@
                                                                 }
 
                                                             </td>
-                                                                    }
+                                                        }
 
 
-                                                                    //EXPERIAN challenge text dropdown
-                                                                    if (strEXValue == "" || strEXValue == "-")
-                                                                    {
+                                                        //EXPERIAN challenge text dropdown
+                                                        if (strEXValue == "" || strEXValue == "-")
+                                                        {
                                                             <td></td>
-                                                                    }
-                                                                    else if (strEXValue == "" || strEXValue == "0")
-                                                                    {
-                                                                        string roundex = "Round-1";
+                                                        }
+                                                        else if (strEXValue == "" || strEXValue == "0")
+                                                        {
+                                                            string roundex = "Round-1";
                                                             <td>
                                                                 <div class="input-group">
                                                                     <span class="input-group-addon btn btn-default" id="sizing-addon1">
@@ -390,9 +395,9 @@
 
 
                                                             </td>
-                                                                    }
-                                                                    else if (!string.IsNullOrEmpty(@strEXValue))
-                                                                    {
+                                                        }
+                                                        else if (!string.IsNullOrEmpty(@strEXValue))
+                                                        {
                                                             <td>
                                                                 @{
                                                                     string challengetextEX = @strEXValue;
@@ -426,16 +431,16 @@
                                                                     </div>
                                                                 }
                                                             </td>
-                                                                    }
+                                                        }
 
-                                                                    //EQUIFAX challenge text dropdown
-                                                                    if (strEQValue == "" || strEQValue == "-")
-                                                                    {
+                                                        //EQUIFAX challenge text dropdown
+                                                        if (strEQValue == "" || strEQValue == "-")
+                                                        {
                                                             <td></td>
-                                                                    }
-                                                                    else if (strEQValue == "" || strEQValue == "0")
-                                                                    {
-                                                                        string roundeq = "Round-1";
+                                                        }
+                                                        else if (strEQValue == "" || strEQValue == "0")
+                                                        {
+                                                            string roundeq = "Round-1";
                                                             <td>
 
                                                                 <div class="input-group">
@@ -444,17 +449,17 @@
                                                                         <label id="lblroundEQnew_@j" style="font-size:12px;">@roundeq</label>
                                                                     </span>
                                                                     @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
-                                            aria-describedby="sizing-addon1" id="txtAccountTypeEQ_@j" onkeydown="AutoFillAccountTypeEQ(@j)"
-                                            name="txtAccountTypeEQ_@j" style="height:43px;">*@
+                                                                        aria-describedby="sizing-addon1" id="txtAccountTypeEQ_@j" onkeydown="AutoFillAccountTypeEQ(@j)"
+                                                                        name="txtAccountTypeEQ_@j" style="height:43px;">*@
 
                                                                     <textarea class="form-control custom-control" style="resize:both;" rows="2" id="txtAccountTypeEQ_@j" onkeydown="AutoFillAccountTypeEQ(@j)"
                                                                               name="txtAccountTypeEQ_@j" placeholder="Select account type or enter own challenge text">@strEQValue1</textarea>
                                                                     <label id="lblChallengeTextEQ_@j"></label>
                                                                 </div>
                                                             </td>
-                                                                    }
-                                                                    else if (!string.IsNullOrEmpty(@strEQValue))
-                                                                    {
+                                                        }
+                                                        else if (!string.IsNullOrEmpty(@strEQValue))
+                                                        {
                                                             <td>
                                                                 @{
                                                                     string challengetextEQ = @strEQValue;
@@ -480,8 +485,8 @@
                                                                             <label id="lblroundEQ_@j" hidden>@strEQ[0]-@strEQ[1]</label>
                                                                         </span>
                                                                         @*<input type="text" id="txtAccountTypeEQ_@j" class="form-control" aria-describedby="sizing-addon1"
-                                                placeholder="Select account type or enter own challenge text" name="txtAccountTypeEQ_@j"
-                                                onkeydown="AutoFillAccountTypeEQ(@j);" style="height:43px;" />*@
+                                                                            placeholder="Select account type or enter own challenge text" name="txtAccountTypeEQ_@j"
+                                                                            onkeydown="AutoFillAccountTypeEQ(@j);" style="height:43px;" />*@
 
                                                                         <textarea style="resize:both;" class="form-control custom-control" rows="2" id="txtAccountTypeEQ_@j" onkeydown="AutoFillAccountTypeEQ(@j)"
                                                                                   name="txtAccountTypeEQ_@j" placeholder="Select account type or enter own challenge text">@strEQValue1</textarea>
@@ -489,150 +494,140 @@
                                                                     </div>
                                                                 }
                                                             </td>
-                                                                            }
-                                                                        }
+                                                        }
+                                                    }
 
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        if (item.Heading != "CreditreportId")
-                                                                        {
+                                                }
+                                                else
+                                                {
+                                                    if (item.Heading != "CreditreportId")
+                                                    {
 
-                                                                            string[] str = null;
+                                                        string[] str = null;
 
-                                                                            string negativeitemTU = "0";
-                                                                            string negativeitemEX = "0";
-                                                                            string negativeitemEQ = "0";
+                                                        string negativeitemTU = "0";
+                                                        string negativeitemEX = "0";
+                                                        string negativeitemEQ = "0";
 
-                                                                            string statusTU = item.TRANSUNION;
-                                                                            string statusEX = item.EXPERIAN;
-                                                                            string statusEQ = item.EQUIFAX;
-                                                                            if (i == 11)
-                                                                            {
+                                                        string statusTU = item.TRANSUNION;
+                                                        string statusEX = item.EXPERIAN;
+                                                        string statusEQ = item.EQUIFAX;
+                                                        if (i == 11)
+                                                        {
 
-                                                                                if (item.TRANSUNION != "-")
-                                                                                {
-                                                                                    if (item.TRANSUNION.Contains("~"))
-                                                                                    {
-                                                                                        str = item.TRANSUNION.Split('~');
-                                                                                        string late = string.Empty;
-                                                                                        late = string.IsNullOrEmpty(str[2]) ? "" : " ( " + str[2] + " ) ";
-                                                                                        statusTU = str[0] + late;
-                                                                                        negativeitemTU = str[1];
-                                                                                    }
-                                                                                    else
-                                                                                    {
-                                                                                        statusTU = item.TRANSUNION;
-                                                                                    }
+                                                            if (item.TRANSUNION != "-")
+                                                            {
+                                                                if (item.TRANSUNION.Contains("~"))
+                                                                {
+                                                                    str = item.TRANSUNION.Split('~');
+                                                                    string late = string.Empty;
+                                                                    late = string.IsNullOrEmpty(str[2]) ? "" : " ( " + str[2] + " ) ";
+                                                                    statusTU = str[0] + late;
+                                                                    negativeitemTU = str[1];
+                                                                }
+                                                                else
+                                                                {
+                                                                    statusTU = item.TRANSUNION;
+                                                                }
 
-                                                                                }
+                                                            }
 
-                                                                                if (item.EXPERIAN != "-")
-                                                                                {
-                                                                                    if (item.EXPERIAN.Contains("~"))
-                                                                                    {
-                                                                                        str = item.EXPERIAN.Split('~');
-                                                                                        string late = string.Empty;
-                                                                                        late = string.IsNullOrEmpty(str[2]) ? "" : " ( " + str[2] + " ) ";
-                                                                                        statusEX = str[0] + late;
-                                                                                        negativeitemEX = str[1];
-                                                                                    }
-                                                                                    else
-                                                                                    {
-                                                                                        statusEX = item.EXPERIAN;
-                                                                                    }
-                                                                                }
+                                                            if (item.EXPERIAN != "-")
+                                                            {
+                                                                if (item.EXPERIAN.Contains("~"))
+                                                                {
+                                                                    str = item.EXPERIAN.Split('~');
+                                                                    string late = string.Empty;
+                                                                    late = string.IsNullOrEmpty(str[2]) ? "" : " ( " + str[2] + " ) ";
+                                                                    statusEX = str[0] + late;
+                                                                    negativeitemEX = str[1];
+                                                                }
+                                                                else
+                                                                {
+                                                                    statusEX = item.EXPERIAN;
+                                                                }
+                                                            }
 
-                                                                                if (item.EQUIFAX != "-")
-                                                                                {
-                                                                                    if (item.EQUIFAX.Contains("~"))
-                                                                                    {
-                                                                                        str = item.EQUIFAX.Split('~');
-                                                                                        string late = string.Empty;
-                                                                                        late = string.IsNullOrEmpty(str[2]) ? "" : " ( " + str[2] + " ) ";
-                                                                                        statusEQ = str[0] + late;
-                                                                                        negativeitemEQ = str[1];
-                                                                                    }
-                                                                                    else
-                                                                                    {
-                                                                                        statusEQ = item.EQUIFAX;
-                                                                                    }
-                                                                                }
+                                                            if (item.EQUIFAX != "-")
+                                                            {
+                                                                if (item.EQUIFAX.Contains("~"))
+                                                                {
+                                                                    str = item.EQUIFAX.Split('~');
+                                                                    string late = string.Empty;
+                                                                    late = string.IsNullOrEmpty(str[2]) ? "" : " ( " + str[2] + " ) ";
+                                                                    statusEQ = str[0] + late;
+                                                                    negativeitemEQ = str[1];
+                                                                }
+                                                                else
+                                                                {
+                                                                    statusEQ = item.EQUIFAX;
+                                                                }
+                                                            }
 
-                                                                            }
+                                                        }
 
-                                                                            //showing Late 30 Days challenge text in red background
-                                                                            if (statusTU.ToUpper().Contains("30 DAYS") && i == 11)
-                                                                            {
+                                                        //showing Late 30 Days challenge text in red background
+                                                        if (statusTU.ToUpper().Contains("30 DAYS") && i == 11)
+                                                        {
                                                             <td style="background-color:red;color:white">@statusTU</td>
-                                                                            }
-                                                                            else
-                                                                            {
+                                                        }
+                                                        else
+                                                        {
                                                             <td>@statusTU</td>
-                                                                            }
-                                                                            if (statusEX.ToUpper().Contains("30 DAYS") && i == 11)
-                                                                            {
+                                                        }
+                                                        if (statusEX.ToUpper().Contains("30 DAYS") && i == 11)
+                                                        {
                                                             <td style="background-color:red;color:white">@statusEX</td>
-                                                                            }
-                                                                            else
-                                                                            {
+                                                        }
+                                                        else
+                                                        {
                                                             <td>@statusEX</td>
-                                                                            }
-                                                                            if (statusEQ.ToUpper().Contains("30 DAYS") && i == 11)
-                                                                            {
+                                                        }
+                                                        if (statusEQ.ToUpper().Contains("30 DAYS") && i == 11)
+                                                        {
                                                             <td style="background-color:red;color:white">@statusEQ</td>
-                                                                            }
-                                                                            else
-                                                                            {
+                                                        }
+                                                        else
+                                                        {
                                                             <td>@statusEQ</td>
-                                                                                }
+                                                        }
 
-                                                                            }
-
-
-                                                                        }
+                                                    }
 
 
-                                                                    }
+                                                }
+
+
+                                            }
                                         </tr>
 
-                                                                    i++;
-                                                                    j++;
-                                                                    if (i == 14)
-                                                                    {
+                                        i++;
+                                        j++;
+                                        if (i == 14)
+                                        {
                                             <lable id="hdnEXPECreditRepItemId_@j" hidden>@item.EXPERIAN</lable>
                                             <lable id="hdnEQUICreditRepItemId_@j" hidden>@item.EQUIFAX</lable>
                                             <lable id="hdnTRANSCreditRepItemId_@j" hidden>@item.TRANSUNION</lable>
-                                                                    }
+                                        }
 
-                                                                    if (i == 14)
-                                                                    {
+                                        if (i == 14)
+                                        {
                                             <tr>
                                                 <td> </td>
                                                 <td> </td>
                                                 <td> </td>
                                                 <td> </td>
                                             </tr>
-                                                                                i = 0;
-                                                                            }
+                                            i = 0;
+                                        }
 
-                                                                        }
-
-
-
-                                                                    }
-                                @if (ViewBag.PublicRecords == null) { 
-                                    if (role.ToUpper() != "CLIENT")
-                                    {
-                                        <tr>
-                                            <td> </td>
-                                            <td> </td>
-                                            <td> </td>
-                                            <td> <button class="btn btn-secondary pull-right" id="AddChallenge1">Create Challenge for Negative Items</button></td>
-                                        </tr>
-                                            }
                                     }
-                                </tbody>
+
+
+
+                                }
+                              
+                            </tbody>
 
                         </table>
                         <div>
@@ -646,8 +641,8 @@
                 {
 
                     @*<div class="row" style="padding-bottom:12px;">
-                        <span class="pull-left"><h5>Public Records</h5></span>
-                    </div>*@
+                            <span class="pull-left"><h5>Public Records</h5></span>
+                        </div>*@
 
                     <div class="row">
                         <div class="table-responsive">
@@ -894,15 +889,15 @@
 
                                         }
                                     }
-                                    @if (role.ToUpper() != "CLIENT")
-                                    {
-                                        <tr>
-                                            <td> </td>
-                                            <td> </td>
-                                            <td> </td>
-                                            <td>  <button class="btn btn-secondary pull-right" id="AddChallenge1">Create Challenge for Negative Items</button></td>
-                                        </tr>
-                                    }
+                                    @*@if (role.ToUpper() != "CLIENT")
+                                        {
+                                            <tr>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td>  <button class="btn btn-secondary pull-right" id="AddChallenge1">Create Challenge for Negative Items</button></td>
+                                            </tr>
+                                        }*@
                                 </tbody>
 
                             </table>
@@ -914,22 +909,22 @@
                 @if (ViewBag.Inquires != null)
                 {
 
-                    <div class="row" style="padding-bottom:12px;">
-                        <span class="pull-left"><h5>Inquiries</h5></span>
-                        @if (role.ToUpper() != "CLIENT")
-                        {
-                            <span class="pull-right">
-                                <button class="btn btn-secondary" id="AddInquiriesChallenge">Create Challenge for Inquiries</button>
-                            </span>
-                        }
-                    </div>
+                    @*<div class="row" style="padding-bottom:12px;">
+                            <span class="pull-left"><h5>Inquiries</h5></span>
+                            @if (role.ToUpper() != "CLIENT")
+                            {
+                                <span class="pull-right">
+                                    <button class="btn btn-secondary" id="AddInquiriesChallenge">Create Challenge for Inquiries</button>
+                                </span>
+                            }
+                        </div>*@
 
                     <div class="row">
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th width="20%"></th>
+                                        <th width="20%"><strong>Inquiries</strong> </th>
                                         @*<th width="23%" style="text-align:center;background-color:#DAB96A;color:#fff;">TransUnion</th>
                                             <th width="23%" style="text-align:center;background-color:#98BDC5;color:#fff;">Experian</th>
                                             <th width="23%" style="text-align:center;background-color:#CBD06C;color:#fff;">Equifax</th>*@
@@ -987,12 +982,12 @@
                                                                 <td>
                                                                     <div class="input-group">
                                                                         <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" checked>
+                                                                            <input @dispInq type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" checked>
                                                                             <label id="lblroundITUnew_@j" style="font-size:12px;">@roundtu</label>
                                                                         </span>
 
 
-                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
+                                                                        <textarea @dispInq style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
                                                                                   name="TRANSInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                                     </div>
                                                                 </td>
@@ -1018,14 +1013,14 @@
 
                                                                     <div class="input-group">
                                                                         <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" checked>
+                                                                            <input @dispInq type="checkbox" class="use-address" name="case[]" id="chkInquiriesTRANS_@j" checked>
                                                                             <label id="lblroundITUnew_@j" style="font-size:12px;">@roundTU</label>
                                                                         </span>
                                                                         @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
                                                                             id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
                                                                             name="TRChallenge" style="height:43px;" />*@
 
-                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
+                                                                        <textarea @dispInq style="resize:both;" rows="2" class="form-control custom-control" id="TRANSInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeTU(@j)"
                                                                                   name="TRANSInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                                     </div>
                                                                     <label id="lblroundITU_@j" hidden>@strTU[0]-@strTU[1]</label>
@@ -1045,14 +1040,14 @@
                                                                 <td>
                                                                     <div class="input-group">
                                                                         <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" checked>
+                                                                            <input @dispInq type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" checked>
                                                                             <label id="lblroundIEXnew_@j" style="font-size:12px;">@roundex</label>
                                                                         </span>
                                                                         @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
                                                                             aria-describedby="sizing-addon1" id="EXPEInquiriesChallenge_@j"
                                                                             onkeydown="AutoFillInquiriesAccountTypeEX(@j)" name="TRChallenge" style="height:43px;">*@
 
-                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
+                                                                        <textarea @dispInq style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
                                                                                   name="EXPEInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                                     </div>
                                                                 </td>
@@ -1079,7 +1074,7 @@
 
                                                                     <div class="input-group">
                                                                         <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" checked>
+                                                                            <input @dispInq type="checkbox" class="use-address" name="case[]" id="chkInquiriesEXPE_@j" checked>
                                                                             <label id="lblroundIEXnew_@j" style="font-size:12px;">@roundEX</label>
                                                                         </span>
                                                                         @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
@@ -1087,7 +1082,7 @@
                                                                             name="TRChallenge" style="height:43px;" />*@
 
 
-                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
+                                                                        <textarea @dispInq style="resize:both;" rows="2" class="form-control custom-control" id="EXPEInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEX(@j)"
                                                                                   name="EXPEInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                                     </div>
                                                                     <label id="lblroundIEX_@j" hidden>@strEX[0]-@strEX[1]</label>
@@ -1105,14 +1100,14 @@
                                                                 <td>
                                                                     <div class="input-group">
                                                                         <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" checked>
+                                                                            <input @dispInq type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" checked>
                                                                             <label id="lblroundIEQnew_@j" style="font-size:12px;">@roundeq</label>
                                                                         </span>
                                                                         @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
                                                                             aria-describedby="sizing-addon1" id="EQUIInquiriesChallenge_@j"
                                                                             onkeydown="AutoFillInquiriesAccountTypeEQ(@j)" name="TRChallenge" style="height:43px;">*@
 
-                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
+                                                                        <textarea @dispInq style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
                                                                                   name="EQUIInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                                     </div>
                                                                 </td>
@@ -1138,13 +1133,13 @@
                                                                     }
                                                                     <div class="input-group">
                                                                         <span class="input-group-addon btn btn-default" id="sizing-addon1">
-                                                                            <input type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" checked>  <label id="lblroundIEQnew_@j" style="font-size:12px;">@roundEQ</label>
+                                                                            <input @dispInq type="checkbox" class="use-address" name="case[]" id="chkInquiriesEQUI_@j" checked>  <label id="lblroundIEQnew_@j" style="font-size:12px;">@roundEQ</label>
                                                                         </span>
                                                                         @*<input type="text" class="form-control" placeholder="Select account type or enter own challenge text"
                                                                             id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
                                                                             name="TRChallenge" style="height:43px;" />*@
 
-                                                                        <textarea style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
+                                                                        <textarea @dispInq style="resize:both;" rows="2" class="form-control custom-control" id="EQUIInquiriesChallenge_@j" onkeydown="AutoFillInquiriesAccountTypeEQ(@j)"
                                                                                   name="EQUIInquiriesChallenge_@j" placeholder="Select account type or enter own challenge text">INQUIRY</textarea>
                                                                     </div>
                                                                     <label id="lblroundIEQ_@j" hidden>@strEQ[0]-@strEQ[1]</label>
@@ -1194,15 +1189,15 @@
 
                                         }
                                     }
-                                    @if (role.ToUpper() != "CLIENT")
-                                    {
-                                        <tr>
-                                            <td> </td>
-                                            <td> </td>
-                                            <td> </td>
-                                            <td> <button class="btn btn-secondary pull-right" id="AddInquiriesChallenge1">Create Challenge for Inquiries</button></td>
-                                        </tr>
-                                    }
+                                    @*@if (role.ToUpper() != "CLIENT")
+                                        {
+                                            <tr>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td> </td>
+                                                <td> <button class="btn btn-secondary pull-right" id="AddInquiriesChallenge1">Create Challenge for Inquiries</button></td>
+                                            </tr>
+                                        }*@
                                 </tbody>
 
                             </table>
@@ -1211,7 +1206,14 @@
 
                 }
 
-
+                <div class="row" style="padding-bottom:12px;">
+                    @if (role.ToUpper() != "CLIENT")
+                    {
+                        <span class="pull-right">
+                            <button class="btn btn-secondary" id="AddChallenge1">Create Challenge for Negative Items</button>
+                        </span>
+                    }
+                </div>
             </div>
         </div>
 
@@ -1311,9 +1313,12 @@
         $("#AddChallenge").click(function () {
             debugger;
         var items =@Html.Raw(Json.Encode(ViewBag.challenges));
-        var itemsPR=@Html.Raw(Json.Encode(ViewBag.PublicRecords));
+            var itemsPR =@Html.Raw(Json.Encode(ViewBag.PublicRecords));
+            var itemsINQ =@Html.Raw(Json.Encode(ViewBag.Inquires));
+            if ($("#hdncheckIncInq").val() != "1") {
+                itemsINQ = null;
+            }
 
-        
                 var i = 0;
                 var AllItemsChecked = true;
                 for (var i = 0; i < items.length; i++) {
@@ -1351,6 +1356,24 @@
                     }
                 }
             }
+
+            if (itemsINQ != null) {
+                for (var i = 0; i < itemsINQ.length; i++) {
+                    var c = i + 4;
+                    if ($("#chkInquiriesEXPE_" + c).prop("checked") == false) {
+                        AllItemsChecked = false;
+                        break;
+                    }
+                    if ($("#chkInquiriesTRANS_" + c).prop("checked") == false) {
+                        AllItemsChecked = false;
+                        break;
+                    }
+                    if ($("#chkInquiriesEQUI_" + c).prop("checked") == false) {
+                        AllItemsChecked = false;
+                        break;
+                    }
+                }
+            }
             if (AllItemsChecked == false) {
                 Swal.fire({
                     title: 'Some negative items are not selected. Are you sure you want to create challenge for selected negative items?',
@@ -1371,7 +1394,12 @@
 
         });
     $("#AddChallenge1").click(function () {
-          var items=@Html.Raw(Json.Encode(ViewBag.challenges));
+        debugger
+        var items =@Html.Raw(Json.Encode(ViewBag.challenges));
+        var itemsINQ =@Html.Raw(Json.Encode(ViewBag.Inquires));
+        if ($("#hdncheckIncInq").val() != "1") {
+            itemsINQ = null;
+        }
                 var i = 0;
                 var AllItemsChecked = true;
                 for (var i = 0; i < items.length; i++) {
@@ -1409,6 +1437,25 @@
                 }
             }
         }
+
+        if (itemsINQ != null) {
+            for (var i = 0; i < itemsINQ.length; i++) {
+                var c = i + 4;
+                if ($("#chkInquiriesEXPE_" + c).prop("checked") == false) {
+                    AllItemsChecked = false;
+                    break;
+                }
+                if ($("#chkInquiriesTRANS_" + c).prop("checked") == false) {
+                    AllItemsChecked = false;
+                    break;
+                }
+                if ($("#chkInquiriesEQUI_" + c).prop("checked") == false) {
+                    AllItemsChecked = false;
+                    break;
+                }
+            }
+        }
+
             if (AllItemsChecked == false) {
                 Swal.fire({
                     title: 'Some negative items are not selected. Are you sure you want to create challenge for selected negative items?',
@@ -1433,7 +1480,14 @@
                 var tuLoanStatus = $("#TULoanStatus").val();
                 var exLoanStatus = $("#EXLoanStatus").val();
                 var eqLoanStatus = $("#EQLoanStatus").val();
-            var items=@Html.Raw(Json.Encode(ViewBag.challenges));
+                var items =@Html.Raw(Json.Encode(ViewBag.challenges));
+                var itemsInq=@Html.Raw(Json.Encode(ViewBag.Inquires));
+
+
+                if ($("#hdncheckIncInq").val() != "1") {
+                    itemsInq = null;
+                }
+
                 var i = 0;
             var AllAgenciesvalues = new Array();
             for (var i = 0; i < items.length; i++) {
@@ -1607,12 +1661,12 @@
                 } catch (e) {
                 }
             }
-                if (AllAgenciesvalues.length == 0 && items.length > 0)
-            {
-                debugger
-                Swal.fire("Warning!", "Please select challenge !", 'warning');
-                return false;
-            }
+            //    if (AllAgenciesvalues.length == 0 && items.length > 0)
+            //{
+            //    debugger
+            //    Swal.fire("Warning!", "Please select challenge !", 'warning');
+            //    return false;
+            //}
             var values = new Array();
             var ClientId = getUrlParameter('ClientId');
             var res = 0;
@@ -1699,8 +1753,99 @@
                 }
         }
                 }
-
                 //Public Records end
+                //Inquires start
+                 var i = 0;
+                var AllAgenciesvaluesInq = new Array();
+                if (itemsInq != null) {
+                    for (var i = 0; i < itemsInq.length; i++) {
+
+                        var j = i + 4;
+                        //Reading  Inquiries challenge text from Inquiries table
+
+
+                        var TRANSAccountTypeInq = $("#TRANSInquiriesChallenge_" + j).val();
+                        var EXPEAccountTypeInq = $("#EXPEInquiriesChallenge_" + j).val();
+                        var EQUIAccountTypeInq = $("#EQUIInquiriesChallenge_" + j).val();
+
+                        //Reading  CreditInqId from  Inquiries table
+                        var k = i + 6;
+
+
+                        var hdnTRANSCreditInqId = $("#hdnTRANSCreditInqId_" + k).text();
+                        var hdnEXPECreditInqId = $("#hdnEXPECreditInqId_" + k).text();
+                        var hdnEQUICreditInqId = $("#hdnEQUICreditInqId_" + k).text();
+
+
+                        var lblroundITUInq_ = $("#lblroundITUnew_" + j).text();
+                        var lblroundEXInq_ = $("#lblroundIEXnew_" + j).text();
+                        var lblroundEQInq_ = $("#lblroundIEQnew_" + j).text();
+
+                        //TU
+                        var flag = false;
+                        if (hdnTRANSCreditInqId != "" && $("#chkInquiriesTRANS_" + j).prop("checked") == true) {
+                            if (TRANSAccountTypeInq != "") {
+                                AllAgenciesvaluesInq.push({
+
+                                    'CreditInqId': hdnTRANSCreditInqId,
+                                    'AccountType': TRANSAccountTypeInq,
+                                    'RoundType': lblroundITUInq_,
+                                });
+                                flag = true;
+
+                            }
+                            else {
+                                $("#TRANSInquiriesChallenge_" + j).focus();
+                                Swal.fire("Warning!", "Please select Account Type !", 'warning');
+                                return false;
+                            }
+                        }
+                        //Ex
+                        var flag = false;
+                        if (hdnEXPECreditInqId != "" && $("#chkInquiriesEXPE_" + j).prop("checked") == true) {
+                            if (EXPEAccountTypeInq != "") {
+                                AllAgenciesvaluesInq.push({
+
+                                    'CreditInqId': hdnEXPECreditInqId,
+                                    'AccountType': EXPEAccountTypeInq,
+                                    'RoundType': lblroundEXInq_,
+                                });
+                                flag = true;
+                            }
+                            else {
+                                $("#EXPEInquiriesChallenge_" + j).focus();
+                                Swal.fire("Warning!", "Please select Account Type !", 'warning');
+                                return false;
+                            }
+                        }
+                        //EQ
+                        var flag = false;
+                        if (hdnEQUICreditInqId != "" && $("#chkInquiriesEQUI_" + j).prop("checked") == true) {
+                            if (EQUIAccountTypeInq != "") {
+                                AllAgenciesvaluesInq.push({
+                                    'CreditInqId': hdnEQUICreditInqId,
+                                    'AccountType': EQUIAccountTypeInq,
+                                    'RoundType': lblroundEQInq_,
+                                });
+                                flag = true;
+                            }
+                            else {
+                                $("#EQUIInquiriesChallenge_" + j).focus();
+                                Swal.fire("Warning!", "Please select Account Type !", 'warning');
+                                return false;
+                            }
+                        }
+                    }
+                }
+        debugger;
+                if (AllAgenciesvalues.length == 0 && AllAgenciesvaluesPR.length == 0 && AllAgenciesvaluesInq.length == 0)
+        {
+            debugger
+                Swal.fire("Warning!", "Please select challenge !", 'warning');
+                return false;
+            }
+
+                //Inquires end
         $(".loader1").show();
         $("#overlay").show();
             debugger;
@@ -1708,7 +1853,7 @@
             method: "POST",
             url: "/Client/ClientChallengeform",
             dataType: "json",
-            data: { credit: AllAgenciesvalues, Id: ClientId, values: values, publicRecords: AllAgenciesvaluesPR},
+            data: { credit: AllAgenciesvalues, Id: ClientId, values: values, publicRecords: AllAgenciesvaluesPR, inquires: AllAgenciesvaluesInq},
             success: function (data) {
                 debugger;
                 if (data == "1") {
