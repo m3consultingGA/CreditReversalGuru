@@ -883,15 +883,16 @@ namespace CreditReversal.BLL
             try
             {
                 sbrowser sb = new sbrowser();
-                //string username = "georgecole622@msn.com";
-                //string Password = "211665gc";
-                //string SecurityAnswer = "4344";
                 string username = IdentityIQInfo.UserName;
                 string Password = IdentityIQInfo.Password;
                 string SecurityAnswer = IdentityIQInfo.Answer;
 
                 CreditReport cr = sb.pullcredit(username, Password, SecurityAnswer, IdentityIQInfo.ClientId.ToString());
-
+                if(!string.IsNullOrEmpty(cr.errMsg))
+                {
+                    creditReportData.errMsg = cr.errMsg;
+                    return creditReportData;
+                }
 
                 List<MonthlyPayStatus> monthlyPayStatusEQ = new List<MonthlyPayStatus>();
                 List<MonthlyPayStatus> monthlyPayStatusTU = new List<MonthlyPayStatus>();
@@ -1032,11 +1033,12 @@ namespace CreditReversal.BLL
                 {
                     foreach (var ach in cr.ExperianParsed)
                     {
+                        TradeLineParsed trBank = new TradeLineParsed();
                         string BankName = string.Empty;
                         var trData = cr.TransUnionParsed;
                         if (trData.Count > 0)
                         {
-                            var trBank = trData.FirstOrDefault(x => x.commonName.Trim() == ach.commonName.Trim());
+                             trBank = trData.FirstOrDefault(x => x.commonName.Trim() == ach.commonName.Trim());
                             if (trBank != null)
                             {
                                 if (!string.IsNullOrEmpty(trBank.atcreditorName))
@@ -1120,6 +1122,22 @@ namespace CreditReversal.BLL
                             ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
                             ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
                         }
+                        try
+                        {
+                            if (trBank != null)
+                            {
+                                if (string.IsNullOrEmpty(ah.AccountType))
+                                {
+                                    ah.AccountTypeDetail = trBank.GrantedTrade.CreditType.atdescription;
+                                }
+                                if (string.IsNullOrEmpty(ah.AccountTypeDetail))
+                                {
+                                    ah.AccountTypeDetail = trBank.GrantedTrade.AccountType.atdescription;
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        { }
                         if (ah.AccountType == "Unknown")
                         {
                             ah.AccountType = ach.AccountCondition.atdescription;
@@ -1174,11 +1192,12 @@ namespace CreditReversal.BLL
                 {
                     foreach (var ach in cr.EquifaxParsed)
                     {
+                        TradeLineParsed trBank = new TradeLineParsed();
                         string BankName = string.Empty;
                         var trData = cr.TransUnionParsed;
                         if (trData.Count > 0)
                         {
-                            var trBank = trData.FirstOrDefault(x => x.commonName.Trim() == ach.commonName.Trim());
+                             trBank = trData.FirstOrDefault(x => x.commonName.Trim() == ach.commonName.Trim());
                             if (trBank != null)
                             {
                                 if (!string.IsNullOrEmpty(trBank.atcreditorName))
@@ -1273,6 +1292,7 @@ namespace CreditReversal.BLL
                         {
                             ah.AccountType = ach.GrantedTrade.CreditType.atabbreviation; //AccountType
                             ah.AccountTypeDetail = ach.GrantedTrade.AccountType.atdescription; //AccountTypeDetail 
+                            
 
                         }
                         catch (Exception)
@@ -1280,6 +1300,24 @@ namespace CreditReversal.BLL
                             ah.AccountType = ach.IndustryCode != null ? ach.IndustryCode.atabbreviation : "NA";
                             ah.AccountTypeDetail = ach.IndustryCode.atabbreviation;
                         }
+
+                        try
+                        {
+                            if (trBank != null)
+                            {
+                                if (string.IsNullOrEmpty(ah.AccountType))
+                                {
+                                    ah.AccountTypeDetail = trBank.GrantedTrade.CreditType.atdescription;
+                                }
+                                if (string.IsNullOrEmpty(ah.AccountTypeDetail))
+                                {
+                                    ah.AccountTypeDetail = trBank.GrantedTrade.AccountType.atdescription;
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {}
+
                         if (ah.AccountType == "Unknown")
                         {
                             ah.AccountType = ach.AccountCondition.atdescription;

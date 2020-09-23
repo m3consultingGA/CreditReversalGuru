@@ -14,7 +14,7 @@
 <style>
     #placeholder {
         width: 550px;
-        height: 300px;
+        AddCreditReport height: 300px;
         text-align: center;
     }
 
@@ -323,27 +323,16 @@ else if (AgentType == "1")
         $("#overlay").hide();
 
 
-       var from = '@TempData["from"]';
-        if (from == "error")
+        var errmsg = '@TempData["errmsg"]';
+        if (errmsg != "")
         {
             Swal.fire({
                 title: "Warning!",
-                text: "Identity IQ Information not available.",
+                text: errmsg,
                 type: 'warning',
 
             });
         }
-        else if (from == "InvalidIdentityIQ")
-        {
-            Swal.fire({
-                title: "Warning!",
-                text: "Invalid Identity IQ Information.",
-                type: 'warning',
-
-            });
-        }
-        @*@TempData["from"] = "";*@
-
 
         var clients = @Html.Raw(Json.Encode(ViewBag.Clients.Count));
 		var activeclients = @Html.Raw(Json.Encode(ViewBag.ActiveClients.Count));

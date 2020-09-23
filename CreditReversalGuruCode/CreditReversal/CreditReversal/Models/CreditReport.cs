@@ -7,6 +7,7 @@ namespace CreditReversal.Models
 {
     public class CreditReportData
     {
+        public string errMsg { get; set; }
         public List<AccountHistory> AccHistory { get; set; }
         public List<Inquires> inquiryDetails { get; set; }
         public List<MonthlyPayStatusHistory> monthlyPayStatusHistoryDetails { get; set; }
@@ -15,6 +16,7 @@ namespace CreditReversal.Models
     
     public class CreditReport
     {
+        public string errMsg { get; set; }
         public List<TradeLineParsed> EquifaxParsed { get; set; }
         public List<TradeLineParsed> ExperianParsed { get; set; }
         public List<TradeLineParsed> TransUnionParsed { get; set; }

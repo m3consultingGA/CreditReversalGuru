@@ -861,7 +861,7 @@ stringWriter
                 IdentityIQInfo = IQfunction.CheckIdentityIQInfo(clientId);
                 CreditReportData tuple = GetCreditReportItemsbyReading(IdentityIQInfo);
 
-                if (tuple.AccHistory.Count > 0)
+                if (string.IsNullOrEmpty(tuple.errMsg))
                 {
                     accountHistories = tuple.AccHistory;
                     inquires = tuple.inquiryDetails;
@@ -872,8 +872,6 @@ stringWriter
                 {
                     return Json(0);
                 }
-
-
             }
             catch (Exception ex) { ex.insertTrace(""); }
 
@@ -937,8 +935,8 @@ stringWriter
                     List<Inquires> inquires = new List<Inquires>();
                     List<PublicRecord> publicRecords = new List<PublicRecord>();
                     CreditReportData tuple = GetCreditReportItemsbyReading(objidentity);
-                    //string ds = "";
-                    if (tuple.AccHistory.Count > 0)
+
+                    if (string.IsNullOrEmpty(tuple.errMsg))
                     {
                         accountHistories = tuple.AccHistory;
                         inquires = tuple.inquiryDetails;
@@ -949,44 +947,29 @@ stringWriter
                     }
                     else
                     {
+                        TempData["errmsg"] = tuple.errMsg; 
+
                         if (role == "agentstaff")
                         {
-                            TempData["from"] = "InvalidIdentityIQ";
                             return RedirectToAction("AgentStaff", "dashboard");
                         }
                         if (role == "agentadmin")
                         {
-                            TempData["from"] = "InvalidIdentityIQ";
                             return RedirectToAction("Agent", "dashboard");
                         }
 
                     }
                 }
-                else
-                {
-                    if (role == "agentstaff")
-                    {
-                        TempData["from"] = "error";
-                        return RedirectToAction("AgentStaff", "dashboard");
-                    }
-                    if (role == "agentadmin")
-                    {
-                        TempData["from"] = "error";
-                        return RedirectToAction("Agent", "dashboard");
-                    }
-
-                }
             }
             catch (Exception ex)
             {
+                TempData["errmsg"] = "error.";
                 if (role == "agentstaff")
                 {
-                    TempData["from"] = "error";
                     return RedirectToAction("AgentStaff", "dashboard");
                 }
                 if (role == "agentadmin")
                 {
-                    TempData["from"] = "error";
                     return RedirectToAction("Agent", "dashboard");
                 }
             }

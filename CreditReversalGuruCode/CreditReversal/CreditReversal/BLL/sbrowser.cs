@@ -19,7 +19,7 @@ namespace CreditReversal.BLL
             CreditReport cr = new CreditReport();
             try
             {
-                Browser browser = new Browser();
+                Browser browser = new Browser(); 
 
                 // we'll fake the user agent for websites that alter their content for unrecognised browsers
                 browser.UserAgent = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/534.10 (KHTML, like Gecko) Chrome/8.0.552.224 Safari/534.10";
@@ -31,11 +31,44 @@ namespace CreditReversal.BLL
                 //  browser.Find(ElementType.Button, "name", "imgBtnLogin").Click();
                 browser.Find("imgBtnLogin").Click();
                 var html = browser.CurrentHtml;
-
+                
                 browser.Navigate("https://www.identityiq.com/SecurityQuestions.aspx");
                 browser.Find("FBfbforcechangesecurityanswer_txtSecurityAnswer").Value = SecurityAnswer; // "4344";
-                browser.Find("FBfbforcechangesecurityanswer_ibtSubmit").Click();
+                try
+                {
+                    browser.Find("FBfbforcechangesecurityanswer_ibtSubmit").Click();
+                }
+                catch (Exception)
+                {
+                    cr.errMsg = "Invalid Identity IQ details.";
+                    browser.Close();
+                    return cr;
+                }
                 var html1 = browser.CurrentHtml;
+                //Invalid Secret Answer
+                try
+                {
+                    if (browser.Text.Contains("Invalid Secret Answer"))
+                    {
+                        cr.errMsg = "Invalid Security Answer";
+                        browser.Close();
+                        return cr;
+                    }
+                }
+                catch (Exception)
+                { }
+                try
+                {
+                    if (browser.Text.ToUpper().Contains("ACCOUNT LOCKED"))
+                    {
+                        cr.errMsg = "Account locked.";
+                        browser.Close();
+                        return cr;
+
+                    }
+                }
+                catch (Exception)
+                { }
                 browser.Navigate("https://www.identityiq.com/CreditReport.aspx");
                 var val = browser.Find("div", FindBy.Id, "divReprtOuter");
                 var html3 = browser.CurrentHtml;
@@ -53,7 +86,18 @@ namespace CreditReversal.BLL
                 html2 = html2.Replace("{ \"", " { ");
                 html2 = html2.Replace("\" :", " : ");
                 html2 = html2.Replace(", \"", " , ");
-                var data = JsonConvert.DeserializeObject<dynamic>(html2);
+                try
+                {
+                    var data = JsonConvert.DeserializeObject<dynamic>(html2);
+                    
+                }
+                catch (Exception)
+                {
+                    cr.errMsg = "Technical issue.";
+                    browser.Close();
+                    return cr;
+                }
+               
                 browser.Close();
 
                 //need to comment
