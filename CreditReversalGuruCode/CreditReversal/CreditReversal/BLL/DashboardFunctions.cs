@@ -2675,21 +2675,18 @@ namespace CreditReversal.BLL
                 DataSet ds = clientdata.GetCreditReportInquires(id.ToString(), role);
                 dt = ds.Tables[0];
                 dt1 = ds.Tables[1];
+                List<Inquires> inqquifax = new List<Inquires>();
+                List<Inquires> inqexperian = new List<Inquires>();
+                List<Inquires> inqtransunion = new List<Inquires>();
                 for (int r = 0; r < dt.Rows.Count; r++)
                 {
-
                     string EQUIFAX = dt.Rows[r]["EQUIFAX"].ToString();
                     string TRANSUNION = dt.Rows[r]["TRANSUNION"].ToString();
                     string EXPERIAN = dt.Rows[r]["EXPERIAN"].ToString();
                     string[] strTRANSUNION = TRANSUNION.Split('^');
                     string newstrTRANSUNION = strTRANSUNION.ToString();
-
                     string[] strEQUIFAX = EQUIFAX.Split('^');
                     string[] strEXPERIAN = EXPERIAN.Split('^');
-
-                    List<Inquires> inqquifax = new List<Inquires>();
-                    List<Inquires> inqexperian = new List<Inquires>();
-                    List<Inquires> inqtransunion = new List<Inquires>();
 
                     if (TRANSUNION != "")
                     {
@@ -2745,7 +2742,8 @@ namespace CreditReversal.BLL
                             }
                         }
                     }
-                    for (int x = 0; x < dt1.Rows.Count; x++)
+                }
+                 for (int x = 0; x < dt1.Rows.Count; x++)
                     {
                         //string accountid = dt1.Rows[x]["accountId"].ToString();
                         for (int i = 0; i < 6; i++)
@@ -3072,7 +3070,7 @@ namespace CreditReversal.BLL
 
                         }
                     }
-                }
+                
             }
             catch (Exception ex) { ex.insertTrace(""); }
 

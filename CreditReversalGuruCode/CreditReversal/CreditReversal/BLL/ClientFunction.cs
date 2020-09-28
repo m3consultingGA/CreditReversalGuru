@@ -543,7 +543,7 @@ namespace CreditReversal.BLL
                 }
 
                 CreditReportItems creditReportItems = cd.GetCreditReportItems(credit.CredRepItemsId.ToString())[0];
-                var opendate1 = creditReportItems.OpenDate.MMDDYYStringToDateTime("MM/dd/yyyy");
+                //var opendate1 = creditReportItems.OpenDate.MMDDYYStringToDateTime("MM/dd/yyyy");
 
                 if (credit.PastDueDays > 0 && credit.AccountType.ToUpper() == "EDUCATION" && credit.LoanStatus.ToUpper() == "DEFERMENT")
                 {
@@ -570,7 +570,7 @@ namespace CreditReversal.BLL
                 //    }
                 //}
                 object ChallengeText = "";
-                string sql2 = "Select AccTypeId from AccountTypes where AccountType = '" + AccountType + "'";
+                string sql2 = "Select AccTypeId from AccountTypes where upper(AccountType) = '" + AccountType.ToUpper() + "'";
                 object AccountTypeId = utilities.ExecuteScalar(sql2, true);
                 if (AccountTypeId != null && sno != 0)
                 {
@@ -1177,7 +1177,7 @@ namespace CreditReversal.BLL
                         FormatedDate = month + "/" + dat + "/" + year;
                         ah.LastReported = FormatedDate;
                         ah.PaymentStatus = ach.PayStatus.atdescription;
-                        var payStatus = monthlyPayStatusEX.FirstOrDefault(x => x.commonName == ach.commonName);
+                        var payStatus = monthlyPayStatusEX.FirstOrDefault(x => x.commonName == ach.commonName );
                         ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
                         accountHistories.Add(ah);
                     }
@@ -1358,7 +1358,7 @@ namespace CreditReversal.BLL
                         FormatedDate = month + "/" + dat + "/" + year;
                         ah.LastReported = FormatedDate;
                         ah.PaymentStatus = ach.PayStatus.atdescription;
-                        var payStatus = monthlyPayStatusEQ.FirstOrDefault(x => x.commonName == ach.commonName);
+                        var payStatus = monthlyPayStatusEQ.FirstOrDefault(x => x.commonName == ach.commonName );
                         ah.negativeitems = payStatus != null ? payStatus.NegitiveItemsCount : 0;
                         accountHistories.Add(ah);
                     }
