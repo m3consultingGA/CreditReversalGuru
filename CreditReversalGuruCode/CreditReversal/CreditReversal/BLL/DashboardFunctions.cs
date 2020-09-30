@@ -3767,8 +3767,8 @@ namespace CreditReversal.BLL
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < files.Count; i++)
                 {
-                    sb.AppendFormat(" insert into CreditReportFiles(CRFilename,RoundType,ClientId,sno) "
-                        + " values('{0}','{1}',{2},{3})", files[i].CRFilename, files[i].RoundType, files[i].ClientId, sno);
+                    sb.AppendFormat(" insert into CreditReportFiles(CRFilename,RoundType,ClientId,sno,isManual) "
+                        + " values('{0}','{1}',{2},{3},{4})", files[i].CRFilename, files[i].RoundType, files[i].ClientId, sno, files[i].isManual);
                 }
                 var cmd1 = new SqlCommand();
                 cmd1.CommandText = sb.ToString();
@@ -3778,7 +3778,18 @@ namespace CreditReversal.BLL
             catch (Exception ex) { ex.insertTrace(""); }
             return res;
         }
-
+        public long UpdateCreditReportFileIsMoved(string file)
+        {
+            long res = 0;
+            try
+            {
+                string sql = "UPDATE CreditReportFiles SET isMoved=1 where CRFilename='" + file + "'";
+                res = utilities.ExecuteString(sql, true);
+                return res;
+            }
+            catch (Exception ex) { ex.insertTrace(""); }
+            return res;
+        }
 
         public List<Agent> GetAgentBillings()
         {

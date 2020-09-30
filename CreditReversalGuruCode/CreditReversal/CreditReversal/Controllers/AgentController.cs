@@ -594,6 +594,18 @@ namespace CreditReversal.Controllers
                 creditreport = agentfunction.GetChallenges(ClientId);
                 creditreportAH = creditreport.Where(x => x.mode == "Account-").ToList();
                 ViewBag.creditreportfile = creditreportAH;
+                string manualFiles = "";
+
+                creditreportAH = creditreportAH.Where(x => x.isManual == 1 && x.isMoved == 0).ToList();
+                if(creditreportAH.Count > 0)
+                {
+                    for (int i = 0; i < creditreportAH.Count; i++)
+                    {
+                        manualFiles = manualFiles + "^" + creditreportAH[i].CRFilename;
+                    }
+                    manualFiles = manualFiles.TrimStart('^'); manualFiles = manualFiles.TrimEnd('^');
+                    ViewBag.ManualChallenges = manualFiles;
+                }
 
                 //creditreportPR = creditreport.Where(x => x.mode == "PublicRe").ToList();
                 //ViewBag.creditreportfilePR = creditreportPR;

@@ -1,0 +1,70 @@
+﻿
+@{
+    ViewBag.Title = "Challenges Info";
+    Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
+}
+<div class="page-header">
+    <h3 class="page-title">Manual Challenge Text(s) </h3>
+    <div style="padding-bottom:10px;">
+        <ol class="breadcrumb pull-right">
+            <li class="breadcrumb-item">
+                <a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a>
+            </li>
+            @*@if (from == null)
+                {
+                    <li class="breadcrumb-item">
+                        <a href="/Client/Index"><i class="fa fa-user"></i>&nbsp;Manage Clients</a>
+                    </li>
+                }*@
+            <li class="breadcrumb-item active">Challenges Info</li>
+        </ol>
+    </div>
+</div>
+<div class="col-md-12">
+    <div class="row">
+        <div class="portlet portlet-boxed">
+            <div class="portlet-header">
+                <h5 class="portlet-title">
+                    <u>Challenge Info</u>
+                </h5>
+
+            </div> <!-- /.portlet-header -->
+            <div class="portlet-body" style="height:400px;">
+                <p><strong> Do you want to print challenges manually  please click on  print button right side of the PDF.</strong></p>
+                <p><strong>(OR)</strong></p>
+                <p><strong>Do you want print challenges using CRG Printing </strong></p>
+
+                <input type="button" class="btn btn-primary" value="Please click here" id="btnMove" />
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $("#btnMove").click(function () {
+        $.ajax({
+            method: "POST",
+            url: "/Client/ChallengeInfo",
+            dataType: "json",
+            data: { strFiles: "" },
+            success: function (data) {
+                debugger;
+                if (data == "1") {
+                    $(".loader1").hide();
+                    $("#overlay").hide();
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Used CRG printing successfully.",
+                        type: 'success',
+                    }).then(function () {
+                        window.location.href = "/dashboard/agent";
+                    })
+                }
+            }
+        });
+    });
+</script>
+

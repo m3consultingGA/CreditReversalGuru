@@ -899,15 +899,18 @@ namespace CreditReversal.Models
         public string atFraudIndicator { get; set; }
         public string atDeceasedIndicator { get; set; }
         public Borrower Borrower { get; set; }
-        public List<InquiryPartition> InquiryPartition { get; set; }
+        //public List<InquiryPartition> InquiryPartition { get; set; }
+        public object InquiryPartition { get; set; }
         //public List<Message> Message { get; set; }
-        public PulblicRecordPartition PulblicRecordPartition { get; set; }
+        // public PulblicRecordPartition PulblicRecordPartition { get; set; }
+        public object PulblicRecordPartition { get; set; }
         public SafetyCheckPassed SafetyCheckPassed { get; set; }
         public SB168Frozen SB168Frozen { get; set; }
         public Sources Sources { get; set; }
         public List<Subscriber> Subscriber { get; set; }
         public Summary Summary { get; set; }
-        public List<TradeLinePartition> TradeLinePartition { get; set; }
+        //public List<TradeLinePartition> TradeLinePartition { get; set; }
+        public object TradeLinePartition { get; set; }
     }
 
     public class BundleComponent

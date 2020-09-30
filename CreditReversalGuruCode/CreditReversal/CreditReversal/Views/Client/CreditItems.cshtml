@@ -1889,20 +1889,26 @@
                     debugger
                     if (data != "" && data != "1" && data != "0") {
                         Swal.fire("Success!", "Challenge letter(s) generated successfully.", 'success');
-                        var files = data.split('^');
-                        for (var i = 0; i < files.length; i++) {
-                            window.open('/Documents/Challenge/' + files[i], "_blank");
-                            //var url = '/Documents/Challenge/' + files[i]
-                            //var link = document.createElement('a');
-                            //document.body.appendChild(link);
-                            //link.href = url;
-                            //link.click();
-                        }
+                        //var files = data.split('^');
+                        //for (var i = 0; i < files.length; i++) {
+                        //    window.open('/Documents/Challenge/' + files[i], "_blank");
+                        //    //var url = '/Documents/Challenge/' + files[i]
+                        //    //var link = document.createElement('a');
+                        //    //document.body.appendChild(link);
+                        //    //link.href = url;
+                        //    //link.click();
+                            
+                        //}
+                        window.location.href = "/Agent/Challenges?ClientId=" + Id;    
                     }
                     $(".loader1").hide();
                     $("#overlay").hide();
-                    location.reload();
+                    
+                   // location.reload();
                 }
+            },
+            complete: function () {
+                
             }
         });
         } catch (e) {

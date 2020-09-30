@@ -169,7 +169,7 @@ namespace CreditReversal.Controllers
                 List<Inquires> Inquires = functions.GetCreditReportInquiresAgent(Convert.ToInt32(ClientId), null, role);
                 ViewBag.Inquires = Inquires.Count == 0 ? null : Inquires;
                 List<PublicRecord> publicRecords = functions.GetCreditReportPublicRecordsAgent(Convert.ToInt32(ClientId), null, role);
-                ViewBag.PublicRecords =  publicRecords.Count == 0 ? null : publicRecords;
+                ViewBag.PublicRecords = publicRecords.Count == 0 ? null : publicRecords;
             }
             catch (Exception ex) { ex.insertTrace(""); }
             return View();
@@ -250,9 +250,9 @@ namespace CreditReversal.Controllers
                 {
                     var ext = Path.GetExtension(clientModel.FProofOfCard.FileName);
                     string PFileName = string.Empty;
-                    if (ext.ToUpper() ==".PDF")
+                    if (ext.ToUpper() == ".PDF")
                     {
-                         PFileName = Path.GetFileName(clientModel.FProofOfCard.FileName);
+                        PFileName = Path.GetFileName(clientModel.FProofOfCard.FileName);
                         filename = "Client-ProofOfCard-" + PFileName;
                         path = Server.MapPath("~/documents/" + filename);
                         clientModel.FProofOfCard.SaveAs(path);
@@ -263,7 +263,7 @@ namespace CreditReversal.Controllers
                         PFileName = ResizeImage(clientModel.FProofOfCard);
                         clientModel.sProofOfCard = PFileName;
                     }
-                    
+
                 }
                 if (clientModel.FDrivingLicense != null)
                 {
@@ -942,12 +942,12 @@ stringWriter
                         inquires = tuple.inquiryDetails;
                         publicRecords = tuple.PublicRecords;
 
-                        ReportId = cfunction.AddCreditReport(accountHistories, inquires, tuple.monthlyPayStatusHistoryDetails, clientId, mode,"",publicRecords);
+                        ReportId = cfunction.AddCreditReport(accountHistories, inquires, tuple.monthlyPayStatusHistoryDetails, clientId, mode, "", publicRecords);
                         return RedirectToAction("CreditItems", "Client", new { @ClientId = clientId, @from = from, @mode = mode });
                     }
                     else
                     {
-                        TempData["errmsg"] = tuple.errMsg; 
+                        TempData["errmsg"] = tuple.errMsg;
 
                         if (role == "agentstaff")
                         {
@@ -997,7 +997,7 @@ stringWriter
             }
 
         }
-        
+
         public CreditReportData GetCreditReportItemsbyReading(IdentityIQInfo IdentityIQInfo)
         {
             CreditReportData creditReportData = new CreditReportData();
@@ -1010,7 +1010,7 @@ stringWriter
             { ex.insertTrace(""); }
             return creditReportData;
         }
-        
+
         public JsonResult ClientChallengeform(List<CreditReportItems> credit, int Id, string[] values, List<PublicRecord> publicRecords,
             List<Inquires> inquires)
         {
@@ -1046,7 +1046,7 @@ stringWriter
                         sno = cd.getsnofromitems(Id.ToString(), credit[0].RoundType, "AH");
                         for (i = 0; i < count; i++)
                         {
-                                cfunction.AddReportItemChallenges(credit[i], sno, Id, clientModel.isPrevItemInLastYear);
+                            cfunction.AddReportItemChallenges(credit[i], sno, Id, clientModel.isPrevItemInLastYear);
                             dynamic model = new ExpandoObject();
                             string AgentId = sessionData.GetAgentId();
                             string staffId = sessionData.GetStaffId();
@@ -1072,30 +1072,30 @@ stringWriter
                     List<CreditReportItems> EXCreditItems = credite.Where(x => x.Agency.ToUpper() == "EXPERIAN").ToList();
                     List<CreditReportItems> TUCreditItems = credite.Where(x => x.Agency.ToUpper() == "TRANSUNION").ToList();
 
-                    
 
-                    if(publicRecords != null)
-                    { 
-                    int res = ClientChallengePRform(publicRecords, Id, values);
-                    if(res > 0)
+
+                    if (publicRecords != null)
                     {
-                        List<CreditReportItems> PublicRecords = functions.GetPRChallengesAgentById(publicRecords, Id);
-                        List<CreditReportItems> eqPR = PublicRecords.Where(x => x.Agency.ToUpper() == "EQUIFAX").ToList();
-                        List<CreditReportItems> exPR = PublicRecords.Where(x => x.Agency.ToUpper() == "EXPERIAN").ToList();
-                        List<CreditReportItems> tuPR = PublicRecords.Where(x => x.Agency.ToUpper() == "TRANSUNION").ToList();
-                        if (eqPR.Count > 0)
+                        int res = ClientChallengePRform(publicRecords, Id, values);
+                        if (res > 0)
                         {
-                            EQCreditItems.AddRange(eqPR);
+                            List<CreditReportItems> PublicRecords = functions.GetPRChallengesAgentById(publicRecords, Id);
+                            List<CreditReportItems> eqPR = PublicRecords.Where(x => x.Agency.ToUpper() == "EQUIFAX").ToList();
+                            List<CreditReportItems> exPR = PublicRecords.Where(x => x.Agency.ToUpper() == "EXPERIAN").ToList();
+                            List<CreditReportItems> tuPR = PublicRecords.Where(x => x.Agency.ToUpper() == "TRANSUNION").ToList();
+                            if (eqPR.Count > 0)
+                            {
+                                EQCreditItems.AddRange(eqPR);
+                            }
+                            if (exPR.Count > 0)
+                            {
+                                EXCreditItems.AddRange(exPR);
+                            }
+                            if (tuPR.Count > 0)
+                            {
+                                TUCreditItems.AddRange(tuPR);
+                            }
                         }
-                        if (exPR.Count > 0)
-                        {
-                            EXCreditItems.AddRange(exPR);
-                        }
-                        if (tuPR.Count > 0)
-                        {
-                            TUCreditItems.AddRange(tuPR);
-                        }
-                    }
                     }
 
                     if (inquires != null)
@@ -1154,7 +1154,9 @@ stringWriter
                             status = status + "^" + file3;
                         }
                         status = status.TrimStart('^'); status = status.TrimEnd('^');
+                        Session["files"] = status;
                     }
+
 
                 }
                 catch (Exception ex)
@@ -1189,8 +1191,8 @@ stringWriter
                     StringList.Add(clientModel.SSN);
                 }
                 catch (Exception)
-                {}
-                
+                { }
+
                 List<CreditReportItems> crItems = new List<CreditReportItems>();
 
                 for (int k = 0; k < credite.Count; k++)
@@ -1219,6 +1221,9 @@ stringWriter
                     }
                 }
 
+                AgentData agentData = new AgentData();
+                int _checkExists = agentData.checkAutoChallenges(crItems[0].RoundType, crItems[0].Agency, Id.ToString(), "Account");
+
                 PdfManager objPdf = new PdfManager();
                 PdfDocument objDoc = objPdf.CreateDocument();
                 objDoc.Title = "CreditReversalGuru";
@@ -1228,6 +1233,7 @@ stringWriter
                 filenames = new List<CreditReportFiles>();
                 if (crItems.Count > 0)
                 {
+
                     StringList.Add(crItems[0].Agency);
                     Session["values"] = StringList;
                     objDoc = objPdf.CreateDocument();
@@ -1237,8 +1243,17 @@ stringWriter
                     objDoc.ImportFromUrl(htmlToConvert, "LeftMargin=54;RightMargin=54;TopMargin=54;BottomMargin=54; hyperlinks=true; drawbackground=true");
                     filename = "Challenge-Account-" + crItems[0].Agency + "-" + values[0] + "-" + values[1] + "-" + crItems[0].RoundType + "-" + date + ".pdf";
                     filename = filename.Replace(" ", "");
-                    filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-" + crItems[0].Agency + "-" + values[0] + "-" + values[1]
+                    if (_checkExists == 0)
+                    {
+                        filepath = Server.MapPath("~/Documents/Challenge/Challenge-Account-" + crItems[0].Agency + "-" + values[0] + "-" + values[1]
                         + "-" + crItems[0].RoundType + "-" + date + ".pdf");
+                    }
+                    else
+                    {
+                        filepath = Server.MapPath("~/Documents/AutoPrint/Challenge-Account-" + crItems[0].Agency + "-" + values[0] + "-" + values[1]
+                        + "-" + crItems[0].RoundType + "-" + date + ".pdf");
+                    }
+
                     filepath = filepath.Replace(" ", "");
 
                     try
@@ -1247,7 +1262,7 @@ stringWriter
                         {
                             try
                             {
-                                if(clientModel.sProofOfCard.ToUpper().Contains(".PDF"))
+                                if (clientModel.sProofOfCard.ToUpper().Contains(".PDF"))
                                 {
                                     byte[] bytes = null; PdfDocument objDoc2 = null;
                                     var doc = objPdf.OpenDocument(Server.MapPath("~/Documents/" + clientModel.sProofOfCard));
@@ -1266,7 +1281,7 @@ stringWriter
                                 }
                             }
                             catch (Exception)
-                            {}
+                            { }
                         }
                     }
                     catch (Exception ex)
@@ -1278,6 +1293,10 @@ stringWriter
                     files.RoundType = crItems[0].RoundType;
                     files.CRFilename = filename;
                     files.ClientId = Id;
+                    if (_checkExists == 0)
+                    {
+                        files.isManual = 1;
+                    }
                     filenames.Add(files);
                 }
                 if (filenames.Count > 0)
@@ -1285,8 +1304,8 @@ stringWriter
                     functions.updatechallengefilepath(filenames, sno);
                 }
                 StringList.Clear();
-                AgentData agentData = new AgentData();
-                int _checkExists = agentData.checkAutoChallenges(crItems[0].RoundType, crItems[0].Agency, Id.ToString(), "Account");
+
+                //int _checkExists = agentData.checkAutoChallenges(crItems[0].RoundType, crItems[0].Agency, Id.ToString(), "Account");
                 if (_checkExists == 0)
                 {
                     res = filename;
@@ -1418,7 +1437,7 @@ stringWriter
                     sno = cd.getsnofromitems(Id.ToString(), credit[0].RoundType, "PR");
                     for (i = 0; i < count; i++)
                     {
-                        cfunction.AddReportItemPRChallenges(credit[i],"", sno, Id);
+                        cfunction.AddReportItemPRChallenges(credit[i], "", sno, Id);
                     }
                 }
                 res = 1;
@@ -1501,8 +1520,8 @@ stringWriter
                             objPage.Canvas.DrawImage(objImage, "x=100,y=400");
                         }
                         catch (Exception)
-                        {}
-                        
+                        { }
+
                     }
                     objDoc.Save(filepath, false);
                     objDoc.Close();
@@ -2082,6 +2101,44 @@ stringWriter
                 throw ex;
             }
             return myfile;
+        }
+        public ActionResult ChallengeInfo()
+        {
+            ViewBag.Dasboard = sessionData.getDasboard();
+            return View();
+        }
+
+
+
+        [HttpPost]
+        public ActionResult ChallengeInfo(string strFiles = "")
+        {
+            int res = 0;
+            try
+            {
+                DashboardFunctions functions = new DashboardFunctions();
+                ViewBag.Dasboard = sessionData.getDasboard();
+                if (!string.IsNullOrEmpty(strFiles))
+                {
+                    string sourcePath = Server.MapPath("~/documents/Challenge/");
+                    string destPath = Server.MapPath("~/documents/AutoPrint/");
+                    string[] files = strFiles.Split('^');
+                    foreach (string s in files)
+                    {
+                        System.IO.File.Copy(sourcePath + s, destPath + s, true);
+                        functions.UpdateCreditReportFileIsMoved(s);
+                    }
+                    
+                    
+                    res = 1;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            return Json(res, JsonRequestBehavior.AllowGet);
         }
     }
 }

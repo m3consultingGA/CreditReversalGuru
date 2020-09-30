@@ -540,8 +540,8 @@ namespace CreditReversal.DAL
                             AgentId = Convert.ToInt32(row["AgentId"]),
 
                         });                    }                }            }            catch (Exception ex)            {                ex.insertTrace("");            }            return newClients;        }
-        public List<CreditReportFiles> GetChallenges(string ClientId)        {            List<CreditReportFiles> creditreport = new List<CreditReportFiles>();            CreditReportFiles credit = new CreditReportFiles();            try            {                DataRow clientrow = null;                string name = string.Empty;                string[] agencies;                string query = "Select FirstName,MiddleName,LastName from Client Where ClientId=" + ClientId + "";                clientrow = utills.GetDataRow(query);                if (clientrow != null)                {                    name = clientrow[0].ToString() + clientrow[1].ToString() + clientrow[2].ToString();                }                string sql = "Select *,SUBSTRING(crfilename,11,8) as mode from CreditReportFiles where ClientId=" + ClientId + " order by RoundType asc  ";                DataTable dt = utills.GetDataTable(sql);                if (dt.Rows.Count > 0)                {                                       foreach (DataRow row in dt.Rows)                    {   
-                        credit = new CreditReportFiles();                        credit.ClientId = Convert.ToInt32(row["ClientId"]);                        credit.RoundType = row["RoundType"].ToString();                        credit.CRFilename =  row["CRFilename"].ToString();                        credit.CreateDate = row["CreateDate"].ToString();                        credit.ClientName = name;                        agencies = credit.CRFilename.Split('-');                        credit.CAgency = agencies[2];                        credit.isAutoChallenges = checkAutoChallenges(row["RoundType"].ToString(),agencies[2], row["ClientId"].ToString(), row["mode"].ToString());                        credit.mode = row["mode"].ToString();                        creditreport.Add(credit);                                          }                }
+        public List<CreditReportFiles> GetChallenges(string ClientId)        {            List<CreditReportFiles> creditreport = new List<CreditReportFiles>();            CreditReportFiles credit = new CreditReportFiles();            try            {                DataRow clientrow = null;                string name = string.Empty;                string[] agencies;                string query = "Select FirstName,MiddleName,LastName from Client Where ClientId=" + ClientId + "";                clientrow = utills.GetDataRow(query);                if (clientrow != null)                {                    name = clientrow[0].ToString() + clientrow[1].ToString() + clientrow[2].ToString();                }                string sql = "Select *,SUBSTRING(crfilename,11,8) as mode from CreditReportFiles where ClientId=" + ClientId + "  order by RoundType asc  ";                DataTable dt = utills.GetDataTable(sql);                if (dt.Rows.Count > 0)                {                                       foreach (DataRow row in dt.Rows)                    {   
+                        credit = new CreditReportFiles();                        credit.ClientId = Convert.ToInt32(row["ClientId"]);                        credit.RoundType = row["RoundType"].ToString();                        credit.CRFilename =  row["CRFilename"].ToString();                        credit.CreateDate = row["CreateDate"].ToString();                        credit.ClientName = name;                        agencies = credit.CRFilename.Split('-');                        credit.CAgency = agencies[2];                        credit.isManual = Convert.ToBoolean(row["isManual"].ToString()) == true ? 1 : 0;                        credit.isMoved = Convert.ToBoolean(row["isMoved"].ToString()) == true ? 1 : 0;                        credit.mode = row["mode"].ToString();                        creditreport.Add(credit);                                          }                }
             }            catch (Exception ex) { ex.insertTrace(""); }            return creditreport;        }
         public int checkAutoChallenges(string round, string agency,string clientid,string mode)
         {
@@ -572,6 +572,43 @@ namespace CreditReversal.DAL
                     + " CreditReport c,ChallengeMaster b where cr.CredRepItemsId = cri.CredRepItemsId and "
                     + " c.CreditReportId = cr.CredReportId and convert(varchar, cri.ChallengeText) = convert(varchar, b.ChallengeText) "
                     + " and c.ClientId =" + clientid + " and cri.RoundType ='" + round + "' and cri.Agency ='" + agency + "' ";
+                }
+                long val = long.Parse(utills.ExecuteScalar(sql, true).ToString());
+                if (val > 0)
+                { res = 1; }
+            }
+            catch (Exception ex)
+            { }
+
+            return res;
+        }
+
+        public int checkAutoChallengesExists(string round, string clientid, string mode)
+        {
+            int res = 0; string sql = "";
+            try
+            {
+
+                if (mode == "Inquires")
+                {
+                    sql = "Select Count(*) as itemscount from CreditReportItemChallenges cri, CreditInquiries cr,  "
+                    + " CreditReport c,ChallengeMaster b where cr.CreditInqId=cri.CreditInqId and c.CreditReportId=cr.CreditReportId "
+                    + " and convert(varchar, cri.ChallengeText) = convert(varchar, b.ChallengeText) "
+                    + " and c.ClientId =" + clientid + " and cri.RoundType ='" + round + "' ";
+                }
+                else if (mode == "PR")
+                {
+                    sql = "Select Count(*) as itemscount from CreditReportItemChallenges cri, publicrecords cr,  "
+                    + " CreditReport c,ChallengeMaster b where cr.publicrecordid=cri.publicrecordid and c.CreditReportId=cr.CreditReportId "
+                    + " and convert(varchar, cri.ChallengeText) = convert(varchar, b.ChallengeText) "
+                    + " and c.ClientId =" + clientid + " and cri.RoundType ='" + round + "'  ";
+                }
+                else
+                {
+                    sql = "Select Count(*) as itemscount from CreditReportItemChallenges cri, CreditReportItems cr,  "
+                    + " CreditReport c,ChallengeMaster b where cr.CredRepItemsId = cri.CredRepItemsId and "
+                    + " c.CreditReportId = cr.CredReportId and convert(varchar, cri.ChallengeText) = convert(varchar, b.ChallengeText) "
+                    + " and c.ClientId =" + clientid + " and cri.RoundType ='" + round + "' ";
                 }
                 long val = long.Parse(utills.ExecuteScalar(sql, true).ToString());
                 if (val > 0)

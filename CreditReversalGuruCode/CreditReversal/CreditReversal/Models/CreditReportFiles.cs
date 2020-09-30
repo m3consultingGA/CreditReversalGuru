@@ -15,6 +15,8 @@ namespace CreditReversal.Models
         public string ClientName { get; set; }
         public string CAgency { get; set; }
         public int isAutoChallenges { get; set; }
+        public int isMoved { get; set; }
+        public int isManual { get; set; }
         public string mode { get; set; }
     }
 }

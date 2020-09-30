@@ -3,8 +3,8 @@
     ViewBag.Title = "Challenges";
     Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
 
-  string dispPrint =  "hidden";
-  //  string dispPrint = "";
+    //string dispPrint =  "hidden";
+    string dispPrint = "";
 }
 
 <title>Challenges</title>
@@ -76,12 +76,16 @@
                                             }
 
                                             <td @dispPrint>
-                                                @*@if (item.isAutoChallenges == 0)
-                                        {
-                                            <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
-                                        }*@
+                                                @if (item.isManual == 1)
+                                                {
+                                                    <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
+                                                    @*if (item.isMoved == 0)
+                                                        {
+                                                            <a id="btnCRG" onclick="crgPrint('@path');" class="btn btn-danger btn-xs"> CRG Printing</a>
+                                                        }*@
+                                                }
 
-                                                <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
+
                                             </td>
 
                                         </tr>
@@ -97,10 +101,44 @@
                         </table>
                     </div>
                 </div>
-              
-                
+                @if (ViewBag.ManualChallenges != null)
+                {
+                    string mChallenges = @ViewBag.ManualChallenges;
+                    <div class="row ">
+                        <div class="col-md-4">
+                            <p>To print challenge letters using  CRG Printing  </p>
+                        </div>
+                        <div class="col-md-6">
+                            <a id="btnCRG" onclick="crgPrint('@mChallenges');" class="btn btn-danger btn-xs"> Click here</a>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
 </div>
-
+<script>
+    function crgPrint(file) {
+        $.ajax({
+            method: "POST",
+            url: "/Client/ChallengeInfo",
+            dataType: "json",
+            data: { strFiles: file },
+            success: function (data) {
+                debugger;
+                if (data == "1") {
+                    $(".loader1").hide();
+                    $("#overlay").hide();
+                    Swal.fire({
+                        title: "Success!",
+                        text: "Used CRG printing successfully.",
+                        type: 'success',
+                    }).then(function () {
+                        //  window.location.href = "/dashboard/agent";
+                        location.reload();
+                    })
+                }
+            }
+        });
+    }
+</script>
