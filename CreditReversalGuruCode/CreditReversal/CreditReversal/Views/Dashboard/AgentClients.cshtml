@@ -3,72 +3,74 @@
     ViewBag.Title = "AgentClients";
     Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
     string agentname = string.Empty;
-    if(Request["name"] != null)
+    if (Request["name"] != null)
     {
         agentname = Request["name"].ToString();
     }
 }
+<div class="page-header">
+    <ol class="breadcrumb pull-right">
+        <li><a href="/Dashboard/Admin"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+        <li class="active">&nbsp;Clients</li>
 
-<h2>Clients</h2>
-
-<div class="pl-4">
-    <div class="col-lg-12">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="portlet portlet-boxed">
-                    <div class="portlet-header">
-                        <h4 class="portlet-title">
-                            <u>Agent : @agentname </u>
-                        </h4>
-                    </div> <!-- /.portlet-header -->
-                    <div class="portlet-body" style="padding-bottom:30px;">
-                        <div class="table-responsive">
-                            <table class="table table-bordered" id="AgentList">
-                                <thead>
-                                    <tr>
-                                        <th>Client Name</th>
-                                        <th>DOB</th>
-                                        <th>Address</th>
-                                        <th>SSN</th>
-                                        <th>Email</th>
-                                        <th>Contact Number</th>
-                                        @*<th>Id Question</th>*@
-                                        <th>Id UserName</th>
-                                        <th>Id Password</th>
-                                        <th>Security Answer</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if (ViewBag.GetClients != null )
-                                    {
-                                        var items = ViewBag.GetClients;
-                                       
-                                    <tr>
-                                        <td>@items.FullName</td>
-                                        <td>@items.DOB</td>
-                                        <td>@items.Address1 <br />@items.Address2<br />@items.City @items.State @items.ZipCode</td>
-                                        <td>@items.SSN</td>
-                                        <td>@items.CurrentEmail</td>
-                                        <td>@items.CurrentPhone </td>
-                                        @*<td>@items.IdQuestion</td>*@
-                                        <td>@items.IdUserName</td>
-                                        <td>@items.IdPassword</td>
-                                        <td>@items.IdAnswer</td>
-                                    </tr>
-                                    }
+    </ol>
+</div>
 
 
-                                </tbody>
-                            </table>
-                        </div>
+<div style="padding-top:20px;">
 
-                    </div>
-                </div>
+    <div class="portlet portlet-boxed">
+        <div class="portlet-header">
+            <h4 class="portlet-title">
+                <u>Agent : @agentname </u>
+            </h4>
+        </div> <!-- /.portlet-header -->
+        <div class="portlet-body" style="padding-bottom:30px;">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="AgentList">
+                    <thead>
+                        <tr>
+                            <th>Client Name</th>
+                            <th>DOB</th>
+                            <th>Address</th>
+                            <th>SSN</th>
+                            <th>Email</th>
+                            <th>Contact Number</th>
+                            @*<th>Id Question</th>*@
+                            <th>Id UserName</th>
+                            @*<th>Id Password</th>*@
+                            <th>Security Answer</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.GetClients != null)
+                        {
+                            foreach (var items in ViewBag.GetClients)
+                            {
+                                <tr>
+                                    <td>@items.FullName</td>
+                                    <td>@items.DOB</td>
+                                    <td>@items.Address1 <br />@items.Address2<br />@items.City @items.State @items.ZipCode</td>
+                                    <td>@items.SSN</td>
+                                    <td>@items.CurrentEmail</td>
+                                    <td>@items.CurrentPhone </td>
+                                    @*<td>@items.IdQuestion</td>*@
+                                    <td>@items.IdUserName</td>
+                                    @*<td>@items.IdPassword</td>*@
+                                    <td>@items.IdAnswer</td>
+                                    <td><a href="/Admin/GetChallengesByClientId?agent=@items.AgentId&name=@agentname&ClientId=@items.ClientId">View Challenges</a></td>
+                                </tr>
+                                }
+                            }
+                    </tbody>
+                </table>
             </div>
-        </div>
 
+        </div>
     </div>
 </div>
+
 
 <script>
 

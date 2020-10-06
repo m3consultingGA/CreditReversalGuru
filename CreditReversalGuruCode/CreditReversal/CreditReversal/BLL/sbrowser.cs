@@ -354,6 +354,7 @@ namespace CreditReversal.BLL
                 {
                     for (int i = 0; i < eqParsed.Count; i++)
                     {
+
                         monthlyPayStatusEQItem = new MonthlyPayStatus();
                         monthlyPayStatusEQItem.Agency = eqParsed[i].atbureau;
                         monthlyPayStatusEQItem.Bank = eqParsed[i].atcreditorName;
@@ -509,6 +510,9 @@ namespace CreditReversal.BLL
                             }
                         }
                         monthlyPayStatusEX.Add(monthlyPayStatusEXItem);
+
+                        
+
 
                     }
                 }

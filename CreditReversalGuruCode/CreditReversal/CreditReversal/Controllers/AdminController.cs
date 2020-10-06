@@ -35,8 +35,9 @@ namespace CreditReversal.Controllers
         public ActionResult Index()
         {
             try
-            {
+            {                
                 ViewBag.Dasboard = objSData.getDasboard();
+
             }
             catch (Exception ex) { ex.insertTrace(""); }
 
@@ -635,6 +636,51 @@ namespace CreditReversal.Controllers
 
             return View();
         }
+        #endregion
+
+        #region View Challenges
+        public ActionResult GetChallengesByClientId(string ClientId = "")
+        {
+            try
+            {
+                List<CreditReportFiles> creditreport = new List<CreditReportFiles>();
+                List<CreditReportFiles> creditreportAH = new List<CreditReportFiles>();
+                string manualFiles = "";
+                if (Request.QueryString["agent"] != null&& Request.QueryString["name"] != null)
+                {
+                    ViewBag.agent = Request.QueryString["agent"].ToString();
+                    ViewBag.PrimaryUser =  Request.QueryString["name"].ToString ();
+                }
+
+
+                if (ClientId != "")
+                {
+                      AgentFunction agentfunction = new AgentFunction();
+                     creditreport = agentfunction.GetChallenges(ClientId);
+                    creditreportAH = creditreport.Where(x => x.mode == "Account-").ToList();
+                    ViewBag.creditreportfile = creditreport;
+
+
+
+                    creditreportAH = creditreportAH.Where(x => x.isManual == 1 && x.isMoved == 0).ToList();
+                    if (creditreportAH.Count > 0)
+                    {
+                        for (int i = 0; i < creditreportAH.Count; i++)
+                        {
+                            manualFiles = manualFiles + "^" + creditreportAH[i].CRFilename;
+                        }
+                        manualFiles = manualFiles.TrimStart('^'); manualFiles = manualFiles.TrimEnd('^');
+                        ViewBag.ManualChallenges = manualFiles;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            return View();
+        }
+
         #endregion
     }
 }

@@ -1,27 +1,27 @@
-﻿
-@{
-    ViewBag.Title = "Challenges";
+﻿@{
+    ViewBag.Title = "GetChallengesByClientId";
     Layout = "~/Views/Shared/_secureLayoutPage.cshtml";
-
-    //string dispPrint =  "hidden";
     string dispPrint = "";
 }
-
-<title>Challenges</title>
-
-<div class="page-header">
-    @*<h3 class="page-title">Letter </h3>*@
+<div class="page-header">   
     <ol class="breadcrumb pull-right">
-        <li><a href="@ViewBag.Dasboard"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
-        <li active">Challenges </li>
+        <li><a href="/Dashboard/Admin"><i class="fa fa-dashboard"></i>&nbsp;Dashboard</a></li>
+        @if (@ViewBag.agent != null)
+        {
+            <li><a href="/Dashboard/AgentClients?agent=@ViewBag.agent&name=@ViewBag.PrimaryUser">&nbsp;Clients</a></li>
+        }
+
+        <li class="active">&nbsp;View Challenges</li>
+
     </ol>
 </div>
+
 
 <div style="padding-top:20px;">
     <div class="portlet portlet-boxed">
         <div class="portlet-header">
             <h4 class="portlet-title">
-                Challenges
+                View Challenges
             </h4>
 
 
@@ -29,22 +29,20 @@
         <div class="portlet-body">
             <div class="row" style="padding:20px 10px 10px 20px;">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="padding-bottom:10px;">
                         @if (ViewBag.creditreportfile != null && ViewBag.creditreportfile.Count > 0)
                         {
                             <strong> Client: @ViewBag.creditreportfile[0].ClientName</strong>
                         }
 
                     </div>
-                </div>
-                <br />
-                <h2>Account History</h2>
+                </div>                
+               
                 <div class="row m-2 p-2">
                     <div class="table-responsive">
                         <table id="tblChallenge" class="table table-bordered">
                             <thead>
-                                <tr class="trTable">
-                                    @*<th>Client </th>*@
+                                <tr class="trTable">                                 
                                     <th>Round Type</th>
                                     <th>File Name</th>
                                     <th @dispPrint>Actions</th>
@@ -80,9 +78,9 @@
                                                 {
                                                     <a href="~/documents/Challenge/@path" target="_blank" class="btn btn-danger btn-xs"> Print</a>
                                                     @*if (item.isMoved == 0)
-                                            {
-                                                <a id="btnCRG" onclick="crgPrint('@path');" class="btn btn-danger btn-xs"> CRG Printing</a>
-                                            }*@
+                                                        {
+                                                            <a id="btnCRG" onclick="crgPrint('@path');" class="btn btn-danger btn-xs"> CRG Printing</a>
+                                                        }*@
                                                 }
 
 
@@ -117,28 +115,3 @@
         </div>
     </div>
 </div>
-<script>
-    function crgPrint(file) {
-        $.ajax({
-            method: "POST",
-            url: "/Client/ChallengeInfo",
-            dataType: "json",
-            data: { strFiles: file },
-            success: function (data) {
-                debugger;
-                if (data == "1") {
-                    $(".loader1").hide();
-                    $("#overlay").hide();
-                    Swal.fire({
-                        title: "Success!",
-                        text: "Used CRG printing successfully.",
-                        type: 'success',
-                    }).then(function () {
-                        //  window.location.href = "/dashboard/agent";
-                        location.reload();
-                    })
-                }
-            }
-        });
-    }
-</script>

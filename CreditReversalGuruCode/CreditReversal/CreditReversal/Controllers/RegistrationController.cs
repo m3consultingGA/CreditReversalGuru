@@ -8,6 +8,8 @@ using CreditReversal.BLL;
 using CreditReversal.Utilities;
 using System.IO;
 using System.Net;
+using System.Collections;
+using System.Data;
 
 namespace CreditReversal.Controllers
 {
@@ -102,7 +104,26 @@ namespace CreditReversal.Controllers
                 }
                 else
                 {
-                    pay = Payment(agent);
+                    Common common = new Common();
+                    DataTable dt = common.getSettings();
+                    if(dt.Rows.Count > 0)
+                    {
+                        bool isPaypal = Convert.ToBoolean(dt.Rows[0]["isPaypal"].ToString());
+                        if(isPaypal)
+                        {
+                            pay = PayPalPayment(agent);
+                        }
+                        else
+                        {
+                            pay = Payment(agent);
+                        }
+                        
+                    }
+                    else
+                    {
+                        pay = "Invalid Payment Setup.";
+                    }
+                    
                 }
 
                 if (pay == "Success")
@@ -190,6 +211,124 @@ namespace CreditReversal.Controllers
             }
             return Json(status);
         }
+        //PayPalPayment
+        public string PayPalPayment(Agent agent)
+        {
+            try
+            {
+                //var response = AuthPayment.Pay(500);
+                AuthorizeDotNetModel parentModel = new AuthorizeDotNetModel();
+                CreditCardDetailsModel creditCardDetails = new CreditCardDetailsModel();
+                creditCardDetails.CardNumber = agent.CardNumber;
+
+                //   string r = agent.CardNumber;
+                string expdate = agent.Month +  agent.ExpiryDate;
+                creditCardDetails.ExpDate = expdate;
+                //creditCardDetails.ExpiryMonth = agent.Month;
+                creditCardDetails.CardCode = agent.CVV;
+                creditCardDetails.CardType = agent.CardType;
+                parentModel.creditCardDetails = creditCardDetails;
+
+                CustomerBillingInfoModel customerBillingInfo = new CustomerBillingInfoModel();
+                customerBillingInfo.FirstName = agent.FirstName;
+                customerBillingInfo.LastName = agent.LastName;
+                customerBillingInfo.Address = agent.PrimaryBusinessAdd1;
+                customerBillingInfo.City = agent.PrimaryBusinessCity;
+                customerBillingInfo.ZipCode = agent.PrimaryBusinessZip;
+                //customerBillingInfo.Country = agent.b
+                customerBillingInfo.State = agent.PrimaryBusinessState;
+                customerBillingInfo.CompanyName = agent.CompanyType;
+                customerBillingInfo.EmailAddress = agent.PrimaryBusinessEmail;
+                customerBillingInfo.PhoneNumber = agent.PrimaryBusinessPhone;
+                customerBillingInfo.Fax = agent.FedTaxIdentityNo;
+                parentModel.customerBillingInfo = customerBillingInfo;
+
+                List<LineItemsModel> lineItems = new List<LineItemsModel>();
+                LineItemsModel customerLineItems = new LineItemsModel();
+                customerLineItems.Item = "1";
+                customerLineItems.ItemName = "CreditReversal";
+                customerLineItems.Description = "CreditReversalGuru";
+                customerLineItems.Quantity = Convert.ToInt32(1);
+                //string price = functions.GetPricingById(agent.PricingPlan);
+                //double plan = Convert.ToDouble(price);
+                //customerLineItems.Unitprice = Convert.ToDouble(price);
+
+                string price = functions.GetPricingById(agent.PricingPlan);
+                string[] strtemp = price.Split('$');
+                string pricedouble = strtemp[1];
+                double plan = Convert.ToDouble(pricedouble);
+
+                lineItems.Add(customerLineItems);
+                parentModel.customerLineItems = lineItems;
+
+                CustomerOrderInformationModel customerOrderInfo = new CustomerOrderInformationModel();
+                customerOrderInfo.InVoice = "";
+                customerOrderInfo.Description = "";
+                parentModel.customerOrderInfo = customerOrderInfo;
+
+                CustomerShippingInformationModel customerShippingInfo = new CustomerShippingInformationModel();
+                customerShippingInfo.FirstName = agent.FirstName;
+                customerShippingInfo.LastName = agent.LastName;
+                customerShippingInfo.Address = agent.PrimaryBusinessAdd1;
+                customerShippingInfo.City = agent.PrimaryBusinessCity;
+                customerShippingInfo.ZipCode = agent.PrimaryBusinessZip;
+                //customerShippingInfo.Country = "";
+                customerShippingInfo.State = agent.PrimaryBusinessState;
+                customerShippingInfo.CompanyName = agent.CompanyType;
+                parentModel.customerShippingInfo = customerShippingInfo;
+
+                string ipaddress = GetIpAddress();
+                PayPalPayment paypal = new PayPalPayment();
+                Hashtable htResponse = paypal.Payment(new Decimal(plan), parentModel, ipaddress);
+                if(htResponse != null)
+                {
+                    AgentBillingTransactions agentBillingTransactions = new AgentBillingTransactions();
+                    agentBillingTransactions.IPAddress = ipaddress;
+                    agentBillingTransactions.AgentId = agent.AgentId;
+
+                    string strAck = htResponse["ACK"].ToString();
+                    if (strAck == "Success" || strAck == "SuccessWithWarning")
+                    {
+                        ViewBag.Msg = "Success";
+                        string strAmt = htResponse["AMT"].ToString();
+                        string strCcy = htResponse["CURRENCYCODE"].ToString();
+                        string strSuccess = "Thank you, your order for: $" + strAmt + " " + strCcy + " has been processed.";
+
+                        agentBillingTransactions.TransactionId = htResponse["TRANSACTIONID"].ToString();
+                       // agentBillingTransactions.ResponseCode = response.ResponseCode;
+                        //agentBillingTransactions.MessageCode = response.MessageCode;
+                        //agentBillingTransactions.Description = response.Description;
+                        //agentBillingTransactions.AuthorizeCode = response.AuthorizeCode;
+                        agentBillingTransactions.Status = "SUCCESS";
+                    }
+                    else
+                    {
+                        string Error =  htResponse["L_LONGMESSAGE0"].ToString().Replace("%20", " ").ToUpper();
+                        Error = Error.Replace("%2E", ". ");
+                        string ErrorCode = "Error code: " + htResponse["L_ERRORCODE0"].ToString();
+                        ViewBag.Msg = "PAYMENT WAS DECLINED:  " + Error;
+                        agentBillingTransactions.ErrorCode = htResponse["L_ERRORCODE0"].ToString();
+                        agentBillingTransactions.ErrorMessage = Error;
+                        agentBillingTransactions.Status = "FAILURE";
+                    }
+                    functions.AddAgentBillingTransactions(agentBillingTransactions);
+
+
+                }
+                else
+                {
+                    ViewBag.Msg = "Technical/Server issue.";
+                }
+                return ViewBag.Msg;
+            }
+            catch (Exception e)
+            {
+                e.insertTrace("");
+            }
+            return "";
+        }
+
+        //Auth Payment
         public string Payment(Agent agent)
         {
             try
@@ -343,7 +482,7 @@ namespace CreditReversal.Controllers
             {
                 e.insertTrace("");
             }
-            return"";
+            return "";
         }
         public string GetIpAddress()
         {

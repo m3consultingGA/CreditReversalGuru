@@ -432,9 +432,11 @@ namespace CreditReversal.BLL
             Headings.Add("LoanStatus"); //8
             Headings.Add("PastDueDays"); //9
             Headings.Add("Payment Status"); //10
-            Headings.Add("Challenge"); //11
-            Headings.Add("CreditreportId"); //12
-            Headings.Add("Negativeitems"); //13
+            Headings.Add("Comments"); //11
+            Headings.Add("Challenge"); //12
+            Headings.Add("CreditreportId"); //13
+            //Headings.Add("Negativeitems"); //13
+            
             //Headings.Add("Negativeitems");
             return Headings;
         }
@@ -891,7 +893,7 @@ namespace CreditReversal.BLL
             {
                 for (int i = 0; i < credit.Count; i++)
                 {
-                    sql = "select cr.MerchantName,cr.AccountId,cr.OpenDate,cr.HighestBalance,cr.CurrentBalance,cr.MonthlyPayment,cr.LastReported,crc.RoundType, ";
+                    sql = "select top 1 cr.MerchantName,cr.AccountId,cr.OpenDate,cr.HighestBalance,cr.CurrentBalance,cr.MonthlyPayment,cr.LastReported,crc.RoundType, ";
                     sql += "cr.Agency,crc.ChallengeText,cr.Status,cr.CredRepItemsId,cr.AccountTypeDetails from "
                         + " CreditReportItemChallenges as crc inner join CreditReportItems as cr on crc.CredRepItemsId = cr.CredRepItemsId ";
                     sql += "inner join CreditReport as c on c.CreditReportId = cr.CredReportId ";
@@ -1041,14 +1043,18 @@ namespace CreditReversal.BLL
 
             List<CreditItems> CreditItems = new List<CreditItems>();
             string sql = "";
-            DataTable dt;
-            DataTable dt1;
+            DataTable dt = new DataTable();
+            DataTable dt1 = new DataTable();
             try
             {
                 ClientData clientData = new ClientData();
                DataSet ds= clientdata.GetCreditReportItems(id.ToString(), role);
-                dt = ds.Tables[0];
-                dt1 = ds.Tables[1];
+                if(ds.Tables.Count > 0)
+                {
+                    dt = ds.Tables[0];
+                    dt1 = ds.Tables[1];
+
+                }
 
                 List<AccountHistory> acHistory = new List<AccountHistory>();
                 List<AccountHistory> achquifax = new List<AccountHistory>();
@@ -1106,6 +1112,7 @@ namespace CreditReversal.BLL
                             ah.ArgumentName = strTRANS1[14];
                             ah.LoanStatus = "";
                             ah.PastDueDays = "";
+                            ah.AccountComments = strTRANS1[16];
                             achtransunion.Add(ah);
 
                         }
@@ -1147,6 +1154,7 @@ namespace CreditReversal.BLL
                             ah.PastDueDays = "";
                             ah.TradeLineName = strEQUIFAX1[15];
                             ah.ArgumentName = strEQUIFAX1[14];
+                            ah.AccountComments = strEQUIFAX1[16];
                             achquifax.Add(ah);
 
                         }
@@ -1189,6 +1197,7 @@ namespace CreditReversal.BLL
                             ah.PastDueDays = "";
                             ah.TradeLineName = strEXPERIAN1[15];
                             ah.ArgumentName = strEXPERIAN1[14];
+                            ah.AccountComments = strEXPERIAN1[16];
                             achexperian.Add(ah);
                         }
                     }
@@ -1207,7 +1216,7 @@ namespace CreditReversal.BLL
 
                     string TradeLineName = dt1.Rows[x]["TradeLineName"].ToString();
 
-                    for (int i = 0; i < 14; i++)
+                    for (int i = 0; i < 15; i++)
                         {
 
                             CreditItems CreditItem = new CreditItems();
@@ -1607,39 +1616,39 @@ namespace CreditReversal.BLL
                                     CreditItem.EXPERIAN = "-";
                                 }
                             }
-                            if (CreditItem.Heading == "Negativeitems")
-                            {
+                            //if (CreditItem.Heading == "Negativeitems")
+                            //{
 
                                
-                                if (equifax != null)
-                                {
-                                    CreditItem.EQUIFAX = equifax.PastDue;
-                                }
-                                else
-                                {
-                                    CreditItem.EQUIFAX = "-";
-                                }
+                            //    if (equifax != null)
+                            //    {
+                            //        CreditItem.EQUIFAX = equifax.PastDue;
+                            //    }
+                            //    else
+                            //    {
+                            //        CreditItem.EQUIFAX = "-";
+                            //    }
 
                               
-                                if (transunio != null)
-                                {
-                                    CreditItem.TRANSUNION = transunio.PastDue;
-                                }
-                                else
-                                {
-                                    CreditItem.TRANSUNION = "-";
-                                }
+                            //    if (transunio != null)
+                            //    {
+                            //        CreditItem.TRANSUNION = transunio.PastDue;
+                            //    }
+                            //    else
+                            //    {
+                            //        CreditItem.TRANSUNION = "-";
+                            //    }
 
                                
-                                if (experian != null)
-                                {
-                                    CreditItem.EXPERIAN = experian.PastDue;
-                                }
-                                else
-                                {
-                                    CreditItem.EXPERIAN = "-";
-                                }
-                            }
+                            //    if (experian != null)
+                            //    {
+                            //        CreditItem.EXPERIAN = experian.PastDue;
+                            //    }
+                            //    else
+                            //    {
+                            //        CreditItem.EXPERIAN = "-";
+                            //    }
+                            //}
                             if (CreditItem.Heading == "LoanStatus" || CreditItem.Heading == "PastDueDays")
                             {
                                
@@ -1701,7 +1710,40 @@ namespace CreditReversal.BLL
 
 
                             }
-                            if (CreditItem.EXPERIAN == "-" && CreditItem.TRANSUNION == "-" && CreditItem.EQUIFAX == "-")
+                        if (CreditItem.Heading == "Comments")
+                        {
+
+
+                            if (equifax != null)
+                            {
+                                CreditItem.EQUIFAX = equifax.AccountComments;
+                            }
+                            else
+                            {
+                                CreditItem.EQUIFAX = "-";
+                            }
+
+
+                            if (transunio != null)
+                            {
+                                CreditItem.TRANSUNION = transunio.AccountComments;
+                            }
+                            else
+                            {
+                                CreditItem.TRANSUNION = "-";
+                            }
+
+
+                            if (experian != null)
+                            {
+                                CreditItem.EXPERIAN = experian.AccountComments;
+                            }
+                            else
+                            {
+                                CreditItem.EXPERIAN = "-";
+                            }
+                        }
+                        if (CreditItem.EXPERIAN == "-" && CreditItem.TRANSUNION == "-" && CreditItem.EQUIFAX == "-")
                             {
 
                             }
@@ -1721,14 +1763,18 @@ namespace CreditReversal.BLL
 
             List<PublicRecord> publicRecords = new List<PublicRecord>();
             string sql = "";
-            DataTable dt;
-            DataTable dt1;
+            DataTable dt = new DataTable();
+            DataTable dt1 = new DataTable();
             try
             {
                 ClientData clientData = new ClientData();
                 DataSet ds = clientdata.GetCreditReportPublicRecords(id.ToString(), role);
-                dt = ds.Tables[0];
-                dt1 = ds.Tables[1];
+                if(ds.Tables.Count > 0)
+                {
+                    dt = ds.Tables[0];
+                    dt1 = ds.Tables[1];
+                }
+                
                 for (int r = 0; r < dt.Rows.Count; r++)
                 {
 
@@ -2666,15 +2712,19 @@ namespace CreditReversal.BLL
 
             List<Inquires> Inquires = new List<Inquires>();
             string sql = "";
-            DataTable dt;
-            DataTable dt1;
+            DataTable dt =new DataTable();
+            DataTable dt1 = new DataTable();
             try
             {
 
                 ClientData clientData = new ClientData();
                 DataSet ds = clientdata.GetCreditReportInquires(id.ToString(), role);
-                dt = ds.Tables[0];
-                dt1 = ds.Tables[1];
+                if(ds.Tables.Count > 0)
+                {
+                    dt = ds.Tables[0];
+                    dt1 = ds.Tables[1];
+                }
+                
                 List<Inquires> inqquifax = new List<Inquires>();
                 List<Inquires> inqexperian = new List<Inquires>();
                 List<Inquires> inqtransunion = new List<Inquires>();
@@ -3685,7 +3735,7 @@ namespace CreditReversal.BLL
             {
                 for (int i = 0; i < credit.Count; i++)
                 {
-                    sql = "select ci.CreditorName,ci.TypeOfBusiness,ci.DateOfInquiry,ci.Agency,crc.RoundType, ";
+                    sql = "select top 1 ci.CreditorName,ci.TypeOfBusiness,ci.DateOfInquiry,ci.Agency,crc.RoundType, ";
                     sql += "crc.ChallengeText from CreditReportItemChallenges as crc inner join CreditInquiries as ci on crc.CreditInqId = ci.CreditInqId ";
                     sql += "inner join CreditReport as c on c.CreditReportId = ci.CreditReportId ";
                     sql += "where c.ClientId = '" + id + "' and crc.sno=(select max(sno) from CreditReportItemChallenges where CreditInqId=crc.CreditInqId) and crc.CreditInqId ='" + credit[i].CreditInqId + "'";
@@ -3722,7 +3772,7 @@ namespace CreditReversal.BLL
             {
                 for (int i = 0; i < credit.Count; i++)
                 {
-                    sql = "select ci.CreditorName,ci.TypeOfPR,ci.DateOfPR,ci.Agency,crc.RoundType, ci.PublicRecordId, ";
+                    sql = "select top 1 ci.CreditorName,ci.TypeOfPR,ci.DateOfPR,ci.Agency,crc.RoundType, ci.PublicRecordId, ";
                     sql += "crc.ChallengeText from CreditReportItemChallenges as crc inner join publicrecords as ci on crc.PublicRecordId = ci.PublicRecordId ";
                     sql += "inner join CreditReport as c on c.CreditReportId = ci.CreditReportId ";
                     sql += "where c.ClientId = '" + id + "' and crc.sno=(select max(sno) from CreditReportItemChallenges"

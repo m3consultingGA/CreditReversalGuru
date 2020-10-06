@@ -1043,7 +1043,7 @@ stringWriter
                     ClientData cd = new ClientData();
                     if (credit != null)
                     {
-                        sno = cd.getsnofromitems(Id.ToString(), credit[0].RoundType, "AH");
+                        sno = cd.getsnofromitems(Id.ToString(), "AH");
                         for (i = 0; i < count; i++)
                         {
                             cfunction.AddReportItemChallenges(credit[i], sno, Id, clientModel.isPrevItemInLastYear);
@@ -1434,7 +1434,7 @@ stringWriter
 
                 if (credit != null)
                 {
-                    sno = cd.getsnofromitems(Id.ToString(), credit[0].RoundType, "PR");
+                    sno = cd.getsnofromitems(Id.ToString(), "PR");
                     for (i = 0; i < count; i++)
                     {
                         cfunction.AddReportItemPRChallenges(credit[i], "", sno, Id);
@@ -1567,7 +1567,7 @@ stringWriter
 
                 if (credit != null)
                 {
-                    sno = cd.getsnofromitems(Id.ToString(), credit[0].RoundType, "INQ");
+                    sno = cd.getsnofromitems(Id.ToString(),  "INQ");
                     for (i = 0; i < count; i++)
                     {
                         cfunction.AddReportItemInquiriesChallenges(credit[i], "", sno, Id);

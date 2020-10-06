@@ -400,21 +400,22 @@ namespace CreditReversal.DAL
             catch (Exception ex) { ex.insertTrace(""); }
             return status;
         }
-
-        public ClientModel GetClientsByAgent(string agentid)
+        public List<ClientModel> GetClientsByAgent(string agentid)
         {
-            ClientModel res = new ClientModel();
+            List<ClientModel> clients = new List<ClientModel>(); ClientModel res = new ClientModel();
             try
             {
-                string sql = "SELECT c.FirstName,c.MiddleName,c.LastName,Convert(varchar(15),c.DOB,101)as DOB,c.Address1,"
+                string sql = "SELECT c.ClientId,c.FirstName,c.MiddleName,c.LastName,Convert(varchar(15),c.DOB,101)as DOB,c.Address1,"
                     + " c.Address2,c.City,c.State,c.ZipCode,c.SSN,c.CurrentEmail,c.CurrentPhone,c.DrivingLicense,c.SocialSecCard,"
                     + " c.ProofOfCard,i.Question,i.Answer,i.UserName as uname,i.Password as passwd,c.AgentId,c.AgentStaffId,c.isPrevItemInLastYear FROM Client c "
-                   + " Left Join IdentityIqInformation i ON c.ClientId=i.ClientId "
-                   + "WHERE c.AgentId=" + agentid;
+                    + " Left Join IdentityIqInformation i ON c.ClientId=i.ClientId "
+                    + " WHERE c.AgentId=" + agentid;
                 DataTable dt = utils.GetDataTable(sql, true);
-                if (dt.Rows.Count > 0)
+                for(int i=0; i< dt.Rows.Count; i++)
                 {
-                    DataRow row = dt.Rows[0];
+                    res = new ClientModel();
+                    DataRow row = dt.Rows[i];
+                    res.ClientId = row["ClientId"].ConvertObjectToIntIfNotNull();
                     res.FirstName = string.IsNullOrEmpty(row["FirstName"].ConvertObjectToStringIfNotNull()) ? "" : row["FirstName"].ConvertObjectToStringIfNotNull();
                     res.MiddleName = string.IsNullOrEmpty(row["MiddleName"].ConvertObjectToStringIfNotNull()) ? "" : row["MiddleName"].ConvertObjectToStringIfNotNull();
                     res.LastName = row["LastName"].ConvertObjectToStringIfNotNull();
@@ -444,14 +445,66 @@ namespace CreditReversal.DAL
                     res.AgentId = row["AgentId"].ConvertObjectToIntIfNotNull();
                     res.AgentStaffId = row["AgentStaffId"].ConvertObjectToIntIfNotNull();
                     res.isPrevItemInLastYear = row["isPrevItemInLastYear"].ConvertObjectToStringIfNotNull();
+                    clients.Add(res);
                 }
             }
             catch (Exception ex)
             {
                 ex.insertTrace("");
             }
-            return res;
+            return clients;
         }
+        //public ClientModel GetClientsByAgent(string agentid)
+        //{
+        //    ClientModel res = new ClientModel();
+        //    try
+        //    {
+        //        string sql = "SELECT c.FirstName,c.MiddleName,c.LastName,Convert(varchar(15),c.DOB,101)as DOB,c.Address1,"
+        //            + " c.Address2,c.City,c.State,c.ZipCode,c.SSN,c.CurrentEmail,c.CurrentPhone,c.DrivingLicense,c.SocialSecCard,"
+        //            + " c.ProofOfCard,i.Question,i.Answer,i.UserName as uname,i.Password as passwd,c.AgentId,c.AgentStaffId,c.isPrevItemInLastYear FROM Client c "
+        //           + " Left Join IdentityIqInformation i ON c.ClientId=i.ClientId "
+        //           + "WHERE c.AgentId=" + agentid;
+        //        DataTable dt = utils.GetDataTable(sql, true);
+        //        if (dt.Rows.Count > 0)
+        //        {
+        //            DataRow row = dt.Rows[0];
+        //            res.FirstName = string.IsNullOrEmpty(row["FirstName"].ConvertObjectToStringIfNotNull()) ? "" : row["FirstName"].ConvertObjectToStringIfNotNull();
+        //            res.MiddleName = string.IsNullOrEmpty(row["MiddleName"].ConvertObjectToStringIfNotNull()) ? "" : row["MiddleName"].ConvertObjectToStringIfNotNull();
+        //            res.LastName = row["LastName"].ConvertObjectToStringIfNotNull();
+        //            res.FullName = res.FirstName + " " + res.LastName;
+        //            res.DOB = row["DOB"].ConvertObjectToStringIfNotNull();
+
+
+
+        //            res.Address1 = row["Address1"].ConvertObjectToStringIfNotNull();
+        //            res.Address2 = row["Address2"].ConvertObjectToStringIfNotNull();
+        //            res.City = row["City"].ConvertObjectToStringIfNotNull();
+        //            res.State = row["State"].ConvertObjectToStringIfNotNull();
+        //            res.ZipCode = row["ZipCode"].ConvertObjectToStringIfNotNull();
+
+
+
+        //            res.SSN = common.Decrypt(row["SSN"].ConvertObjectToStringIfNotNull());
+        //            res.CurrentEmail = row["CurrentEmail"].ConvertObjectToStringIfNotNull();
+        //            res.CurrentPhone = row["CurrentPhone"].ConvertObjectToStringIfNotNull();
+        //            res.sDrivingLicense = row["DrivingLicense"].ConvertObjectToStringIfNotNull();
+        //            res.sSocialSecCard = row["SocialSecCard"].ConvertObjectToStringIfNotNull();
+        //            res.sProofOfCard = row["ProofOfCard"].ConvertObjectToStringIfNotNull();
+        //            res.IdQuestion = row["Question"].ConvertObjectToStringIfNotNull();
+        //            res.IdAnswer = row["Answer"].ConvertObjectToStringIfNotNull();
+        //            res.IdUserName = row["uname"].ConvertObjectToStringIfNotNull();
+        //            res.IdPassword = common.Decrypt(row["passwd"].ConvertObjectToStringIfNotNull());
+        //            res.AgentId = row["AgentId"].ConvertObjectToIntIfNotNull();
+        //            res.AgentStaffId = row["AgentStaffId"].ConvertObjectToIntIfNotNull();
+        //            res.isPrevItemInLastYear = row["isPrevItemInLastYear"].ConvertObjectToStringIfNotNull();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ex.insertTrace("");
+        //    }
+        //    return res;
+        //}
         public ClientModel GetClient(string ClientId)
         {
             ClientModel res = new ClientModel();
@@ -679,7 +732,7 @@ namespace CreditReversal.DAL
             { }
             return sno;
         }
-        public int getsnofromitems(string id, string round, string type)
+        public int getsnofromitems(string id, string type)
         {
             int sno = 0;
             try
@@ -1207,7 +1260,7 @@ namespace CreditReversal.DAL
                 Getroud[0] = roundtype;
                 Getroud[1] = date;
             }
-            catch (Exception ex) { ex.insertTrace(""); }
+            catch (Exception ex) {  }
 
             return Getroud;
         }

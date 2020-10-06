@@ -187,19 +187,22 @@ namespace CreditReversal.BLL
             try
             {
                 string ChallengeText = credit.Challenge;
-                string sql = "Select ChallengeText from ChallengeMaster where ChallengeText = '" + ChallengeText + "'";
-                dataTable = utilities.GetDataTable(sql, true);
-                if (dataTable.Rows.Count == 0)
+                if (!string.IsNullOrEmpty(ChallengeText))
                 {
-                    string query = "insert into AgentGenChallenges(AgentId,StaffId,ChallengeLevel,ChallengeText,CreatedDate,Status) values(@AgentId,@StaffId,@ChallengeLevel,@ChallengeText,GetDate(),@Status)";
-                    SqlCommand command = new SqlCommand();
-                    command.CommandText = query;
-                    command.Parameters.AddWithValue("@StaffId", string.IsNullOrEmpty(staffId) ? "" : staffId);
-                    command.Parameters.AddWithValue("@AgentId", string.IsNullOrEmpty(AgentId) ? "" : AgentId);
-                    command.Parameters.AddWithValue("@ChallengeLevel", 1);
-                    command.Parameters.AddWithValue("@ChallengeText", ChallengeText);
-                    command.Parameters.AddWithValue("@Status", 1);
-                    res = utilities.ExecuteInsertCommand(command, true);
+                    string sql = "Select ChallengeText from ChallengeMaster where ChallengeText = '" + ChallengeText + "'";
+                    dataTable = utilities.GetDataTable(sql, true);
+                    if (dataTable.Rows.Count == 0)
+                    {
+                        string query = "insert into AgentGenChallenges(AgentId,StaffId,ChallengeLevel,ChallengeText,CreatedDate,Status) values(@AgentId,@StaffId,@ChallengeLevel,@ChallengeText,GetDate(),@Status)";
+                        SqlCommand command = new SqlCommand();
+                        command.CommandText = query;
+                        command.Parameters.AddWithValue("@StaffId", string.IsNullOrEmpty(staffId) ? "" : staffId);
+                        command.Parameters.AddWithValue("@AgentId", string.IsNullOrEmpty(AgentId) ? "" : AgentId);
+                        command.Parameters.AddWithValue("@ChallengeLevel", 1);
+                        command.Parameters.AddWithValue("@ChallengeText", string.IsNullOrEmpty(ChallengeText) ? "" : ChallengeText);
+                        command.Parameters.AddWithValue("@Status", 1);
+                        res = utilities.ExecuteInsertCommand(command, true);
+                    }
                 }
             }
             catch (Exception ex) { /*ex.insertTrace("");*/ }

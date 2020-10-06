@@ -977,9 +977,9 @@
                                                                     {
 
                                                                         string year = item.ToString();
-                                                                        year = year.Substring(2, 2);
+                                                                        string subyear = year.Substring(2, 2);
 
-                                                                        if (year == Model.ExpiryDate)
+                                                                        if (subyear == Model.ExpiryDate || year == Model.ExpiryDate)
                                                                         {
                                                                             <option value="@year" selected>@item</option>
                                                                         }

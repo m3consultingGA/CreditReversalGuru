@@ -568,10 +568,14 @@ namespace CreditReversal.DAL
                 }
                 else
                 {
-                    sql = "Select Count(*) as itemscount from CreditReportItemChallenges cri, CreditReportItems cr,  "
-                    + " CreditReport c,ChallengeMaster b where cr.CredRepItemsId = cri.CredRepItemsId and "
-                    + " c.CreditReportId = cr.CredReportId and convert(varchar, cri.ChallengeText) = convert(varchar, b.ChallengeText) "
-                    + " and c.ClientId =" + clientid + " and cri.RoundType ='" + round + "' and cri.Agency ='" + agency + "' ";
+                    //sql = "Select Count(*) as itemscount from CreditReportItemChallenges cri, CreditReportItems cr,  "
+                    //+ " CreditReport c,ChallengeMaster b where cr.CredRepItemsId = cri.CredRepItemsId and "
+                    //+ " c.CreditReportId = cr.CredReportId and convert(varchar, cri.ChallengeText) = convert(varchar, b.ChallengeText) "
+                    //+ " and c.ClientId =" + clientid + " and cri.RoundType ='" + round + "' and cri.Agency ='" + agency + "' ";
+
+                    sql = "Select Count(*) as itemscount from CreditReportItemChallenges cri,   "
+                    + " ChallengeMaster b where  convert(varchar, cri.ChallengeText) = convert(varchar, b.ChallengeText) "
+                    + " and cri.ClientId =" + clientid + " and cri.RoundType ='" + round + "' and cri.Agency ='" + agency + "' ";
                 }
                 long val = long.Parse(utills.ExecuteScalar(sql, true).ToString());
                 if (val > 0)
